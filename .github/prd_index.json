@@ -1,0 +1,106 @@
+{
+  "manifest_version": 1,
+  "generated": "2026-04-02",
+  "files": [
+    {
+      "path": ".github/PRD.md",
+      "role": "product_requirements",
+      "primary_action": "read_for_goals",
+      "priority": "high"
+    },
+    {
+      "path": ".github/AGENT_INDEX.md",
+      "role": "human_agent_index",
+      "primary_action": "map_tasks",
+      "priority": "high"
+    },
+    {
+      "path": ".github/skills/agent-customization/SKILL.md",
+      "role": "agent_workflow",
+      "primary_action": "load_before_modifications",
+      "priority": "medium"
+    },
+    {
+      "path": ".github/references/README.md",
+      "role": "reference_index",
+      "primary_action": "choose_topic_docs",
+      "priority": "high"
+    },
+    {
+      "path": ".github/references/game-mechanics.md",
+      "role": "game_rules",
+      "primary_action": "implement_move_logic",
+      "priority": "high"
+    },
+    {
+      "path": ".github/references/level-generator.md",
+      "role": "generation_design",
+      "primary_action": "implement_seeded_generator",
+      "priority": "high"
+    },
+    {
+      "path": ".github/references/palettes.md",
+      "role": "visual_palette_spec",
+      "primary_action": "implement_palette_support",
+      "priority": "medium"
+    },
+    {
+      "path": ".github/references/data-model.md",
+      "role": "data_contract",
+      "primary_action": "implement_state_types",
+      "priority": "high"
+    },
+    {
+      "path": ".github/references/persistence.md",
+      "role": "storage_spec",
+      "primary_action": "implement_local_storage",
+      "priority": "medium"
+    },
+    {
+      "path": ".github/references/testing.md",
+      "role": "test_plan",
+      "primary_action": "add_unit_and_integration_tests",
+      "priority": "high"
+    },
+    {
+      "path": ".github/references/ui-guidelines.md",
+      "role": "ui_spec",
+      "primary_action": "implement_mobile_ui",
+      "priority": "medium"
+    },
+    {
+      "path": ".github/references/tasks.md",
+      "role": "execution_checklist",
+      "primary_action": "track_delivery",
+      "priority": "high"
+    },
+    {
+      "path": ".github/agents/game-designer.agent.md",
+      "role": "agent_profile",
+      "primary_action": "design_work_mode",
+      "priority": "low"
+    },
+    {
+      "path": ".github/agents/web-frontend-react.agent.md",
+      "role": "agent_profile",
+      "primary_action": "frontend_work_mode",
+      "priority": "low"
+    },
+    {
+      "path": ".github/instructions/react-frontend.instructions.md",
+      "role": "coding_conventions",
+      "primary_action": "apply_frontend_rules",
+      "priority": "medium"
+    }
+  ],
+  "recommended_agent_workflow": [
+    "load .github/prd_index.json",
+    "open referenced files in order of priority",
+    "generate task list and update .github TODOs or repo issue tracker",
+    "create PRs for implemented tasks"
+  ],
+  "notes": [
+    "Issue and PR templates are optional; if absent, use .github/references/tasks.md and PRD acceptance criteria.",
+    "PRD is the source of truth when conflicts appear across documents."
+  ]
+}

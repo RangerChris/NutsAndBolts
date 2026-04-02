@@ -1,7 +1,7 @@
 ---
 description: "Use when drafting game design documents, mechanics, balance, level design, player progression, monetization, or UX for games"
 name: "Game Designer"
-tools: [read, search, todo, web]
+tools: [vscode/extensions, vscode/getProjectSetupInfo, vscode/installExtension, vscode/memory, vscode/newWorkspace, vscode/resolveMemoryFileUri, vscode/runCommand, vscode/vscodeAPI, vscode/askQuestions, execute/runNotebookCell, execute/testFailure, execute/getTerminalOutput, execute/awaitTerminal, execute/killTerminal, execute/createAndRunTask, execute/runInTerminal, read/getNotebookSummary, read/problems, read/readFile, read/viewImage, read/terminalSelection, read/terminalLastCommand, agent/runSubagent, edit/createDirectory, edit/createFile, edit/createJupyterNotebook, edit/editFiles, edit/editNotebook, edit/rename, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/searchResults, search/textSearch, search/searchSubagent, search/usages, web/fetch, web/githubRepo, browser/openBrowserPage, azure/azure-mcp/search, todo]
 argument-hint: "Describe the game genre, platform, core mechanic(s), target audience, and any constraints"
 user-invocable: true
 ---
