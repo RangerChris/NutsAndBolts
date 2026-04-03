@@ -124,10 +124,17 @@ export function addExtraBolt(state: GameState, boltId?: string, capacity?: numbe
 }
 
 export function isWin(state: GameState): boolean {
+  // Each non-empty bolt must contain only a single color, and any given
+  // color may appear on exactly one bolt (not spread across multiple bolts).
+  const seenColors = new Set<string>();
   for (const b of state.bolts) {
     if (b.nuts.length === 0) continue;
     const first = b.nuts[0];
+    // all nuts on the bolt must be the same color
     if (!b.nuts.every((n) => n === first)) return false;
+    // the color must not already appear on another bolt
+    if (seenColors.has(first)) return false;
+    seenColors.add(first);
   }
   return true;
 }

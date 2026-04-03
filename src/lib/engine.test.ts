@@ -119,6 +119,20 @@ describe('engine helpers', () => {
     expect(isWin(state)).toBe(false);
   });
 
+  it('isWin fails when same color exists on multiple bolts', () => {
+    const state: GameState = {
+      bolts: [
+        { id: 'a', capacity: 4, nuts: ['red', 'red'] },
+        { id: 'b', capacity: 4, nuts: ['red'] },
+      ],
+      extraBoltUsed: false,
+      level: 1,
+      difficulty: 'easy',
+      moveHistory: [],
+    };
+    expect(isWin(state)).toBe(false);
+  });
+
   it('validateState catches simple invariants', () => {
     const state: GameState = {
       bolts: [ { id: 'a', capacity: 1, nuts: ['x','y'] } ],
