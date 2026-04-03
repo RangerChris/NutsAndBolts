@@ -19,10 +19,10 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 1) Foundation and Tooling
 
-- [ ] Initialize and verify app baseline
-  - [ ] Ensure Vite + React + TypeScript app is set up and runs
-  - [ ] Enable strict TypeScript settings
-  - [ ] Add scripts: dev, build, test, test:watch
+- [x] Initialize and verify app baseline
+  - [x] Ensure Vite + React + TypeScript app is set up and runs
+  - [x] Enable strict TypeScript settings
+  - [x] Add scripts: dev, build, test, test:watch
 - [ ] Add baseline project structure
   - [ ] Create folders: src/app, src/components, src/features, src/game, src/lib, src/styles, src/test
   - [ ] Add index barrel files where useful
