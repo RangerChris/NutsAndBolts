@@ -90,8 +90,6 @@ Note: the number of distinct colors in a level matches the number of bolts for t
 
 ## Questions
 
-- Any preference for the four palettes (e.g., vibrant, pastel, dark, high-contrast colorblind)? If not, the sets above are fine.
-
 ## Reference Docs
 
 - [Reference index](.github/references/README.md)

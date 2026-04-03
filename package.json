@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest --run",
+    "test": "vitest --run src",
+    "test:e2e": "playwright test",
     "check:accessibility": "node scripts/check_palettes.cjs",
     "test:watch": "vitest --watch",
     "simulate": "node scripts/run-sim.js",
@@ -19,6 +20,7 @@
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.2",
+    "@playwright/test": "^1.36.0",
     "@types/node": "^20.4.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -36,6 +38,8 @@
     "vitest": "^4.1.2"
   },
   "vitest": {
-    "environment": "jsdom"
+    "environment": "jsdom",
+    "include": ["src/**/*.test.*", "src/**/*.spec.*"],
+    "exclude": ["e2e/**"]
   }
 }

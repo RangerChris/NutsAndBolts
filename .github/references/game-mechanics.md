@@ -2,42 +2,80 @@
 
 Summary
 
-- Single-player, turn-based grouping puzzle. Player moves contiguous same-colored nuts from the top of one bolt to another.
+- Single-player, deterministic, turn-based grouping puzzle. The player moves contiguous same-colored nuts from the top of one bolt to another.
 
-- Starting state: levels begin with the nuts scrambled across bolts (not solved). The player's objective is to move contiguous same-colored nuts so that each bolt (when non-empty) contains nuts of a single color that that bolt accepts.
+- Objective: starting from a scrambled board, rearrange nuts so that each non-empty bolt contains nuts of a single color.
 
 Board constraints
 
-- Bolts: 3–9 base columns per level, plus one player-created temporary extra bolt (max total 10). Each bolt has a fixed capacity (3–10 slots depending on level parameters).
-- Nuts: colored tokens. Each bolt in a solved state contains nuts of a single color.
-- Colors: number of distinct colors in a level equals the number of bolts in that level (the temporary extra bolt counts toward this total per PRD rules).
+- Bolts: levels use 3–9 base bolt columns. The player may add exactly one temporary extra bolt during play (single-use). Each bolt has a fixed capacity (commonly 3–10 slots depending on difficulty/level parameters).
+
+- Nuts: colored tokens stacked on bolts. A solved bolt contains nuts of a single color only.
+
+- Colors: the generator targets a number of distinct colors appropriate for the level. To support shuffle generation the generator may temporarily use additional columns (a transient extra bolt) during reverse-play shuffling, but the returned starting board does not include that transient bolt. The player's single-use extra bolt is not present in the returned starting board and must be added by the player during play.
 
 Move rules
 
-- Selection: tapping a bolt picks up the contiguous group of same-colored nuts at the top of that bolt (one or more). The contiguous group is formed by consecutive nuts at the top that share the same color.
+- Selection: tapping (or keyboard-activating) a bolt picks up the contiguous group of same-colored nuts at the top of that bolt (one or more). If the bolt is empty the tap is ignored.
+
 - Placement: tapping a target bolt attempts to place the picked group on top of that bolt.
-- Valid placement: the move is allowed if either the target bolt is empty, OR the color of the picked group equals the color of the target bolt's top nut. Also the target bolt must have enough free capacity to accept the whole group.
-- Invalid placement: if placement is invalid, the game should provide immediate feedback (shake, brief red flash, or similar) and return the group to the source bolt.
 
-Extra bolt
+- Valid placement: the move is allowed iff the target bolt is empty OR the color of the picked group equals the color of the target bolt's top nut, AND the target has enough free capacity to accept the entire group. Partial placements are disallowed.
 
-- The player may request exactly one temporary empty bolt per level. This extra bolt is a single-use resource and is removed on level completion or restart.
+- Invalid placement: if placement is invalid the UI should provide immediate feedback (shake, brief red flash, etc.) and the engine must leave the game state unchanged.
+
+Extra bolt (player-controlled)
+
+- The UI exposes an "Extra Bolt" action that adds one empty bolt to the board. This action is single-use per level; the UI should disable the action when an extra bolt is already present or when the board has reached the maximum allowed columns.
+
+- The engine enforces this invariant and will return a failure result when an attempt is made to add a second extra bolt.
+
+- The extra bolt is removed on level completion or when the level is restarted.
+
+- Generator note: during reverse-play generation the shuffler may temporarily create an extra bolt to enable legal reverse moves; this transient bolt is removed before returning the starting board so the player does not see it pre-added.
 
 Win condition
 
-- A level is completed when every non-empty bolt contains nuts of only one color (i.e., all nuts on each bolt share the same color) and no bolt contains a mix of colors.
+- A level is complete when every non-empty bolt contains nuts of a single color (no mixed bolts) and any level-specific solved constraints are met. The presence of the player's extra bolt does not alter the solved predicate; if the solved condition is met while the extra is present, the level is considered completed and the extra is cleaned up.
 
-Undo/hint (optional)
+Undo / Hint
 
-- `Undo` can revert the last move; useful for accessibility and players who make quick mistakes.
-- `Hint` may show a safe move or the next move from a known solution path; should be limited (e.g., cooldown or charge).
+- `Undo` should revert the last successful move and restore engine state to the previous moment. If the engine semantics allow it, undo should also restore any resources consumed by the last move.
 
-Edge cases
+- `Hint` may highlight a legal move or suggest the next move from a computed solution path. Hints should be conservative and rate-limited to avoid trivializing puzzles.
 
-- Moves that would exceed bolt capacity must be disallowed.
-- If a player picks from an empty bolt, ignore the tap.
-- Selection should be deterministic and consistent across platforms.
+Engine & generator notes
+
+- Determinism: level generation is seedable — given the same seed and difficulty the generator must produce the same starting board.
+
+- Scrambling: the reverse-play shuffler biases toward producing visually scrambled starts. To achieve this it may allow temporary helper columns during shuffle, but it must strip transient helper columns before returning the starting state.
+
+- Extra bolt in generation: the generator should not return a board with the player's extra bolt pre-added; the extra bolt exists only when the player requests it during play.
+
+Edge cases & invariants
+
+- Capacity: moves that would exceed a bolt's capacity are disallowed.
+- Deterministic selection: selection and move resolution must be deterministic and independent of rendering timing or animations.
+- Single extra bolt: the engine must never allow more than one player extra bolt per level.
+- IDs: bolt and nut ids must be stable and unique within a level so replay/undo and animations can reliably reference DOM elements.
 
 Telemetry events (recommended)
 
-- `move_attempted`, `move_succeeded`, `move_failed`, `extra_bolt_used`, `level_completed`, `level_started`.
+- `level_started` — include seed and difficulty
+- `move_attempted` — include src, tgt, moved count, and attempted color
+- `move_succeeded`
+- `move_failed` — include failure reason (capacity, color mismatch, etc.)
+- `extra_bolt_requested` — accepted/denied
+- `level_completed` — moves count, elapsed time
+
+Accessibility notes
+
+- All interactive controls (difficulty, seed input, palette picker, Extra Bolt, Undo, Hint) must be keyboard-focusable and expose appropriate ARIA attributes. The palette picker and Extra Bolt should support both keyboard and mouse interaction.
+
+- Animations are presentation-only; the game logic must be accessible via non-animated flows and must not rely on animation timing.
+
+Design notes
+
+- The UI uses a FLIP-style clone animation for moving nuts to give smooth visual feedback. Animations must be cancelled/cleaned up when the game resets or navigates away.
+
+- The engine returns structured success/failure results for actions (move, addExtraBolt, undo) so the UI can show contextual feedback without guessing engine internals.

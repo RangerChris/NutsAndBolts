@@ -25,8 +25,11 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
   const shuffleMoves = randomInt(rng, cfg.shuffleRange[0], cfg.shuffleRange[1]);
 
   const bolts = createSolvedBoard(numBolts, stackHeight);
-  // Add one temporary empty bolt to allow legal reverse moves
-  bolts.push({ id: `extra`, capacity: stackHeight, nuts: [] });
+  // Temporarily add an extra empty bolt to allow legal reverse moves while shuffling.
+  // This temp bolt will be removed before returning the generated state so the
+  // level does not start with the extra bolt present.
+  const TEMP_EXTRA_ID = '__temp_extra';
+  bolts.push({ id: TEMP_EXTRA_ID, capacity: stackHeight, nuts: [] });
   const moveHistory: any[] = [];
 
   let lastMove: { from?: string; to?: string } | null = null;
@@ -69,15 +72,32 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
       lastMove = { from: mv.fromBoltId, to: mv.toBoltId };
     }
   }
+  // Filter out any moves that involved the transient extra bolt and reconstruct the
+  // resulting bolts by replaying only the filtered moves from the solved board.
+  const filteredMoves = moveHistory.filter((m) => m.fromBoltId !== TEMP_EXTRA_ID && m.toBoltId !== TEMP_EXTRA_ID);
+
+  // Rebuild bolts from a solved board and apply filtered moves in order so the
+  // returned `moveHistory` is reversible back to the solved board.
+  const rebuilt = createSolvedBoard(numBolts, stackHeight);
+  for (const m of filteredMoves) {
+    const src = rebuilt.find((b) => b.id === m.fromBoltId);
+    const tgt = rebuilt.find((b) => b.id === m.toBoltId);
+    if (!src || !tgt) continue;
+    const moved = src.nuts.splice(Math.max(0, src.nuts.length - m.count), m.count);
+    tgt.nuts.push(...moved);
+  }
+  // Use the rebuilt bolts and only the filtered move history for the returned state
+  const boltsToReturn = rebuilt;
 
   const state: GameState = {
-    bolts,
-    // An empty extra bolt is included at creation; mark it as used so only one exists
-    extraBoltUsed: true,
+    bolts: boltsToReturn || bolts,
+    // An empty extra bolt is included at creation; still mark as not 'used' —
+    // presence of the extra bolt itself determines availability.
+    extraBoltUsed: false,
     level: opts.level || 1,
     difficulty: opts.difficulty,
     seed,
-    moveHistory,
+    moveHistory: filteredMoves,
   };
 
   // Guarantee at least one mixed bolt so the level does not look solved at start.

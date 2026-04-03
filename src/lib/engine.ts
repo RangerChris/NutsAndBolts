@@ -111,7 +111,10 @@ export function undoLastMove(state: GameState): { success: boolean; reason?: str
 }
 
 export function addExtraBolt(state: GameState, boltId?: string, capacity?: number): { success: boolean; reason?: string } {
+  // Prevent adding a second extra bolt if the state flag indicates one was used
   if (state.extraBoltUsed) return { success: false, reason: 'already-used' };
+  // Also be defensive: prevent adding if a bolt id prefixed with 'extra' already exists
+  if (state.bolts.some((b) => String(b.id).startsWith('extra'))) return { success: false, reason: 'already-used' };
   if (state.bolts.length >= MAX_BOLTS) return { success: false, reason: 'max-bolts' };
   const id = boltId || `extra-${Date.now()}`;
   const cap = capacity ?? (state.bolts[0]?.capacity ?? 4);

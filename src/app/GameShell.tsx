@@ -5,7 +5,7 @@ import { addExtraBolt, undoLastMove, isWin, executeMoveOnState, pickTopGroup, ca
 import Board from '../components/Board';
 import BottomBar from '../components/BottomBar';
 import TopBar from '../components/TopBar';
-import { loadProgress, setPaletteId } from '../lib/persistence';
+import { loadProgress, setPaletteId, getSelectedDifficulty, setSelectedDifficulty } from '../lib/persistence';
 import { getPalette } from '../lib/palettes';
 
 export default function GameShell(): JSX.Element {
@@ -13,11 +13,13 @@ export default function GameShell(): JSX.Element {
     const progress = loadProgress();
     const [paletteId, setPalette] = useState<number>(progress.settings?.paletteId ?? 0);
     const [seed, setSeed] = useState<string>(() => `seed-${Date.now()}`);
+    const persistedDifficulty = getSelectedDifficulty();
+    const [difficulty, setDifficulty] = useState<GameState['difficulty']>(persistedDifficulty as GameState['difficulty']);
 
     useEffect(() => {
-        const { state: s } = createLevel({ difficulty: 'easy', level: 1, seed });
+        const { state: s } = createLevel({ difficulty, level: 1, seed });
         setState(s);
-    }, [seed]);
+    }, [seed, difficulty]);
 
     const [selected, setSelected] = useState<string | null>(null);
     const [invalidTarget, setInvalidTarget] = useState<string | null>(null);
@@ -124,11 +126,31 @@ export default function GameShell(): JSX.Element {
             <div style={{ marginBottom: 12 }}>
                 <strong>Level</strong>: {state.level} — <strong>Difficulty</strong>: {state.difficulty}
                 <div style={{ marginTop: 8 }}>
-                    <TopBar level={state.level} difficulty={state.difficulty} seed={seed} paletteId={paletteId} onPaletteChange={(id) => { setPalette(id); setPaletteId(id); }} onSeedChange={(s) => { setSeed(s); const { state: sst } = createLevel({ difficulty: 'easy', level: state.level, seed: s }); setState(sst); }} />
+                    <TopBar
+                        level={state.level}
+                        difficulty={difficulty}
+                        seed={seed}
+                        paletteId={paletteId}
+                        onPaletteChange={(id) => {
+                            setPalette(id);
+                            setPaletteId(id);
+                        }}
+                        onSeedChange={(s) => {
+                            setSeed(s);
+                            const { state: sst } = createLevel({ difficulty, level: state.level, seed: s });
+                            setState(sst);
+                        }}
+                        onDifficultyChange={(d) => {
+                            const newDiff = d as GameState['difficulty'];
+                            setDifficulty(newDiff);
+                            setSelectedDifficulty(newDiff);
+                            // regenerate immediately for faster UI feedback
+                            const { state: sst } = createLevel({ difficulty: newDiff, level: state.level, seed });
+                            setState(sst);
+                        }}
+                    />
                 </div>
-                <div style={{ marginTop: 8, fontSize: 13, color: 'rgba(15,23,42,0.8)' }}>
-                    Objective: the level starts scrambled — move nuts so each bolt (when non-empty) contains nuts of a single color that that bolt accepts.
-                </div>
+                {/* objective text removed per UI update */}
             </div>
 
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
@@ -137,7 +159,8 @@ export default function GameShell(): JSX.Element {
                         onExtra={handleExtra}
                         onUndo={handleUndo}
                         onHint={handleHint}
-                        extraDisabled={state.extraBoltUsed || state.bolts.length >= 12}
+                        // Disable the Extra button when an extra bolt is already present
+                        extraDisabled={state.bolts.some((b) => String(b.id).startsWith('extra')) || state.bolts.length >= 12}
                         undoDisabled={!state.moveHistory || state.moveHistory.length === 0}
                         hintDisabled={!!findHint() === false}
                     />
