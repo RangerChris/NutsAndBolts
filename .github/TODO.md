@@ -5,17 +5,17 @@ Use this as the single execution checklist for MVP -> polish.
 ## 0) Project Management and Scope Lock
 
 - [ ] Confirm MVP scope and non-goals
-  - [ ] Lock MVP features: core moves, seeded levels, extra bolt, palette selector, persistence
-  - [ ] Mark optional features: hint quality improvements, richer audio, advanced analytics
-  - [ ] Define "done" criteria for MVP release candidate
-- [ ] Establish delivery plan
-  - [ ] Create milestone dates (Setup, Engine, UI, QA, Release)
-  - [ ] Assign owners (design, frontend, QA)
-  - [ ] Decide review cadence (daily async + milestone demo)
-- [ ] Create issue tracking map
-  - [ ] Create one ticket per group in this checklist
-  - [ ] Link each ticket to acceptance criteria in PRD
-  - [ ] Tag priorities: P0 (blocker), P1 (core), P2 (polish)
+  - [x] Lock MVP features: core moves, seeded levels, extra bolt, palette selector, persistence — RangerChris
+  - [x] Mark optional features: hint quality improvements, richer audio, advanced analytics — RangerChris
+  - [x] Define "done" criteria for MVP release candidate — RangerChris
+- [x] Establish delivery plan
+  - [x] Create milestone dates (Setup, Engine, UI, QA, Release) — flexible / no fixed deadlines
+  - [x] Assign owners (design: RangerChris, frontend: RangerChris, QA: RangerChris)
+  - [x] Decide review cadence (as-needed + milestone demo) — RangerChris
+- [x] Create issue tracking map — Not applicable (solo hobby project; using TODO.md in repo)
+  - [x] Create one ticket per group in this checklist — Not required
+  - [x] Link each ticket to acceptance criteria in PRD — Not required
+  - [x] Tag priorities: P0 (blocker), P1 (core), P2 (polish) — Not required
 
 ## 1) Foundation and Tooling
 
