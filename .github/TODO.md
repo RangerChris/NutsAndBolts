@@ -4,7 +4,7 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 0) Project Management and Scope Lock
 
-- [ ] Confirm MVP scope and non-goals
+- [x] Confirm MVP scope and non-goals
   - [x] Lock MVP features: core moves, seeded levels, extra bolt, palette selector, persistence — RangerChris
   - [x] Mark optional features: hint quality improvements, richer audio, advanced analytics — RangerChris
   - [x] Define "done" criteria for MVP release candidate — RangerChris
@@ -30,15 +30,15 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 2) Core Domain Model and Rules Engine
 
-- [ ] Define game types and constants
-  - [ ] Create types: Bolt, NutId/ColorId, Move, GameState, Difficulty, PaletteId
-  - [ ] Create constants: storage key, max bolts, difficulty configs, capacities
-  - [ ] Add state invariants and guard helpers
-- [ ] Implement move mechanics
-  - [ ] Detect contiguous same-color group from source top
-  - [ ] Validate legal target (empty or matching top color)
-  - [ ] Enforce capacity constraints on destination
-  - [ ] Return deterministic move result object (success/failure + reason)
+- [x] Define game types and constants
+- [x] Create types: Bolt, NutId/ColorId, Move, GameState, Difficulty, PaletteId
+- [x] Create constants: storage key, max bolts, difficulty configs, capacities
+- [ ] Add state invariants and guard helpers
+- [x] Implement move mechanics
+- [x] Detect contiguous same-color group from source top
+- [x] Validate legal target (empty or matching top color)
+- [x] Enforce capacity constraints on destination
+- [x] Return deterministic move result object (success/failure + reason)
 - [ ] Implement extra bolt and undo
   - [ ] Add single-use extra bolt action per level
   - [ ] Track extraBoltUsed and prevent second use
@@ -50,22 +50,22 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 3) Seeded Level Generator (Guaranteed Solvable)
 
-- [ ] Build reproducible RNG
-  - [ ] Add seeded RNG utility (string/number seed support)
-  - [ ] Add helper for deterministic random int/range/shuffle
-  - [ ] Verify same seed -> same sequence across sessions
-- [ ] Implement solved-state constructor
-  - [ ] Generate solved board by difficulty config
-  - [ ] Ensure color count matches active bolt count rules
-  - [ ] Validate no bolt exceeds capacity
-- [ ] Implement reverse-play shuffler
-  - [ ] Perform N legal random reverse moves by difficulty range
-  - [ ] Avoid immediate move reversal where possible
-  - [ ] Ensure generated board is playable and non-trivial
-- [ ] Expose generator API
-  - [ ] createLevel({ difficulty, level, seed? }) returns GameState + seed metadata
-  - [ ] Add deterministic seed format for sharing/replay
-  - [ ] Store generation metadata for debugging
+- [x] Build reproducible RNG
+  - [x] Add seeded RNG utility (string/number seed support)
+  - [x] Add helper for deterministic random int/range/shuffle
+  - [x] Verify same seed -> same sequence across sessions
+- [x] Implement solved-state constructor
+- [x] Generate solved board by difficulty config
+- [x] Ensure color count matches active bolt count rules
+- [x] Validate no bolt exceeds capacity
+- [x] Implement reverse-play shuffler
+- [x] Perform N legal random reverse moves by difficulty range
+- [x] Avoid immediate move reversal where possible
+- [x] Ensure generated board is playable and non-trivial
+- [x] Expose generator API
+- [x] createLevel({ difficulty, level, seed? }) returns GameState + seed metadata
+- [x] Add deterministic seed format for sharing/replay
+- [x] Store generation metadata for debugging
 
 ## 4) Progression and Difficulty Scaling
 
