@@ -47,7 +47,8 @@ export default function Board({ state, paletteId, selectedBoltId, invalidBoltId,
             clone.style.zIndex = '9999';
             clone.style.pointerEvents = 'none';
             clone.style.transition = 'transform 360ms ease, opacity 260ms ease';
-            clone.innerHTML = `<svg width="${pr.width}" height="${pr.height}" viewBox="0 0 36 32" xmlns="http://www.w3.org/2000/svg"><polygon points="18,2 30,8 30,24 18,30 6,24 6,8" fill="${pr.color}" stroke="#6b7280" stroke-width="0.8"/><circle cx="18" cy="16" r="5" fill="#f3f4f6"/></svg>`;
+            // Side-view nut clone (66×20 viewBox matches BoltView NUT_W×NUT_H)
+            clone.innerHTML = `<svg width="${pr.width}" height="${pr.height}" viewBox="0 0 66 20" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="66" height="20" rx="2" fill="${pr.color}" stroke="rgba(0,0,0,0.35)" stroke-width="0.8"/><line x1="0" y1="0" x2="8" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/><line x1="66" y1="0" x2="58" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/><ellipse cx="33" cy="10" rx="7" ry="9" fill="rgba(0,0,0,0.30)"/><ellipse cx="33" cy="10" rx="5" ry="7" fill="rgba(0,0,0,0.15)"/><rect x="3" y="2" width="60" height="2" rx="1" fill="rgba(255,255,255,0.28)"/></svg>`;
             document.body.appendChild(clone);
             clones.push(clone);
 

@@ -4,6 +4,8 @@ Summary
 
 - Single-player, turn-based grouping puzzle. Player moves contiguous same-colored nuts from the top of one bolt to another.
 
+- Starting state: levels begin with the nuts scrambled across bolts (not solved). The player's objective is to move contiguous same-colored nuts so that each bolt (when non-empty) contains nuts of a single color that that bolt accepts.
+
 Board constraints
 
 - Bolts: 3–9 base columns per level, plus one player-created temporary extra bolt (max total 10). Each bolt has a fixed capacity (3–10 slots depending on level parameters).

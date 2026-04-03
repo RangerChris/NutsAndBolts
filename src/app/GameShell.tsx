@@ -12,12 +12,12 @@ export default function GameShell(): JSX.Element {
     const [state, setState] = useState<GameState | null>(null);
     const progress = loadProgress();
     const [paletteId, setPalette] = useState<number>(progress.settings?.paletteId ?? 0);
-    const [seed, setSeed] = useState<string>('ui-1');
+    const [seed, setSeed] = useState<string>(() => `seed-${Date.now()}`);
 
     useEffect(() => {
-        const { state: s } = createLevel({ difficulty: 'easy', level: 1, seed: 'ui-1' });
+        const { state: s } = createLevel({ difficulty: 'easy', level: 1, seed });
         setState(s);
-    }, []);
+    }, [seed]);
 
     const [selected, setSelected] = useState<string | null>(null);
     const [invalidTarget, setInvalidTarget] = useState<string | null>(null);
@@ -75,8 +75,9 @@ export default function GameShell(): JSX.Element {
                 // derive color from svg polygon fill if possible
                 let color = '#999999';
                 try {
-                    const poly = sel.querySelector('polygon');
-                    if (poly) color = (poly as SVGElement).getAttribute('fill') || color;
+                    // First child rect of the nut <g> is the body with the palette color
+                    const nutRect = sel.querySelector('rect');
+                    if (nutRect) color = (nutRect as SVGElement).getAttribute('fill') || color;
                 } catch (e) {
                     // ignore
                 }
@@ -124,6 +125,9 @@ export default function GameShell(): JSX.Element {
                 <strong>Level</strong>: {state.level} — <strong>Difficulty</strong>: {state.difficulty}
                 <div style={{ marginTop: 8 }}>
                     <TopBar level={state.level} difficulty={state.difficulty} seed={seed} paletteId={paletteId} onPaletteChange={(id) => { setPalette(id); setPaletteId(id); }} onSeedChange={(s) => { setSeed(s); const { state: sst } = createLevel({ difficulty: 'easy', level: state.level, seed: s }); setState(sst); }} />
+                </div>
+                <div style={{ marginTop: 8, fontSize: 13, color: 'rgba(15,23,42,0.8)' }}>
+                    Objective: the level starts scrambled — move nuts so each bolt (when non-empty) contains nuts of a single color that that bolt accepts.
                 </div>
             </div>
 
