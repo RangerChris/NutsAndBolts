@@ -81,18 +81,18 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 5) Persistence and Recovery
 
-- [ ] Implement persistence schema
-  - [ ] Use key: nuts-and-bolts:progress
-  - [ ] Save progress per difficulty
-  - [ ] Save settings: selected palette, optional haptics/audio toggles
-- [ ] Implement load/save lifecycle
-  - [ ] Load on app start with safe fallback
-  - [ ] Save on level complete
-  - [ ] Save on visibility change / app background
-- [ ] Add migration and resilience
-  - [ ] Version persisted schema
-  - [ ] Add migration path for future schema updates
-  - [ ] Handle corrupted localStorage gracefully (reset with warning)
+- [x] Implement persistence schema
+- [x] Use key: nuts-and-bolts:progress
+- [x] Save progress per difficulty
+- [x] Save settings: selected palette, optional haptics/audio toggles
+- [x] Implement load/save lifecycle
+- [x] Load on app start with safe fallback
+- [x] Save on level complete
+- [x] Save on visibility change / app background
+- [x] Add migration and resilience
+- [x] Version persisted schema
+- [x] Add migration path for future schema updates
+- [x] Handle corrupted localStorage gracefully (reset with warning)
 
 ## 6) UX/UI Implementation (Mobile-First)
 
