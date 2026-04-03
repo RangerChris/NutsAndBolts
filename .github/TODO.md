@@ -33,20 +33,20 @@ Use this as the single execution checklist for MVP -> polish.
 - [x] Define game types and constants
 - [x] Create types: Bolt, NutId/ColorId, Move, GameState, Difficulty, PaletteId
 - [x] Create constants: storage key, max bolts, difficulty configs, capacities
-- [ ] Add state invariants and guard helpers
+- [x] Add state invariants and guard helpers
 - [x] Implement move mechanics
 - [x] Detect contiguous same-color group from source top
 - [x] Validate legal target (empty or matching top color)
 - [x] Enforce capacity constraints on destination
 - [x] Return deterministic move result object (success/failure + reason)
-- [ ] Implement extra bolt and undo
-  - [ ] Add single-use extra bolt action per level
-  - [ ] Track extraBoltUsed and prevent second use
-  - [ ] Implement undo using move history snapshots or reversible moves
-- [ ] Implement win/loss state checks
-  - [ ] Win: each non-empty bolt contains only one color
-  - [ ] Ignore empty bolts in win evaluation
-  - [ ] Trigger level completion event payload
+  - [x] Implement extra bolt and undo
+  - [x] Add single-use extra bolt action per level
+  - [x] Track extraBoltUsed and prevent second use
+  - [x] Implement undo using move history snapshots or reversible moves
+- [x] Implement win/loss state checks
+- [x] Win: each non-empty bolt contains only one color
+- [x] Ignore empty bolts in win evaluation
+- [x] Trigger level completion event payload
 
 ## 3) Seeded Level Generator (Guaranteed Solvable)
 

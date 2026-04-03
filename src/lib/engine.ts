@@ -1,5 +1,6 @@
 import type { Bolt, Move, GameState } from './types';
 import { MAX_BOLTS } from './constants';
+import { emitBalancerEvent } from './balancer';
 
 export function pickTopGroup(bolt: Bolt): { color?: string; count: number } {
   if (!bolt.nuts || bolt.nuts.length === 0) return { color: undefined, count: 0 };
@@ -74,6 +75,21 @@ export function executeMoveOnState(state: GameState, fromId: string, toId: strin
   if (!move) return { success: false, reason: 'perform-failed' };
   state.moveHistory = state.moveHistory || [];
   state.moveHistory.push(move);
+  // Emit level-complete event if this move solved the level
+  try {
+    if (isWin(state)) {
+      emitBalancerEvent('game', {
+        event: 'levelComplete',
+        level: state.level,
+        difficulty: state.difficulty,
+        seed: state.seed,
+        moveHistoryLength: state.moveHistory.length,
+        bolts: state.bolts.length,
+      });
+    }
+  } catch (e) {
+    // swallow
+  }
   return { success: true, move };
 }
 
@@ -111,4 +127,53 @@ export function isWin(state: GameState): boolean {
     if (!b.nuts.every((n) => n === first)) return false;
   }
   return true;
+}
+
+// New: state invariant and guard helpers
+export function checkStateInvariants(state: GameState): { ok: boolean; problems: string[] } {
+  const problems: string[] = [];
+  const v = validateState(state);
+  if (!v.ok) problems.push(v.reason || 'invalid-state');
+  // unique bolt ids
+  const ids = state.bolts.map((b) => b.id);
+  const dup = ids.filter((id, i) => ids.indexOf(id) !== i);
+  if (dup.length > 0) problems.push('duplicate-bolt-ids');
+  // bolt capacity and nuts types
+  for (const b of state.bolts) {
+    if (typeof b.capacity !== 'number' || b.capacity < 0) problems.push('invalid-bolt-capacity');
+    if (!Array.isArray(b.nuts)) problems.push('invalid-bolt-nuts');
+    else if (b.nuts.length > b.capacity) problems.push('bolt-over-capacity');
+    else if (b.nuts.some((n) => typeof n !== 'string')) problems.push('invalid-nut-type');
+  }
+  // moveHistory structure
+  if (state.moveHistory && !Array.isArray(state.moveHistory)) problems.push('invalid-moveHistory');
+  else if (Array.isArray(state.moveHistory)) {
+    for (const m of state.moveHistory) {
+      if (!m || typeof m !== 'object' || !('fromBoltId' in m) || !('toBoltId' in m) || !('count' in m)) {
+        problems.push('invalid-move-entry');
+        break;
+      }
+    }
+  }
+  // extraBoltUsed is boolean
+  if (typeof state.extraBoltUsed !== 'boolean') problems.push('invalid-extraBoltUsed');
+
+  return { ok: problems.length === 0, problems };
+}
+
+export function normalizeState(state: Partial<GameState>): GameState {
+  const bolts = (state.bolts || []).map((b: any, idx: number) => ({
+    id: b?.id ?? `b${idx}`,
+    capacity: typeof b?.capacity === 'number' ? b.capacity : 4,
+    nuts: Array.isArray(b?.nuts) ? b.nuts.slice() : [],
+  }));
+  const normalized: GameState = {
+    bolts,
+    extraBoltUsed: Boolean(state.extraBoltUsed),
+    level: state.level ?? 1,
+    difficulty: (state as any).difficulty ?? 'easy',
+    seed: (state as any).seed ?? '',
+    moveHistory: Array.isArray(state.moveHistory) ? (state.moveHistory as any[]).slice() : [],
+  } as GameState;
+  return normalized;
 }
