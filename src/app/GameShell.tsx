@@ -5,7 +5,7 @@ import { addExtraBolt, undoLastMove, isWin, executeMoveOnState, pickTopGroup, ca
 import Board from '../components/Board';
 import BottomBar from '../components/BottomBar';
 import TopBar from '../components/TopBar';
-import { loadProgress, setPaletteId, getSelectedDifficulty, setSelectedDifficulty } from '../lib/persistence';
+import { loadProgress, setPaletteId, getSelectedDifficulty, setSelectedDifficulty, setCurrentLevel } from '../lib/persistence';
 import { getPalette } from '../lib/palettes';
 
 export default function GameShell(): JSX.Element {
@@ -15,20 +15,29 @@ export default function GameShell(): JSX.Element {
     const [seed, setSeed] = useState<string>(() => `seed-${Date.now()}`);
     const persistedDifficulty = getSelectedDifficulty();
     const [difficulty, setDifficulty] = useState<GameState['difficulty']>(persistedDifficulty as GameState['difficulty']);
+    const initialLevel = progress.difficulties?.[difficulty]?.currentLevel ?? 1;
+    const [currentLevel, setCurrentLevelState] = useState<number>(initialLevel);
 
     useEffect(() => {
-        const { state: s } = createLevel({ difficulty, level: 1, seed });
+        const { state: s } = createLevel({ difficulty, level: currentLevel, seed });
         setState(s);
-    }, [seed, difficulty]);
+    }, [seed, difficulty, currentLevel]);
 
     const [selected, setSelected] = useState<string | null>(null);
     const [invalidTarget, setInvalidTarget] = useState<string | null>(null);
     // Animation state for FLIP clone animations — keep hooks unconditional
     const [animMove, setAnimMove] = useState<any | null>(null);
+    const [showComplete, setShowComplete] = useState(false);
 
     const handleAnimDone = () => {
         setAnimMove(null);
     };
+
+    useEffect(() => {
+        if (!state) return;
+        if (isWin(state)) setShowComplete(true);
+        else setShowComplete(false);
+    }, [state]);
 
     if (!state) return <div style={{ padding: 16 }}>Loading...</div>;
 
@@ -121,36 +130,44 @@ export default function GameShell(): JSX.Element {
         setTimeout(() => setSelected(null), 800);
     };
 
+    const handleContinue = () => {
+        // advance to next level using currentLevel state
+        const nextLevel = (currentLevel || 1) + 1;
+        // persist current level progress
+        setCurrentLevel(difficulty, nextLevel);
+        setCurrentLevelState(nextLevel);
+        // generate a fresh seed for the next level — effect will create the level
+        const newSeed = `seed-${Date.now()}`;
+        setSeed(newSeed);
+        setShowComplete(false);
+    };
+
     return (
         <div style={{ padding: 16 }}>
             <div style={{ marginBottom: 12 }}>
-                <strong>Level</strong>: {state.level} — <strong>Difficulty</strong>: {state.difficulty}
-                <div style={{ marginTop: 8 }}>
-                    <TopBar
-                        level={state.level}
-                        difficulty={difficulty}
-                        seed={seed}
-                        paletteId={paletteId}
-                        onPaletteChange={(id) => {
-                            setPalette(id);
-                            setPaletteId(id);
-                        }}
-                        onSeedChange={(s) => {
-                            setSeed(s);
-                            const { state: sst } = createLevel({ difficulty, level: state.level, seed: s });
-                            setState(sst);
-                        }}
-                        onDifficultyChange={(d) => {
-                            const newDiff = d as GameState['difficulty'];
-                            setDifficulty(newDiff);
-                            setSelectedDifficulty(newDiff);
-                            // regenerate immediately for faster UI feedback
-                            const { state: sst } = createLevel({ difficulty: newDiff, level: state.level, seed });
-                            setState(sst);
-                        }}
-                    />
-                </div>
-                {/* objective text removed per UI update */}
+                <TopBar
+                    level={state.level}
+                    difficulty={difficulty}
+                    seed={seed}
+                    paletteId={paletteId}
+                    onPaletteChange={(id) => {
+                        setPalette(id);
+                        setPaletteId(id);
+                    }}
+                    onSeedChange={(s) => {
+                        setSeed(s);
+                    }}
+                    onDifficultyChange={(d) => {
+                        const newDiff = d as GameState['difficulty'];
+                        setDifficulty(newDiff);
+                        setSelectedDifficulty(newDiff);
+                        // switch to stored level for the new difficulty (or 1)
+                        const lvl = loadProgress().difficulties?.[newDiff]?.currentLevel ?? 1;
+                        setCurrentLevelState(lvl);
+                        const newSeed = `seed-${Date.now()}`;
+                        setSeed(newSeed);
+                    }}
+                />
             </div>
 
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
@@ -174,6 +191,17 @@ export default function GameShell(): JSX.Element {
                 <strong>Bolts</strong> ({state.bolts.length}):
                 <Board state={state} paletteId={paletteId} selectedBoltId={selected} invalidBoltId={invalidTarget} onBoltClick={handleBoltClick} animMove={animMove} onAnimDone={handleAnimDone} />
             </div>
+            {showComplete && (
+                <div role="dialog" aria-modal="true" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>
+                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 360, boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
+                        <h2>Level Complete</h2>
+                        <p>Nice work — you completed level {state.level}.</p>
+                        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 12 }}>
+                            <button onClick={handleContinue} style={{ fontWeight: '600' }}>Continue</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

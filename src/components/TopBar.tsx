@@ -17,15 +17,26 @@ export default function TopBar({ level, difficulty, seed, paletteId, onPaletteCh
     const [seedValue, setSeedValue] = useState(seed || '');
     const [open, setOpen] = useState(false);
 
+
     return (
-        <div className="topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+        <div className="topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                 <div>
                     <strong>Level</strong>: {level}
                 </div>
                 <div>
-                    <strong>Difficulty</strong>: {difficulty}
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <strong>Difficulty</strong>:
+                        <select value={difficulty} onChange={(e) => onDifficultyChange?.(e.target.value)}>
+                            <option value="easy">easy</option>
+                            <option value="medium">medium</option>
+                            <option value="hard">hard</option>
+                            <option value="extreme">extreme</option>
+                        </select>
+                    </label>
                 </div>
+            </div>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginLeft: 'auto' }}>
                 <div>
                     <strong>Seed</strong>:{' '}
                     {!editingSeed ? (
@@ -40,22 +51,10 @@ export default function TopBar({ level, difficulty, seed, paletteId, onPaletteCh
                         </span>
                     )}
                 </div>
-            </div>
-
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    Difficulty:
-                    <select value={difficulty} onChange={(e) => onDifficultyChange?.(e.target.value)}>
-                        <option value="easy">easy</option>
-                        <option value="medium">medium</option>
-                        <option value="hard">hard</option>
-                        <option value="extreme">extreme</option>
-                    </select>
-                </label>
                 <div style={{ position: 'relative' }}>
                     <button
                         aria-haspopup="true"
-                        aria-expanded={false}
+                        aria-expanded={open}
                         onClick={() => setOpen((o) => !o)}
                         style={{ display: 'inline-flex', gap: 8, alignItems: 'center', padding: '6px 8px', borderRadius: 6, background: '#fff', border: '1px solid rgba(0,0,0,0.08)' }}
                     >

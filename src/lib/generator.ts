@@ -101,33 +101,51 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
   };
 
   // Guarantee at least one mixed bolt so the level does not look solved at start.
-  if (!hasMixedBolt(state.bolts)) {
-    const src = state.bolts.find((b) => b.nuts.length > 0);
-    const tgt = state.bolts.find(
-      (b) =>
-        b.id !== src?.id &&
-        b.nuts.length > 0 &&
-        b.nuts.length < b.capacity &&
-        src &&
-        b.nuts[b.nuts.length - 1] !== src.nuts[src.nuts.length - 1]
-    );
-    if (src && tgt) {
-      const moved = src.nuts.splice(src.nuts.length - 1, 1);
-      if (moved.length > 0) {
-        tgt.nuts.push(moved[0]);
-        moveHistory.push({
-          fromBoltId: src.id,
-          toBoltId: tgt.id,
-          color: moved[0],
-          count: 1,
-          timestamp: Date.now(),
-        });
+  // Operate on the returned bolts and the filteredMoves list so the returned
+  // state is consistent and reversible.
+  if (!hasMixedBolt(boltsToReturn)) {
+    // try to find a source and a target where moving one nut will create a mixed bolt
+    let mixedApplied = false;
+    for (let i = 0; i < boltsToReturn.length; i++) {
+      const src = boltsToReturn[i];
+      if (src.nuts.length === 0) continue;
+      for (let j = 0; j < boltsToReturn.length; j++) {
+        if (i === j) continue;
+        const tgt = boltsToReturn[j];
+        if (tgt.nuts.length < tgt.capacity && tgt.nuts[tgt.nuts.length - 1] !== src.nuts[src.nuts.length - 1]) {
+          const moved = src.nuts.splice(src.nuts.length - 1, 1);
+          if (moved.length > 0) {
+            tgt.nuts.push(moved[0]);
+            filteredMoves.push({ fromBoltId: src.id, toBoltId: tgt.id, color: moved[0], count: 1, timestamp: Date.now() });
+            mixedApplied = true;
+            break;
+          }
+        }
+      }
+      if (mixedApplied) break;
+    }
+
+    // fallback: if no capacity-based move was possible, swap top nuts between first two non-empty bolts
+    if (!mixedApplied) {
+      const nonEmpty = boltsToReturn.filter((b) => b.nuts.length > 0);
+      if (nonEmpty.length >= 2) {
+        const a = nonEmpty[0];
+        const b = nonEmpty[1];
+        const ta = a.nuts.pop() as string;
+        const tb = b.nuts.pop() as string;
+        a.nuts.push(tb);
+        b.nuts.push(ta);
+        // record as two moves for reversibility
+        filteredMoves.push({ fromBoltId: a.id, toBoltId: b.id, color: ta, count: 1, timestamp: Date.now() });
+        filteredMoves.push({ fromBoltId: b.id, toBoltId: a.id, color: tb, count: 1, timestamp: Date.now() });
       }
     }
   }
 
   // Normalize and validate before returning/emit
 
+  // update state.moveHistory to the filteredMoves we used/repaired above
+  state.moveHistory = filteredMoves;
   const normalized = normalizeState(state);
   const invariants = checkStateInvariants(normalized);
 

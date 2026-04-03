@@ -82,18 +82,21 @@ export default function Board({ state, paletteId, selectedBoltId, invalidBoltId,
         return () => clearTimeout(t);
     }, [animMove, state, onAnimDone]);
 
+    // Render bolts in a wrapping flex container so as many bolts as fit are
+    // shown per row and the remaining bolts wrap to the next line.
     return (
         <div style={{ overflowX: 'auto' }} ref={containerRef}>
-            <div style={{ display: 'flex', gap: 12, padding: 8 }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, padding: 8, alignItems: 'flex-start' }}>
                 {state.bolts.map((b) => (
-                    <BoltView
-                        key={b.id}
-                        bolt={b}
-                        paletteId={paletteId}
-                        selected={selectedBoltId === b.id}
-                        invalid={invalidBoltId === b.id}
-                        onClick={onBoltClick}
-                    />
+                    <div key={b.id} style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                        <BoltView
+                            bolt={b}
+                            paletteId={paletteId}
+                            selected={selectedBoltId === b.id}
+                            invalid={invalidBoltId === b.id}
+                            onClick={onBoltClick}
+                        />
+                    </div>
                 ))}
             </div>
         </div>
