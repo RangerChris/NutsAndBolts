@@ -74,10 +74,68 @@ export function loadProgress(): PersistedProgress {
   try {
     const raw = storageImpl.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_PROGRESS;
-    const parsed = JSON.parse(raw) as PersistedProgress;
-    if (!parsed.version) return DEFAULT_PROGRESS;
-    return parsed;
+    const parsed = JSON.parse(raw);
+    const migrated = migrateProgress(parsed);
+    return migrated;
   } catch (e) {
     return DEFAULT_PROGRESS;
   }
+}
+
+export function migrateProgress(obj: any): PersistedProgress {
+  if (!obj || typeof obj !== 'object') return DEFAULT_PROGRESS;
+  // If already has a version and matches our shape, accept it
+  if (typeof obj.version === 'number' && obj.difficulties && obj.settings) {
+    return obj as PersistedProgress;
+  }
+
+  // Migration: older schema might have 'levels' keyed by difficulty
+  if (obj.levels && typeof obj.levels === 'object') {
+    const difficulties: Record<string, { currentLevel: number; maxReached: number }> = {};
+    for (const k of Object.keys(obj.levels)) {
+      const v = obj.levels[k];
+      difficulties[k] = { currentLevel: v.current || 1, maxReached: v.max || v.current || 1 };
+    }
+    return { version: 1, difficulties, settings: obj.settings || DEFAULT_PROGRESS.settings };
+  }
+
+  // Fallback: try to salvage partial fields
+  const difficulties = obj.difficulties || DEFAULT_PROGRESS.difficulties;
+  const settings = obj.settings || DEFAULT_PROGRESS.settings;
+  return { version: 1, difficulties, settings };
+}
+
+// Initialize persistence lifecycle hooks. Returns current progress and an unsubscribe function.
+export function initPersistence() {
+  const progress = loadProgress();
+  let unsub = () => {};
+  try {
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      const onVisibility = () => saveProgress(loadProgress());
+      window.addEventListener('visibilitychange', onVisibility);
+      unsub = () => window.removeEventListener('visibilitychange', onVisibility);
+    }
+  } catch (e) {
+    // ignore in non-browser environments
+  }
+  return { progress, unsubscribe: unsub };
+}
+
+export function setCurrentLevel(difficulty: string, level: number) {
+  const p = loadProgress();
+  p.difficulties = p.difficulties || {};
+  const cur = p.difficulties[difficulty] || { currentLevel: 1, maxReached: 1 };
+  cur.currentLevel = level;
+  cur.maxReached = Math.max(cur.maxReached || 1, level);
+  p.difficulties[difficulty] = cur;
+  saveProgress(p);
+  return p;
+}
+
+export function setPaletteId(paletteId: number) {
+  const p = loadProgress();
+  p.settings = p.settings || DEFAULT_PROGRESS.settings;
+  p.settings.paletteId = paletteId;
+  saveProgress(p);
+  return p;
 }

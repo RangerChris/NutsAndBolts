@@ -1,7 +1,7 @@
 import { seededRandom, randomInt } from './rng';
 import type { GameState, Bolt } from './types';
 import { DIFFICULTY_CONFIG } from './constants';
-import { pickTopGroup, canPlaceGroup, performMove } from './engine';
+import { pickTopGroup, canPlaceGroup, performMove, normalizeState, checkStateInvariants } from './engine';
 import { emitBalancerEvent } from './balancer';
 
 type CreateLevelOpts = { difficulty: GameState['difficulty']; level?: number; seed?: string | number };
@@ -60,7 +60,11 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
     moveHistory,
   };
 
-  // Emit a balancing event for analysis tools
+  // Normalize and validate before returning/emit
+  const normalized = normalizeState(state);
+  const invariants = checkStateInvariants(normalized);
+
+  // Emit a balancing event for analysis tools (include invariants)
   try {
     emitBalancerEvent('generator', {
       seed,
@@ -68,13 +72,14 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
       level: opts.level || 1,
       params: { numBolts, stackHeight, shuffleMoves },
       generated: {
-        bolts: bolts.length,
-        shufflePerformed: moveHistory.length,
+        bolts: normalized.bolts.length,
+        shufflePerformed: normalized.moveHistory.length,
       },
+      invariants,
     });
   } catch (e) {
     // ignore
   }
 
-  return { state, seed };
+  return { state: normalized, seed };
 }

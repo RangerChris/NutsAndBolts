@@ -1,6 +1,6 @@
 type BalancerEvent = {
   timestamp: number;
-  source: 'generator' | 'progression' | 'simulation';
+  source: string;
   payload: Record<string, any>;
 };
 
