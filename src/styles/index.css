@@ -21,3 +21,103 @@ body {
     background: #fff;
     border-bottom: 1px solid rgba(0, 0, 0, 0.04)
 }
+
+.bolt-list {
+    display: flex;
+    gap: 12px;
+}
+
+.bolt {
+    padding: 8px;
+    background: #fff;
+    border-radius: 8px;
+    min-width: 120px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bolt-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bolt-id {
+    font-size: 12px;
+}
+
+.nut-stack {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 8px;
+    align-items: center;
+}
+
+.nut-svg {
+    width: 36px;
+    height: 32px;
+    display: block;
+}
+
+.nut {
+    width: 28px;
+    height: 18px;
+    border-radius: 4px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06) inset;
+}
+
+.bolt-selected {
+    outline: 3px solid rgba(59, 130, 246, 0.25);
+    transform: translateY(-2px);
+}
+
+.bottom-bar {
+    background: transparent;
+}
+
+.bottom-bar button[disabled] {
+    opacity: 0.5;
+}
+
+@keyframes shake {
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-6px);
+    }
+
+    50% {
+        transform: translateX(6px);
+    }
+
+    75% {
+        transform: translateX(-4px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.bolt-invalid {
+    animation: shake 420ms ease-in-out;
+}
+
+.nut-anim-clone {
+    transition: transform 360ms ease, opacity 260ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bolt-selected {
+        transform: none;
+    }
+
+    .bolt-invalid {
+        animation: none;
+    }
+}
