@@ -96,23 +96,23 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 6) UX/UI Implementation (Mobile-First)
 
-- [ ] Build top bar
-  - [ ] Difficulty selector
-  - [ ] Level display
-  - [ ] Seed display + seed input/recreate action
-  - [ ] Palette selector
-- [ ] Build board area
-  - [ ] Horizontal scroll/swipe when bolts overflow
-  - [ ] Bolt component with clear slot capacity visualization
-  - [ ] Nut tokens with color + pattern overlay support
-- [ ] Build interaction flow
-  - [ ] Tap source highlights valid contiguous pick
-  - [ ] Tap target executes move if valid
-  - [ ] Invalid target shows blocked feedback animation
-- [ ] Build bottom action bar
-  - [ ] Extra Bolt action with remaining indicator
-  - [ ] Undo action
-  - [ ] Hint placeholder button and disabled-state rules
+- [x] Build top bar
+  - [x] Difficulty selector
+  - [x] Level display
+  - [x] Seed display + seed input/recreate action
+  - [x] Palette selector
+- [x] Build board area
+  - [x] Horizontal scroll/swipe when bolts overflow
+  - [x] Bolt component with clear slot capacity visualization
+  - [x] Nut tokens with color + pattern overlay support
+- [x] Build interaction flow
+  - [x] Tap source highlights valid contiguous pick
+  - [x] Tap target executes move if valid
+  - [x] Invalid target shows blocked feedback animation
+- [x] Build bottom action bar
+  - [x] Extra Bolt action with remaining indicator
+  - [x] Undo action
+  - [x] Hint placeholder button and disabled-state rules
 - [ ] Responsive and performance polish
   - [ ] Smooth 60fps animation targets on common mobile devices
   - [ ] Touch-friendly hit targets
@@ -120,19 +120,19 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 7) Accessibility and Color System
 
-- [ ] Implement 4 palettes from PRD
-  - [ ] Vibrant palette mapping
-  - [ ] Pastel palette mapping
-  - [ ] Dark palette mapping
-  - [ ] Colorblind-friendly palette mapping
-- [ ] Add non-color distinguishers
-  - [ ] Pattern/shape overlays per color id
-  - [ ] Ensure overlays remain visible on small token sizes
-  - [ ] Verify contrast for UI labels and controls
-- [ ] Add accessibility checks
-  - [ ] Keyboard navigation basics for non-touch users
-  - [ ] Accessible names for controls
-  - [ ] Reduced motion preference handling (optional for MVP, recommended)
+- [x] Implement 4 palettes from PRD
+  - [x] Vibrant palette mapping
+  - [x] Pastel palette mapping
+  - [x] Dark palette mapping
+  - [x] Colorblind-friendly palette mapping
+- [x] Add non-color distinguishers
+  - [x] Pattern/shape overlays per color id
+  - [x] Ensure overlays remain visible on small token sizes
+  - [x] Verify contrast for UI labels and controls
+- [x] Add accessibility checks
+  - [x] Keyboard navigation basics for non-touch users
+  - [x] Accessible names for controls
+  - [x] Reduced motion preference handling (optional for MVP, recommended)
 
 ## 8) Feedback, Audio, and Feel
 

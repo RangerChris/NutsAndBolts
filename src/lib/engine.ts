@@ -111,7 +111,10 @@ export function undoLastMove(state: GameState): { success: boolean; reason?: str
 }
 
 export function addExtraBolt(state: GameState, boltId?: string, capacity?: number): { success: boolean; reason?: string } {
+  // Prevent adding a second extra bolt if the state flag indicates one was used
   if (state.extraBoltUsed) return { success: false, reason: 'already-used' };
+  // Also be defensive: prevent adding if a bolt id prefixed with 'extra' already exists
+  if (state.bolts.some((b) => String(b.id).startsWith('extra'))) return { success: false, reason: 'already-used' };
   if (state.bolts.length >= MAX_BOLTS) return { success: false, reason: 'max-bolts' };
   const id = boltId || `extra-${Date.now()}`;
   const cap = capacity ?? (state.bolts[0]?.capacity ?? 4);
@@ -121,10 +124,17 @@ export function addExtraBolt(state: GameState, boltId?: string, capacity?: numbe
 }
 
 export function isWin(state: GameState): boolean {
+  // Each non-empty bolt must contain only a single color, and any given
+  // color may appear on exactly one bolt (not spread across multiple bolts).
+  const seenColors = new Set<string>();
   for (const b of state.bolts) {
     if (b.nuts.length === 0) continue;
     const first = b.nuts[0];
+    // all nuts on the bolt must be the same color
     if (!b.nuts.every((n) => n === first)) return false;
+    // the color must not already appear on another bolt
+    if (seenColors.has(first)) return false;
+    seenColors.add(first);
   }
   return true;
 }

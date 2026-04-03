@@ -6,7 +6,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "vitest --run src",
+    "test:e2e": "playwright test",
+    "check:accessibility": "node scripts/check_palettes.cjs",
     "test:watch": "vitest --watch",
     "simulate": "node scripts/run-sim.js",
     "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
@@ -18,6 +20,8 @@
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.2",
+    "@playwright/test": "^1.36.0",
+    "@types/node": "^20.4.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.58.0",
@@ -26,15 +30,16 @@
     "@vitest/coverage-v8": "^4.1.2",
     "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
+    "playwright": "^1.59.1",
     "prettier": "^3.8.1",
-    "typescript": "^6.0.2",
     "ts-node": "^10.9.1",
-    "@types/node": "^20.4.0",
+    "typescript": "^6.0.2",
     "vite": "^8.0.3",
     "vitest": "^4.1.2"
-  }
-  ,
+  },
   "vitest": {
-    "environment": "jsdom"
+    "environment": "jsdom",
+    "include": ["src/**/*.test.*", "src/**/*.spec.*"],
+    "exclude": ["e2e/**"]
   }
 }

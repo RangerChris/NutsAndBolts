@@ -90,7 +90,17 @@ Note: the number of distinct colors in a level matches the number of bolts for t
 
 ## Questions
 
-- Any preference for the four palettes (e.g., vibrant, pastel, dark, high-contrast colorblind)? If not, the sets above are fine.
+## Reference Docs
+
+- [Reference index](.github/references/README.md)
+- [Game mechanics](.github/references/game-mechanics.md)
+- [Level generator](.github/references/level-generator.md)
+- [Data model](.github/references/data-model.md)
+- [Palettes](.github/references/palettes.md)
+- [Persistence](.github/references/persistence.md)
+- [UI guidelines](.github/references/ui-guidelines.md)
+- [Testing](.github/references/testing.md)
+- [Task list](.github/references/tasks.md)
 
 ## Agent Integration
 
