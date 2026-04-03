@@ -2,6 +2,7 @@ import { seededRandom, randomInt } from './rng';
 import type { GameState, Bolt } from './types';
 import { DIFFICULTY_CONFIG } from './constants';
 import { pickTopGroup, canPlaceGroup, performMove } from './engine';
+import { emitBalancerEvent } from './balancer';
 
 type CreateLevelOpts = { difficulty: GameState['difficulty']; level?: number; seed?: string | number };
 
@@ -24,6 +25,8 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
   const shuffleMoves = randomInt(rng, cfg.shuffleRange[0], cfg.shuffleRange[1]);
 
   const bolts = createSolvedBoard(numBolts, stackHeight);
+  // Add one temporary empty bolt to allow legal reverse moves
+  bolts.push({ id: `extra`, capacity: stackHeight, nuts: [] });
   const moveHistory: any[] = [];
 
   let lastMove: { from?: string; to?: string } | null = null;
@@ -56,6 +59,22 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
     seed,
     moveHistory,
   };
+
+  // Emit a balancing event for analysis tools
+  try {
+    emitBalancerEvent('generator', {
+      seed,
+      difficulty: opts.difficulty,
+      level: opts.level || 1,
+      params: { numBolts, stackHeight, shuffleMoves },
+      generated: {
+        bolts: bolts.length,
+        shufflePerformed: moveHistory.length,
+      },
+    });
+  } catch (e) {
+    // ignore
+  }
 
   return { state, seed };
 }

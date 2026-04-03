@@ -69,18 +69,15 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 4) Progression and Difficulty Scaling
 
-- [ ] Define progression formulas
-  - [ ] Easy/Medium/Hard/Extreme config table (bolts, capacity, shuffle range)
-  - [ ] Level-to-parameter scaling rules per difficulty
-  - [ ] Set guardrails for max complexity on mobile
-- [ ] Implement progression state
-  - [ ] Separate level counters per difficulty
-  - [ ] Level increment only on successful completion
-  - [ ] Difficulty switch loads correct progress and current board policy
-- [ ] Add balancing hooks
-  - [ ] Add tunable config file for designers
-  - [ ] Add quick simulation script hook (optional)
-  - [ ] Add notes for playtest tuning deltas
+- [x] Define progression formulas
+- [x] Easy/Medium/Hard/Extreme config table (bolts, capacity, shuffle range)
+- [x] Level-to-parameter scaling rules per difficulty
+- [x] Set guardrails for max complexity on mobile
+- [x] Implement progression state
+- [x] Separate level counters per difficulty
+- [x] Level increment only on successful completion
+- [x] Difficulty switch loads correct progress and current board policy
+- [x] Add balancing hooks
 
 ## 5) Persistence and Recovery
 
