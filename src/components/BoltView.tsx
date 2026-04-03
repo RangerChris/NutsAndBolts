@@ -47,9 +47,14 @@ export default function BoltView({ bolt, paletteId, selected = false, invalid = 
     const headY = THREAD_H + capacity * SLOT_H;   // y where head begins (relative to drawing origin)
     const svgH = headY + HEAD_H + TOP_PAD;        // add extra top padding to overall svg height
     // Ensure the bolt is always visible by scaling it down if it would exceed
-    // the available display height. This keeps all nuts visible regardless of
-    // bolt capacity while preserving aspect ratio.
-    const MAX_DISPLAY_HEIGHT = 320; // px — tuned for typical layouts
+    // the available display height. Use the viewport height (when available)
+    // so tall bolts scale to fit smaller screens rather than being clipped.
+    const DEFAULT_MAX = 320; // fallback
+    let MAX_DISPLAY_HEIGHT = DEFAULT_MAX;
+    if (typeof window !== 'undefined' && typeof window.innerHeight === 'number') {
+        // leave some room for topbar/controls; clamp to a reasonable max
+        MAX_DISPLAY_HEIGHT = Math.max(DEFAULT_MAX, Math.min(window.innerHeight - 160, 900));
+    }
     const scale = svgH > MAX_DISPLAY_HEIGHT ? MAX_DISPLAY_HEIGHT / svgH : 1;
     const headGradId = `head-${bolt.id}`;
     const shaftGradId = `shaft-${bolt.id}`;

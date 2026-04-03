@@ -1,6 +1,7 @@
 import { seededRandom, randomInt } from './rng';
 import type { GameState, Bolt } from './types';
 import { DIFFICULTY_CONFIG } from './constants';
+import { getLevelParams } from './progression';
 import { pickTopGroup, normalizeState, checkStateInvariants } from './engine';
 import { emitBalancerEvent } from './balancer';
 
@@ -18,9 +19,11 @@ export function createSolvedBoard(numBolts: number, stackHeight: number): Bolt[]
 
 export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: string } {
   const cfg = DIFFICULTY_CONFIG[opts.difficulty];
-  const numBolts = cfg.minBolts;
-  const stackHeight = cfg.stackHeightRange[0];
-  const seed = opts.seed != null ? String(opts.seed) : `${opts.difficulty}-${opts.level || 1}`;
+  // derive level parameters (numBolts, stackHeight) from progression rules so
+  // generator matches the rest of the game progression logic.
+  const levelNum = opts.level || 1;
+  const { numBolts, stackHeight } = getLevelParams(opts.difficulty, levelNum);
+  const seed = opts.seed != null ? String(opts.seed) : `${opts.difficulty}-${levelNum}`;
   const rng = seededRandom(seed);
   const shuffleMoves = randomInt(rng, cfg.shuffleRange[0], cfg.shuffleRange[1]);
 
