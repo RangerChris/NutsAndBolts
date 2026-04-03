@@ -23,14 +23,10 @@ Use this as the single execution checklist for MVP -> polish.
   - [x] Ensure Vite + React + TypeScript app is set up and runs
   - [x] Enable strict TypeScript settings
   - [x] Add scripts: dev, build, test, test:watch
-- [ ] Add baseline project structure
-  - [ ] Create folders: src/app, src/components, src/features, src/game, src/lib, src/styles, src/test
-  - [ ] Add index barrel files where useful
-  - [ ] Add basic app shell and routing approach (single-screen game view is fine)
-- [ ] Configure code quality and CI basics
-  - [ ] ESLint + Prettier configured
-  - [ ] Add CI task for lint + tests + build
-  - [ ] Add pre-commit hooks (optional but recommended)
+- [x] Add baseline project structure
+  - [x] Create folders: src/app, src/components, src/features, src/game, src/lib, src/styles, src/test
+  - [x] Add index barrel files where useful
+  - [x] Add basic app shell and routing approach (single-screen game view is fine)
 
 ## 2) Core Domain Model and Rules Engine
 
