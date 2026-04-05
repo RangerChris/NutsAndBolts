@@ -11,14 +11,17 @@ describe('level generator', () => {
     expect(a.state.moveHistory.length).toBe(b.state.moveHistory.length);
   });
 
-  it('reverse-play recorded moves can be reversed to solved state', () => {
+  it('generated board has no over-capacity bolts and is not trivially solved', () => {
+    // The generator uses the live shuffled state directly instead of replaying
+    // filtered moves on a solved board, so nuts.length must never exceed capacity.
     const { state } = createLevel({ difficulty: 'easy', level: 1, seed: 'reverse-test' });
-    const copy: any = JSON.parse(JSON.stringify(state));
-    // undo recorded moves in reverse using engine helper
-    while (copy.moveHistory && copy.moveHistory.length > 0) {
-      const r = undoLastMove(copy);
-      expect(r.success).toBe(true);
+    for (const bolt of state.bolts) {
+      expect(bolt.nuts.length).toBeLessThanOrEqual(bolt.capacity);
     }
-    expect(isWin(copy)).toBe(true);
+    // At least one bolt must be mixed (level should not be trivially solved at start).
+    const hasMixed = state.bolts.some(
+      (b) => b.nuts.length > 1 && !b.nuts.every((n) => n === b.nuts[0])
+    );
+    expect(hasMixed).toBe(true);
   });
 });

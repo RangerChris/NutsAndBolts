@@ -36,18 +36,6 @@ Tools To Avoid (by default)
 When To Pick This Agent
 - Pick over the default agent when the task is specifically about React frontend TypeScript work in this repository (component impl, bugfixes, tests, styling, build). Use the prompt prefix: "As Web Frontend React Developer:" to force selection.
 
-Clarifying Questions (ask when necessary)
-- Which bundler/framework: Create React App, Vite, Next.js, or custom?
-- Preferred styling approach: CSS Modules, Tailwind, styled-components, plain CSS?
-- Testing setup: Jest + RTL, Vitest, Cypress end-to-end tests?
-- Any existing design system or component library to reuse?
-
-Examples — Prompts to Try
-- "As Web Frontend React Developer: Implement a `LoginForm` component (`.tsx`) with validation, accessible labels, and unit tests using React Testing Library."
-- "As Web Frontend React Developer: Refactor `src/components/Widget/Widget.tsx` to remove side effects and add tests. Explain the changes."
-- "As Web Frontend React Developer: Fix runtime error thrown on `UserProfile` page in production build; reproduce locally and provide patch."
-- "As Web Frontend React Developer: Audit `src` for accessibility issues and propose small fixes with code patches."
-
 Iteration & Finalization
 - I will draft a focused patch and include tests or instructions to run them.
 - If anything is ambiguous, I will ask the clarifying questions above before finalizing.

@@ -1,0 +1,58 @@
+[
+  {
+    "seed": "bugcheck-easy-1",
+    "difficulty": "easy",
+    "shotPath": "screenshots/check-0-easy.png",
+    "mismatches": [],
+    "boltsCount": 3
+  },
+  {
+    "seed": "bugcheck-easy-2",
+    "difficulty": "easy",
+    "shotPath": "screenshots/check-1-easy.png",
+    "mismatches": [],
+    "boltsCount": 3
+  },
+  {
+    "seed": "bugcheck-medium-1",
+    "difficulty": "medium",
+    "shotPath": "screenshots/check-2-medium.png",
+    "mismatches": [],
+    "boltsCount": 4
+  },
+  {
+    "seed": "bugcheck-medium-2",
+    "difficulty": "medium",
+    "shotPath": "screenshots/check-3-medium.png",
+    "mismatches": [],
+    "boltsCount": 4
+  },
+  {
+    "seed": "bugcheck-hard-1",
+    "difficulty": "hard",
+    "shotPath": "screenshots/check-4-hard.png",
+    "mismatches": [],
+    "boltsCount": 6
+  },
+  {
+    "seed": "bugcheck-hard-2",
+    "difficulty": "hard",
+    "shotPath": "screenshots/check-5-hard.png",
+    "mismatches": [],
+    "boltsCount": 6
+  },
+  {
+    "seed": "bugcheck-extreme-1",
+    "difficulty": "extreme",
+    "shotPath": "screenshots/check-6-extreme.png",
+    "mismatches": [],
+    "boltsCount": 8
+  },
+  {
+    "seed": "bugcheck-extreme-2",
+    "difficulty": "extreme",
+    "shotPath": "screenshots/check-7-extreme.png",
+    "mismatches": [],
+    "boltsCount": 8
+  }
+]

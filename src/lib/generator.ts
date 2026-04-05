@@ -75,22 +75,16 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
       lastMove = { from: mv.fromBoltId, to: mv.toBoltId };
     }
   }
-  // Filter out any moves that involved the transient extra bolt and reconstruct the
-  // resulting bolts by replaying only the filtered moves from the solved board.
-  const filteredMoves = moveHistory.filter((m) => m.fromBoltId !== TEMP_EXTRA_ID && m.toBoltId !== TEMP_EXTRA_ID);
-
-  // Rebuild bolts from a solved board and apply filtered moves in order so the
-  // returned `moveHistory` is reversible back to the solved board.
-  const rebuilt = createSolvedBoard(numBolts, stackHeight);
-  for (const m of filteredMoves) {
-    const src = rebuilt.find((b) => b.id === m.fromBoltId);
-    const tgt = rebuilt.find((b) => b.id === m.toBoltId);
-    if (!src || !tgt) continue;
-    const moved = src.nuts.splice(Math.max(0, src.nuts.length - m.count), m.count);
-    tgt.nuts.push(...moved);
-  }
-  // Use the rebuilt bolts and only the filtered move history for the returned state
-  const boltsToReturn = rebuilt;
+  // Use the actual shuffled bolt state directly (minus the temp bolt).
+  // Replaying only `filteredMoves` on a fresh solved board is incorrect: those
+  // moves were recorded while temp-bolt moves freed capacity, so replaying them
+  // without the temp moves creates over-capacity bolts and clips nuts above the
+  // SVG viewport. The shuffle loop already respected capacity at each step, so
+  // the final `bolts` array is always valid.
+  const boltsToReturn = bolts.filter((b) => b.id !== TEMP_EXTRA_ID);
+  // Move history cannot be reliably reconstructed without temp-bolt moves,
+  // so start fresh. Undo only covers moves made during gameplay.
+  const filteredMoves: any[] = [];
 
   const state: GameState = {
     bolts: boltsToReturn || bolts,

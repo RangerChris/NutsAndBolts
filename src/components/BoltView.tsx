@@ -44,7 +44,10 @@ function nutTop(slotIdx: number, capacity: number): number {
 export default function BoltView({ bolt, paletteId, selected = false, invalid = false, onClick }: Props) {
     const palette = getPalette(paletteId);
     const capacity = bolt.capacity;
-    const headY = THREAD_H + capacity * SLOT_H;   // y where head begins (relative to drawing origin)
+    // Safety net: if the bolt state is somehow over-capacity, use the actual
+    // nut count so all nuts have a valid slot position and none are clipped.
+    const effectiveCapacity = Math.max(capacity, bolt.nuts.length);
+    const headY = THREAD_H + effectiveCapacity * SLOT_H;   // y where head begins (relative to drawing origin)
     const svgH = headY + HEAD_H + TOP_PAD;        // add extra top padding to overall svg height
     // Ensure the bolt is always visible by scaling it down if it would exceed
     // the available display height. Use the viewport height (when available)
@@ -52,12 +55,29 @@ export default function BoltView({ bolt, paletteId, selected = false, invalid = 
     const DEFAULT_MAX = 320; // fallback
     let MAX_DISPLAY_HEIGHT = DEFAULT_MAX;
     if (typeof window !== 'undefined' && typeof window.innerHeight === 'number') {
-        // leave some room for topbar/controls; clamp to a reasonable max
-        MAX_DISPLAY_HEIGHT = Math.max(DEFAULT_MAX, Math.min(window.innerHeight - 160, 900));
+        // available vertical space (leave room for topbar/controls)
+        const avail = window.innerHeight - 160;
+        // clamp into a reasonable range; allow smaller viewports to use a smaller max
+        if (avail > 0) {
+            MAX_DISPLAY_HEIGHT = Math.min(avail, 900);
+        } else {
+            MAX_DISPLAY_HEIGHT = DEFAULT_MAX;
+        }
     }
     const scale = svgH > MAX_DISPLAY_HEIGHT ? MAX_DISPLAY_HEIGHT / svgH : 1;
     const headGradId = `head-${bolt.id}`;
     const shaftGradId = `shaft-${bolt.id}`;
+
+    function readableTextColor(hex: string) {
+        // strip # if present
+        const h = hex.replace('#', '');
+        const r = parseInt(h.substring(0, 2), 16) / 255;
+        const g = parseInt(h.substring(2, 4), 16) / 255;
+        const b = parseInt(h.substring(4, 6), 16) / 255;
+        // relative luminance
+        const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        return lum > 0.6 ? '#000000' : '#ffffff';
+    }
 
     return (
         <div
@@ -111,9 +131,9 @@ export default function BoltView({ bolt, paletteId, selected = false, invalid = 
                         ))}
 
                         {/* ── Empty slot ghost outlines ── */}
-                        {Array.from({ length: capacity }).map((_, slotIdx) => {
+                        {Array.from({ length: effectiveCapacity }).map((_, slotIdx) => {
                             if (slotIdx < bolt.nuts.length) return null;
-                            const y = nutTop(slotIdx, capacity);
+                            const y = nutTop(slotIdx, effectiveCapacity);
                             return (
                                 <rect key={`ghost-${slotIdx}`}
                                     x={NUT_X} y={y} width={NUT_W} height={NUT_H} rx="2"
@@ -126,7 +146,7 @@ export default function BoltView({ bolt, paletteId, selected = false, invalid = 
                         {bolt.nuts.map((colorId, slotIdx) => {
                             const colorIndex = parseInt(colorId.replace(/^c/, ''), 10) || 0;
                             const color = palette.colors[colorIndex % palette.colors.length];
-                            const y = nutTop(slotIdx, capacity);
+                            const y = nutTop(slotIdx, effectiveCapacity);
                             const holeCY = y + NUT_H / 2;
                             return (
                                 <g key={`${bolt.id}-${slotIdx}-${colorId}`} data-nut-index={slotIdx}>
@@ -146,6 +166,12 @@ export default function BoltView({ bolt, paletteId, selected = false, invalid = 
                                     {/* Top-edge highlight */}
                                     <rect x={NUT_X + 3} y={y + 2} width={NUT_W - 6} height={2} rx="1"
                                         fill="rgba(255,255,255,0.28)" />
+                                    {/* Nut label: show color id (e.g. c0) centered */}
+                                    <text x={CX} y={holeCY + 4} textAnchor="middle" fontSize={10} fontWeight={600}
+                                        fill={readableTextColor(color)} style={{ userSelect: 'none', pointerEvents: 'none', fontFamily: 'Inter, Arial, sans-serif' }}
+                                        data-nut-id={colorId}>
+                                        {colorId}
+                                    </text>
                                 </g>
                             );
                         })}
@@ -168,6 +194,20 @@ export default function BoltView({ bolt, paletteId, selected = false, invalid = 
                             fill="rgba(255,255,255,0.40)" />
                     </g>
                 </svg>
+            </div>
+
+            {/* Debug labels shown below the bolt: index:colorId (bottom->top) */}
+            <div style={{ marginTop: 8, display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }} aria-hidden="true">
+                {bolt.nuts.map((nid, i) => {
+                    const colorIndex = parseInt(nid.replace(/^c/, ''), 10) || 0;
+                    const bg = palette.colors[colorIndex % palette.colors.length];
+                    const fg = readableTextColor(bg);
+                    return (
+                        <div key={`${bolt.id}-lbl-${i}`} style={{ fontSize: 11, padding: '2px 6px', borderRadius: 6, background: bg, color: fg, boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.12)' }}>
+                            {i}:{nid}
+                        </div>
+                    );
+                })}
             </div>
         </div >
     );

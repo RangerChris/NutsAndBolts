@@ -28,7 +28,7 @@ Provide consistent, team-friendly conventions for React frontend development in 
 - Folder structure: `src/components/`, `src/features/`, `src/pages/`, `src/lib/`, `src/hooks/`, `src/styles/`.
 - State: prefer local component state and `useContext`/`useReducer` for feature-level state. Use Redux Toolkit as the default global state library for cross-cutting/global state.
 - Styling: use Tailwind CSS as the project styling system. Avoid inline styles except for dynamic style objects.
-- Tests: Playwright is the primary testing tool for the project; ensure unit/component/flow coverage via Playwright tests. (Optional: use Jest+RTL for very targeted unit testing if necessary, but Playwright coverage is required.)
+- Tests: Playwright is the primary testing tool for the project; ensure unit/component/flow coverage via Playwright tests.
 - Types: prefer small, explicit interfaces over large `Record<string, unknown>` structures.
 
 ## Component Patterns

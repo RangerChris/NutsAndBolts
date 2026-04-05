@@ -85,14 +85,18 @@ export default function GameShell(): JSX.Element {
                 const r = sel.getBoundingClientRect();
                 // derive color from svg polygon fill if possible
                 let color = '#999999';
+                let colorLabel: string | undefined = undefined;
                 try {
                     // First child rect of the nut <g> is the body with the palette color
                     const nutRect = sel.querySelector('rect');
                     if (nutRect) color = (nutRect as SVGElement).getAttribute('fill') || color;
+                    // prefer explicit data-nut-id attribute on inner text
+                    const labelEl = sel.querySelector('[data-nut-id]');
+                    if (labelEl) colorLabel = (labelEl as Element).getAttribute('data-nut-id') || undefined;
                 } catch (e) {
                     // ignore
                 }
-                preRects.push({ left: r.left, top: r.top, width: r.width, height: r.height, color });
+                preRects.push({ left: r.left, top: r.top, width: r.width, height: r.height, color, colorLabel });
             }
         }
 
