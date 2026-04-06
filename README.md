@@ -48,10 +48,6 @@ Where to look
 - Persistence: `src/lib/persistence.ts` and `src/lib/persistence.test.ts`
 - UI: `src/app/GameShell.tsx` and components in `src/components`
 
-Contributing
-
-See [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) for branch/PR guidance, testing checklist, and the release notes template.
-
 Live demo
 
 The application is deployed to GitHub Pages at: <https://RangerChris.github.io/NutsAndBolts/>
