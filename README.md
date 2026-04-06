@@ -51,3 +51,8 @@ Where to look
 Contributing
 
 See [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) for branch/PR guidance, testing checklist, and the release notes template.
+
+Live demo
+
+The application is deployed to GitHub Pages at: <https://RangerChris.github.io/NutsAndBolts/>
+Visit that URL to test the app (the site updates automatically on push or when the deploy workflow runs).
