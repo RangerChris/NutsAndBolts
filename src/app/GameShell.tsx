@@ -202,26 +202,62 @@ export default function GameShell(): JSX.Element {
                 <Board state={state} paletteId={paletteId} showDebug={showDebug} selectedBoltId={selected} invalidBoltId={invalidTarget} onBoltClick={handleBoltClick} animMove={animMove} onAnimDone={handleAnimDone} />
             </div>
             {showComplete && (
-                <div role="dialog" aria-modal="true" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>
-                    <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 360, boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
-                        <h2>Level Complete</h2>
-                        <p>Nice work — you completed level {state.level}.</p>
-                        <div style={{ marginTop: 8 }}>
-                            {/* move and star summary */}
-                            {(() => {
-                                const s = computeStars(state);
-                                return (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                        <div><strong>Moves:</strong> {s.moveCount}{s.optimal ? ` (optimal ${s.optimal})` : ''}</div>
-                                        <div><strong>Time:</strong> {Math.round(s.timeSpentMs / 1000)}s used of {Math.round(s.timeAvailableMs / 1000)}s available</div>
-                                        <div><strong>Stars:</strong> {'★'.repeat(s.totalStars)}{'☆'.repeat(3 - s.totalStars)}</div>
+                <div className="complete-overlay" role="dialog" aria-modal="true">
+                    <div className="complete-modal">
+                        <div className="hardware-stars">
+                            <div className="nut-hex small" aria-hidden>
+                                <span style={{ fontSize: 18, opacity: 0.8 }}>★</span>
+                            </div>
+                            <div className="nut-hex big" aria-hidden>
+                                <div style={{ width: 56, height: 56, borderRadius: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--complete-accent)', border: '4px solid rgba(0,0,0,0.12)' }}>
+                                    <span style={{ fontSize: 32 }}>★</span>
+                                </div>
+                            </div>
+                            <div className="nut-hex small" aria-hidden>
+                                <span style={{ fontSize: 18, opacity: 0.8 }}>★</span>
+                            </div>
+                        </div>
+
+                        <h2 className="complete-title">Excellent Sort!</h2>
+                        <p className="complete-sub">Nice work — you completed level {state.level}.</p>
+
+                        {(() => {
+                            const s = computeStars(state);
+                            return (
+                                <>
+                                    <div className="stats-card">
+                                        <div className="stat">
+                                            <div className="label">Moves</div>
+                                            <div className="value">{s.moveCount}{s.optimal ? ` (opt ${s.optimal})` : ''}</div>
+                                        </div>
+                                        <div style={{ width: 1, height: 36, background: 'rgba(255,255,255,0.05)' }} />
+                                        <div className="stat">
+                                            <div className="label">Time</div>
+                                            <div className="value">{Math.round(s.timeSpentMs / 1000)}s</div>
+                                        </div>
+                                        <div style={{ width: 1, height: 36, background: 'rgba(255,255,255,0.05)' }} />
+                                        <div className="stat">
+                                            <div className="label">Stars</div>
+                                            <div className="value">{'★'.repeat(s.totalStars)}{'☆'.repeat(3 - s.totalStars)}</div>
+                                        </div>
                                     </div>
-                                );
-                            })()}
-                        </div>
-                        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 12 }}>
-                            <button onClick={handleContinue} style={{ fontWeight: '600' }}>Continue</button>
-                        </div>
+
+                                    <div style={{ width: '100%', marginTop: 12 }}>
+                                        <button className="primary-cta" onClick={handleContinue}>Next Level</button>
+                                        <div className="secondary-actions" style={{ justifyContent: 'center' }}>
+                                            <button className="action" onClick={handleUndo} aria-label="Replay">
+                                                <div className="icon">⟲</div>
+                                                <div className="muted">Replay</div>
+                                            </button>
+                                            <button className="action" onClick={() => { /* share placeholder */ }} aria-label="Share">
+                                                <div className="icon">⤴</div>
+                                                <div className="muted">Share</div>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            );
+                        })()}
                     </div>
                 </div>
             )}

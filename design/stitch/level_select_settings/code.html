@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-container": "#93000a",
+                    "surface-tint": "#ffb59c",
+                    "error": "#ffb4ab",
+                    "on-background": "#e4e2e5",
+                    "on-surface-variant": "#e7bdb0",
+                    "on-tertiary": "#2e2f3e",
+                    "secondary-fixed-dim": "#77dc7a",
+                    "on-secondary-fixed-variant": "#005316",
+                    "surface-container-lowest": "#0e0e11",
+                    "inverse-surface": "#e4e2e5",
+                    "primary": "#ffb59c",
+                    "on-primary": "#5c1a00",
+                    "on-secondary": "#00390c",
+                    "on-surface": "#e4e2e5",
+                    "surface-container": "#1f1f22",
+                    "secondary-fixed": "#93f993",
+                    "on-primary-fixed-variant": "#822800",
+                    "surface-variant": "#343437",
+                    "surface": "#131316",
+                    "on-secondary-container": "#93f993",
+                    "secondary-container": "#005316",
+                    "on-tertiary-fixed-variant": "#444655",
+                    "primary-container": "#822800",
+                    "surface-bright": "#39393c",
+                    "surface-container-high": "#2a2a2d",
+                    "primary-fixed-dim": "#ffb59c",
+                    "on-error": "#690005",
+                    "tertiary-container": "#444655",
+                    "surface-container-low": "#1b1b1e",
+                    "background": "#131316",
+                    "outline-variant": "#5d4036",
+                    "tertiary-fixed-dim": "#c5c5d8",
+                    "on-primary-fixed": "#380c00",
+                    "on-tertiary-container": "#e1e1f5",
+                    "on-primary-container": "#ffdbcf",
+                    "surface-container-highest": "#343437",
+                    "inverse-on-surface": "#303033",
+                    "primary-fixed": "#ffdbcf",
+                    "on-secondary-fixed": "#002105",
+                    "on-tertiary-fixed": "#191b29",
+                    "surface-dim": "#131316",
+                    "secondary": "#77dc7a",
+                    "outline": "#ad887c",
+                    "inverse-primary": "#a43c12",
+                    "tertiary-fixed": "#e1e1f5",
+                    "tertiary": "#c5c5d8",
+                    "on-error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Plus Jakarta Sans"],
+                    "label": ["Plus Jakarta Sans"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-effect {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+      }
+      body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #131316;
+        color: #e4e2e5;
+      }
+      .asymmetric-pill {
+        border-radius: 3rem 1rem 3rem 1.5rem;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface selection:bg-primary-container">
+<!-- Top Navigation -->
+<header class="bg-[#131316] w-full pt-4 px-6 z-50">
+<nav class="flex justify-between items-center w-full max-w-xl mx-auto">
+<button class="text-[#ffb59c] hover:opacity-80 active:scale-95 duration-200 ease-out-back">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</button>
+<h1 class="text-xl font-extrabold text-[#ffb59c] font-['Plus_Jakarta_Sans'] tracking-tight">Level 42</h1>
+<button class="text-[#ffb59c] hover:opacity-80 active:scale-95 duration-200 ease-out-back">
+<span class="material-symbols-outlined" data-icon="palette">palette</span>
+</button>
+</nav>
+</header>
+<main class="max-w-xl mx-auto px-6 pt-8 pb-32">
+<!-- Hero Progress Section -->
+<section class="mb-10">
+<div class="relative bg-surface-container-low rounded-xl p-8 overflow-hidden group">
+<div class="absolute top-0 right-0 -mr-8 -mt-8 w-48 h-48 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all"></div>
+<div class="relative z-10 flex flex-col gap-2">
+<span class="text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">Active Difficulty</span>
+<h2 class="text-4xl font-extrabold text-primary tracking-tight">Medium</h2>
+<div class="mt-4 flex items-center gap-4">
+<div class="flex-1 bg-surface-container-highest h-3 rounded-full overflow-hidden">
+<div class="bg-gradient-to-r from-primary to-primary-container h-full w-[42%] rounded-full"></div>
+</div>
+<span class="text-sm font-bold text-on-surface">42/100</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Difficulty Selection Grid -->
+<section class="mb-12">
+<h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant/60 mb-6 px-2">Change Difficulty</h3>
+<div class="grid grid-cols-2 gap-4">
+<!-- Easy -->
+<div class="bg-surface-container-low p-6 rounded-xl hover:bg-surface-container transition-all cursor-pointer group border border-outline-variant/10">
+<div class="flex justify-between items-start mb-6">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="child_care">child_care</span>
+</div>
+<span class="text-[10px] font-extrabold text-secondary uppercase bg-secondary/10 px-2 py-1 rounded-full">Completed</span>
+</div>
+<p class="text-on-surface font-bold text-lg">Easy</p>
+<p class="text-xs text-on-surface-variant">100/100 Solved</p>
+</div>
+<!-- Medium (Active) -->
+<div class="bg-primary/10 p-6 rounded-xl border-2 border-primary/30 relative overflow-hidden group">
+<div class="flex justify-between items-start mb-6">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+</div>
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+</div>
+<p class="text-on-surface font-bold text-lg">Medium</p>
+<p class="text-xs text-on-surface-variant">Level 42/100</p>
+</div>
+<!-- Hard -->
+<div class="bg-surface-container-low p-6 rounded-xl hover:bg-surface-container transition-all cursor-pointer border border-outline-variant/10 group">
+<div class="flex justify-between items-start mb-6">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+</div>
+</div>
+<p class="text-on-surface font-bold text-lg">Hard</p>
+<p class="text-xs text-on-surface-variant">12/100 Unlocked</p>
+</div>
+<!-- Expert -->
+<div class="bg-surface-container-low p-6 rounded-xl opacity-60 grayscale hover:grayscale-0 hover:opacity-100 transition-all cursor-pointer border border-outline-variant/10 group">
+<div class="flex justify-between items-start mb-6">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="lock">lock</span>
+</div>
+</div>
+<p class="text-on-surface font-bold text-lg">Expert</p>
+<p class="text-xs text-on-surface-variant">Unlock at Lvl 50</p>
+</div>
+</div>
+</section>
+<!-- Level Replay Grid -->
+<section class="mb-10">
+<div class="flex items-center justify-between mb-6 px-2">
+<h3 class="text-sm font-bold uppercase tracking-widest text-on-surface-variant/60">Stage Select</h3>
+<div class="flex gap-2">
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-5 gap-y-6 gap-x-2">
+<!-- Level Buttons -->
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-secondary-fixed-dim text-on-secondary font-black text-lg flex items-center justify-center shadow-lg active:scale-90 transition-transform">1</button>
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-[10px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[10px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[10px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-secondary-fixed-dim text-on-secondary font-black text-lg flex items-center justify-center shadow-lg active:scale-90 transition-transform">2</button>
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-[10px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[10px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[10px] text-secondary-container">star</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-secondary-fixed-dim text-on-secondary font-black text-lg flex items-center justify-center shadow-lg active:scale-90 transition-transform">3</button>
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-[10px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[10px] text-secondary-container">star</span>
+<span class="material-symbols-outlined text-[10px] text-secondary-container">star</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-secondary-fixed-dim text-on-secondary font-black text-lg flex items-center justify-center shadow-lg active:scale-90 transition-transform">4</button>
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-[10px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[10px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[10px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-secondary-fixed-dim text-on-secondary font-black text-lg flex items-center justify-center shadow-lg active:scale-90 transition-transform">5</button>
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-[10px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[10px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[10px] text-secondary-container">star</span>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface font-black text-lg flex items-center justify-center border-2 border-outline-variant active:scale-90 transition-transform">36</button>
+<span class="text-[10px] font-bold text-on-surface-variant">32s</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface font-black text-lg flex items-center justify-center border-2 border-outline-variant active:scale-90 transition-transform">37</button>
+<span class="text-[10px] font-bold text-on-surface-variant">45s</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface font-black text-lg flex items-center justify-center border-2 border-outline-variant active:scale-90 transition-transform">38</button>
+<span class="text-[10px] font-bold text-on-surface-variant">19s</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface font-black text-lg flex items-center justify-center border-2 border-outline-variant active:scale-90 transition-transform">39</button>
+<span class="text-[10px] font-bold text-on-surface-variant">61s</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface font-black text-lg flex items-center justify-center border-2 border-outline-variant active:scale-90 transition-transform">40</button>
+<span class="text-[10px] font-bold text-on-surface-variant">28s</span>
+</div>
+<!-- Row 3 Active -->
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-surface-container-high text-on-surface font-black text-lg flex items-center justify-center border-2 border-outline-variant active:scale-90 transition-transform">41</button>
+<span class="text-[10px] font-bold text-on-surface-variant">12s</span>
+</div>
+<div class="flex flex-col items-center gap-2 relative">
+<div class="absolute -inset-2 bg-primary/20 rounded-full blur-md"></div>
+<button class="relative w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary-container text-on-primary font-black text-lg flex items-center justify-center shadow-[0_0_20px_rgba(255,181,156,0.4)] scale-110 active:scale-95 transition-transform">42</button>
+<span class="text-[10px] font-bold text-primary">CURRENT</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-surface-container-lowest text-on-surface/20 font-black text-lg flex items-center justify-center border-2 border-dashed border-outline-variant/30">43</button>
+<span class="material-symbols-outlined text-xs text-on-surface/20" data-icon="lock">lock</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-surface-container-lowest text-on-surface/20 font-black text-lg flex items-center justify-center border-2 border-dashed border-outline-variant/30">44</button>
+<span class="material-symbols-outlined text-xs text-on-surface/20" data-icon="lock">lock</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<button class="w-14 h-14 rounded-full bg-surface-container-lowest text-on-surface/20 font-black text-lg flex items-center justify-center border-2 border-dashed border-outline-variant/30">45</button>
+<span class="material-symbols-outlined text-xs text-on-surface/20" data-icon="lock">lock</span>
+</div>
+</div>
+</section>
+<!-- Premium Upsell Asymmetric Card -->
+<section class="mt-8">
+<div class="relative bg-surface-container-high p-6 asymmetric-pill flex items-center justify-between gap-6 border border-primary/20">
+<div class="flex-1">
+<h4 class="text-primary font-extrabold text-lg">Unlimited Hints</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Stuck on a puzzle? Get Pro and never wait again.</p>
+</div>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-full font-bold text-sm shadow-xl active:scale-95 transition-transform">Upgrade</button>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 bg-[#1c1b1f]/80 backdrop-blur-xl rounded-t-[3rem] shadow-[0_-8px_30px_rgb(0,0,0,0.12)]">
+<button class="flex flex-col items-center justify-center text-[#e4e2e5]/50 px-5 py-2 hover:text-[#ffb59c] active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="build">build</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold uppercase tracking-wider">Bolt</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#e4e2e5]/50 px-5 py-2 hover:text-[#ffb59c] active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="undo">undo</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold uppercase tracking-wider">Undo</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-[#ffb59c]/20 text-[#ffb59c] rounded-full px-5 py-2 active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="lightbulb" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold uppercase tracking-wider">Hint</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#e4e2e5]/50 px-5 py-2 hover:text-[#ffb59c] active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold uppercase tracking-wider">Menu</span>
+</button>
+</nav>
+<!-- Visual Polish: Grain Overlay -->
+<div class="fixed inset-0 pointer-events-none opacity-[0.03] mix-blend-overlay">
+<svg viewbox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+<filter id="noiseFilter">
+<feturbulence basefrequency="0.65" numoctaves="3" stitchtiles="stitch" type="fractalNoise"></feturbulence>
+</filter>
+<rect filter="url(#noiseFilter)" height="100%" width="100%"></rect>
+</svg>
+</div>
+</body></html>
