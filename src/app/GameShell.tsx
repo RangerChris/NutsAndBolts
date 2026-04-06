@@ -1,20 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import type { GameState, Bolt } from '../lib/types';
 import { createLevel } from '../lib/generator';
-import { addExtraBolt, undoLastMove, isWin, executeMoveOnState, pickTopGroup, canPlaceGroup, computeStars } from '../lib/engine';
+import {
+    addExtraBolt,
+    undoLastMove,
+    isWin,
+    executeMoveOnState,
+    pickTopGroup,
+    canPlaceGroup,
+    computeStars,
+} from '../lib/engine';
 import Board from '../components/Board';
 import BottomBar from '../components/BottomBar';
 import TopBar from '../components/TopBar';
-import { loadProgress, setPaletteId, getSelectedDifficulty, setSelectedDifficulty, setCurrentLevel } from '../lib/persistence';
+import starUrl from '../assets/icons/star.svg'; // Keep star asset
+import {
+    loadProgress,
+    setPaletteId,
+    getSelectedDifficulty,
+    setSelectedDifficulty,
+    setCurrentLevel,
+} from '../lib/persistence';
 import { getPalette } from '../lib/palettes';
 
-export default function GameShell(): JSX.Element {
+import type { ReactElement } from 'react';
+
+export default function GameShell(): ReactElement {
     const [state, setState] = useState<GameState | null>(null);
     const progress = loadProgress();
     const [paletteId, setPalette] = useState<number>(progress.settings?.paletteId ?? 0);
     const [seed, setSeed] = useState<string>(() => `seed-${Date.now()}`);
     const persistedDifficulty = getSelectedDifficulty();
-    const [difficulty, setDifficulty] = useState<GameState['difficulty']>(persistedDifficulty as GameState['difficulty']);
+    const [difficulty, setDifficulty] = useState<GameState['difficulty']>(
+        persistedDifficulty as GameState['difficulty']
+    );
     const initialLevel = progress.difficulties?.[difficulty]?.currentLevel ?? 1;
     const [currentLevel, setCurrentLevelState] = useState<number>(initialLevel);
     const [showDebug, setShowDebug] = useState<boolean>(false);
@@ -47,7 +66,7 @@ export default function GameShell(): JSX.Element {
         if (res.success) setState({ ...state });
         else {
             // show invalid feedback on target
-            setInvalidTarget(id);
+            setInvalidTarget('extra');
             setTimeout(() => setInvalidTarget(null), 420);
         }
     };
@@ -78,7 +97,14 @@ export default function GameShell(): JSX.Element {
         }
 
         // capture pre-move rects for the top `count` nuts
-        const preRects: Array<{ left: number; top: number; width: number; height: number; color: string }> = [];
+        const preRects: Array<{
+            left: number;
+            top: number;
+            width: number;
+            height: number;
+            color: string;
+            colorLabel?: string;
+        }> = [];
         for (let i = 0; i < count; i++) {
             const idx = srcBolt.nuts.length - count + i;
             const sel = document.querySelector(`[data-bolt="${selected}"] [data-nut-index="${idx}"]`);
@@ -100,7 +126,14 @@ export default function GameShell(): JSX.Element {
                 } catch (e) {
                     // ignore
                 }
-                preRects.push({ left: r.left, top: r.top, width: r.width, height: r.height, color, colorLabel });
+                preRects.push({
+                    left: r.left,
+                    top: r.top,
+                    width: r.width,
+                    height: r.height,
+                    color,
+                    colorLabel,
+                });
             }
         }
 
@@ -181,40 +214,59 @@ export default function GameShell(): JSX.Element {
             </div>
 
             <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                <div style={{ flex: 1 }}>
-                    <BottomBar
-                        onExtra={handleExtra}
-                        onUndo={handleUndo}
-                        onHint={handleHint}
-                        // Disable the Extra button when an extra bolt is already present
-                        extraDisabled={state.bolts.some((b) => String(b.id).startsWith('extra')) || state.bolts.length >= 12}
-                        undoDisabled={!state.moveHistory || state.moveHistory.length === 0}
-                        hintDisabled={!!findHint() === false}
-                    />
-                </div>
                 <div style={{ marginLeft: 12 }}>
                     {isWin(state) ? <span>🎉 Solved</span> : <span>In play</span>}
                 </div>
             </div>
 
             <div>
-                <strong>Bolts</strong> ({state.bolts.length}):
-                <Board state={state} paletteId={paletteId} showDebug={showDebug} selectedBoltId={selected} invalidBoltId={invalidTarget} onBoltClick={handleBoltClick} animMove={animMove} onAnimDone={handleAnimDone} />
+                <Board
+                    state={state}
+                    paletteId={paletteId}
+                    showDebug={showDebug}
+                    selectedBoltId={selected}
+                    invalidBoltId={invalidTarget}
+                    onBoltClick={handleBoltClick}
+                    animMove={animMove}
+                    onAnimDone={handleAnimDone}
+                />
+            </div>
+            <div style={{ marginTop: 12 }}>
+                <BottomBar
+                    onExtra={handleExtra}
+                    onUndo={handleUndo}
+                    onHint={handleHint}
+                    // Disable the Extra button when an extra bolt is already present
+                    extraDisabled={state.bolts.some((b) => String(b.id).startsWith('extra')) || state.bolts.length >= 12}
+                    undoDisabled={!state.moveHistory || state.moveHistory.length === 0}
+                    hintDisabled={!!findHint() === false}
+                />
             </div>
             {showComplete && (
                 <div className="complete-overlay" role="dialog" aria-modal="true">
                     <div className="complete-modal">
                         <div className="hardware-stars">
                             <div className="nut-hex small" aria-hidden>
-                                <span style={{ fontSize: 18, opacity: 0.8 }}>★</span>
+                                <img src={starUrl} alt="star" style={{ width: 28, height: 28, opacity: 0.9 }} />
                             </div>
                             <div className="nut-hex big" aria-hidden>
-                                <div style={{ width: 56, height: 56, borderRadius: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--complete-accent)', border: '4px solid rgba(0,0,0,0.12)' }}>
-                                    <span style={{ fontSize: 32 }}>★</span>
+                                <div
+                                    style={{
+                                        width: 56,
+                                        height: 56,
+                                        borderRadius: 28,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        background: 'var(--complete-accent)',
+                                        border: '4px solid rgba(0,0,0,0.12)',
+                                    }}
+                                >
+                                    <img src={starUrl} alt="star" style={{ width: 36, height: 36 }} />
                                 </div>
                             </div>
                             <div className="nut-hex small" aria-hidden>
-                                <span style={{ fontSize: 18, opacity: 0.8 }}>★</span>
+                                <img src={starUrl} alt="star" style={{ width: 28, height: 28, opacity: 0.9 }} />
                             </div>
                         </div>
 
@@ -228,32 +280,30 @@ export default function GameShell(): JSX.Element {
                                     <div className="stats-card">
                                         <div className="stat">
                                             <div className="label">Moves</div>
-                                            <div className="value">{s.moveCount}{s.optimal ? ` (opt ${s.optimal})` : ''}</div>
+                                            <div className="value">
+                                                {s.moveCount}
+                                                {s.optimal ? ` (opt ${s.optimal})` : ''}
+                                            </div>
                                         </div>
-                                        <div style={{ width: 1, height: 36, background: 'rgba(255,255,255,0.05)' }} />
+                                        <div style={{ width: 1, height: 36, background: 'var(--ghost-stroke)' }} />
                                         <div className="stat">
                                             <div className="label">Time</div>
                                             <div className="value">{Math.round(s.timeSpentMs / 1000)}s</div>
                                         </div>
-                                        <div style={{ width: 1, height: 36, background: 'rgba(255,255,255,0.05)' }} />
+                                        <div style={{ width: 1, height: 36, background: 'var(--ghost-stroke)' }} />
                                         <div className="stat">
                                             <div className="label">Stars</div>
-                                            <div className="value">{'★'.repeat(s.totalStars)}{'☆'.repeat(3 - s.totalStars)}</div>
+                                            <div className="value">
+                                                {'★'.repeat(s.totalStars)}
+                                                {'☆'.repeat(3 - s.totalStars)}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div style={{ width: '100%', marginTop: 12 }}>
-                                        <button className="primary-cta" onClick={handleContinue}>Next Level</button>
-                                        <div className="secondary-actions" style={{ justifyContent: 'center' }}>
-                                            <button className="action" onClick={handleUndo} aria-label="Replay">
-                                                <div className="icon">⟲</div>
-                                                <div className="muted">Replay</div>
-                                            </button>
-                                            <button className="action" onClick={() => { /* share placeholder */ }} aria-label="Share">
-                                                <div className="icon">⤴</div>
-                                                <div className="muted">Share</div>
-                                            </button>
-                                        </div>
+                                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+                                        <button className="control-btn" onClick={handleContinue}>
+                                            Next Level
+                                        </button>
                                     </div>
                                 </>
                             );

@@ -1,30 +1,15 @@
 # Color palettes
 
-Four palettes are supported and selectable during gameplay. Each palette should include pattern overlays or shapes for colorblind accessibility.
+Multiple selectable palettes are implemented in the app (the runtime exposes an array of palettes in `src/lib/palettes.ts`). The shipped set includes the original four accessibility-focused palettes plus several additional theme palettes (Vibrant, Pastel, Jewel, Colorblind, Warm Sunset, Ocean, Earth, Retro, Cyberpunk, High Contrast).
 
-1) Vibrant (default)
+Key implementation notes (current)
 
-- Colors: `#FF6B6B`, `#FFD93D`, `#6BCB77`, `#4D96FF`, `#FF8C42`, `#A56BFF`, `#00C2A8`, `#FF4DA6`, `#C7F464`, `#2F2FFF`
-- Use high saturation and clear borders for small screens.
+- Palettes are represented as simple arrays of color hex strings and an `id`/`name` pair (`Palette[]` in `src/lib/palettes.ts`).
+- The UI exposes a palette dropdown in the top bar that shows a small swatch preview and persists the selected palette id via `src/lib/persistence.ts`.
+- For accessibility, the `Colorblind` palette is provided and the rendering supports pattern/shape overlays; the token rendering code (in `src/components/BoltView.tsx`) uses gradients and can be extended to add SVG patterns for non-color markers.
+- Palettes act as base color sets. When a level requires extra distinct identifiers the runtime prefers pattern overlays or small perceptual shifts rather than inventing arbitrary colors.
 
-1) Pastel
+Suggested guidance for designers
 
-- Colors: `#FFB3BA`, `#FFDFBA`, `#FFFFBA`, `#BFFCC6`, `#B3D9FF`, `#E2B8FF`, `#FDE2FF`, `#DFF8E1`, `#FFF3B0`, `#CDEFFF`
-- Softer tones for relaxed visual style.
-
-1) Dark
-
-- Colors: `#D7263D`, `#021827`, `#0F4C5C`, `#8EA7E9`, `#6A1B4D`, `#124E4A`, `#3B2F2F`, `#5C3E91`, `#1F6F8B`, `#7A4A2F`
-- For dark theme; ensure contrast for outlines and patterns.
-
-1) Colorblind-friendly
-
-- Colors: `#E69F00`, `#56B4E9`, `#009E73`, `#F0E442`, `#0072B2`, `#D55E00`, `#CC79A7`, `#88CCEE`, `#999999`, `#4D4D4D`
-- Use distinct hues and pair with patterns (e.g., stripes, dots, crosshatch) to disambiguate.
-
-Implementation notes
-
-- Represent palette as an array of color + pattern identifiers.
-- Allow players to switch palettes at any time; persist selection to settings.
-- When rendering, draw both color and optional pattern overlay (SVG pattern or mask).
-- Treat these color lists as base sets. If runtime needs additional distinct identifiers, preserve separability via shape/pattern overlays or small hue/lightness adjustments that remain colorblind-safe.
+- Prefer the provided palettes from `src/lib/palettes.ts` rather than adding new ad-hoc hex lists.
+- When adding a palette, include a short `name`, an `id`, and 8–10 colors that remain separable at small sizes; provide a pattern identifier if the palette relies on non-color markers for accessibility.

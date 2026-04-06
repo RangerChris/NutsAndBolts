@@ -9,23 +9,30 @@ Summary of current UI features
 - Bolt rendering (`BoltView`): side-view bolt with nuts — SVG scaled down when bolt height would exceed a maximum display height. An 8px top padding ensures the top nut isn't clipped.
 - Bottom controls (`BottomBar`): `Extra Bolt`, `Undo`, `Hint` and status indicators; Extra Bolt is single-use per level and disabled appropriately.
 - Level Complete modal: shown when `isWin(state)` is true; Continue advances `currentLevel`, persists it, and generates a new seed.
+- The UI uses a FLIP-style clone animation for moving nuts (cloned nut elements animate from source to target). The clone animation implementation lives in `src/components/Board.tsx` and uses short fixed-position SVG clones to animate transforms; animations are cleaned up after `transitionend` or a safety timeout.
+
+Implementation details to keep in mind
+
+- Palette source: palettes are defined in `src/lib/palettes.ts` and the TopBar palette dropdown reads from that list.
+- Bolt geometry: `src/components/BoltView.tsx` exposes constants like `TOP_PAD` and scaling logic that maintain nut visibility on small screens; prefer changing these constants in code rather than overriding via CSS for consistent geometry.
+- Animation anchors: the FLIP clone approach relies on stable `data-bolt` and `data-nut-index` attributes — avoid renaming those attributes without updating the clone capture logic in `GameShell` and `Board`.
 
 Layout and responsiveness
 
 - TopBar: implemented in `src/components/TopBar.tsx`. Layout rules:
- 	- Container uses `display:flex`, `justify-content:space-between`, and `flexWrap: 'wrap'` so controls naturally wrap to the next line on narrow viewports.
- 	- Level and Difficulty are kept visible together; Seed and Palette are rendered to the right (and wrap under when needed).
- 	- Avoids a separate "More" menu; items flow across rows for predictable behavior and simpler keyboard/aria handling.
+  - Container uses `display:flex`, `justify-content:space-between`, and `flexWrap: 'wrap'` so controls naturally wrap to the next line on narrow viewports.
+  - Level and Difficulty are kept visible together; Seed and Palette are rendered to the right (and wrap under when needed).
+  - Avoids a separate "More" menu; items flow across rows for predictable behavior and simpler keyboard/aria handling.
 - Board: `src/components/Board.tsx` uses a wrapping flex container (`flexWrap: 'wrap'`, `flex: 0 0 auto` per bolt) so bolts fill available width and wrap remaining bolts. This makes the UI adaptively show as many bolts as will fit, then flow to next row.
 
 Bolt visual and geometry
 
 - `src/components/BoltView.tsx` renders a side-view bolt with the following features:
- 	- Constants for geometry (WIDTH, HEAD_W/HEAD_H, SHAFT_W, SLOT_H, NUT_W/NUT_H).
- 	- `slotTop`/`nutTop` helper functions compute nut positions relative to the bolt origin.
- 	- `TOP_PAD` (8px) added to avoid clipping the top nut.
- 	- `MAX_DISPLAY_HEIGHT` scaling: bolt SVG scales down when it would exceed a configured max height (currently 320px), preserving aspect ratio and keeping all nuts visible.
- 	- Visual details: gradients for head/shaft, nut chamfer lines, thread hole ellipses, subtle highlights.
+  - Constants for geometry (WIDTH, HEAD_W/HEAD_H, SHAFT_W, SLOT_H, NUT_W/NUT_H).
+  - `slotTop`/`nutTop` helper functions compute nut positions relative to the bolt origin.
+  - `TOP_PAD` (8px) added to avoid clipping the top nut.
+  - `MAX_DISPLAY_HEIGHT` scaling: bolt SVG scales down when it would exceed a configured max height (currently 320px), preserving aspect ratio and keeping all nuts visible.
+  - Visual details: gradients for head/shaft, nut chamfer lines, thread hole ellipses, subtle highlights.
 
 Animations and FLIP behavior
 
@@ -35,20 +42,20 @@ Animations and FLIP behavior
 Game flow & state
 
 - `src/app/GameShell.tsx` is the orchestrator:
- 	- Uses persisted `difficulty`, `paletteId`, and per-difficulty `currentLevel` via `src/lib/persistence.ts`.
- 	- `createLevel({ difficulty, level, seed })` builds `state` (generator produces deterministic boards by seed).
- 	- `handleContinue()` increments `currentLevel`, persists it, generates a new seed and lets the `useEffect` regenerate the board.
- 	- Level Complete dialog is shown based on `isWin(state)`.
+  - Uses persisted `difficulty`, `paletteId`, and per-difficulty `currentLevel` via `src/lib/persistence.ts`.
+  - `createLevel({ difficulty, level, seed })` builds `state` (generator produces deterministic boards by seed).
+  - `handleContinue()` increments `currentLevel`, persists it, generates a new seed and lets the `useEffect` regenerate the board.
+  - Level Complete dialog is shown based on `isWin(state)`.
 
 Generator & engine notes (relevant to UI expectations)
 
 - Reverse-play generator (`src/lib/generator.ts`) now:
- 	- Uses a temporary extra column during reverse-shuffle but filters out temporary moves so returned boards do not contain helper columns.
- 	- Replays the filtered move history from a solved board to produce a scrambled, reversible starting state.
- 	- Ensures at least one mixed (non-uniform) bolt in the starting board so the board is not visually solved on load.
+  - Uses a temporary extra column during reverse-shuffle but filters out temporary moves so returned boards do not contain helper columns.
+  - Replays the filtered move history from a solved board to produce a scrambled, reversible starting state.
+  - Ensures at least one mixed (non-uniform) bolt in the starting board so the board is not visually solved on load.
 - Engine (`src/lib/engine.ts`) changes relevant to UI:
- 	- `addExtraBolt` respects `extraBoltUsed` and prevents duplicates; `Extra Bolt` UI is disabled when an extra bolt exists or bolt count limit reached.
- 	- `isWin` requires that each non-empty bolt be uniform and each color appears on exactly one bolt (matches the Level Complete UI trigger).
+  - `addExtraBolt` respects `extraBoltUsed` and prevents duplicates; `Extra Bolt` UI is disabled when an extra bolt exists or bolt count limit reached.
+  - `isWin` requires that each non-empty bolt be uniform and each color appears on exactly one bolt (matches the Level Complete UI trigger).
 
 Persistence and controls
 

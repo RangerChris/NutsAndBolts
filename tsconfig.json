@@ -18,9 +18,16 @@
         "resolveJsonModule": true,
         "isolatedModules": true,
         "noEmit": true,
-        "jsx": "react-jsx"
+        "jsx": "react-jsx",
+        "ignoreDeprecations": "6.0"
     },
     "include": [
         "src"
+    ],
+    "exclude": [
+        "src/**/*.test.*",
+        "src/**/*.spec.*",
+        "e2e",
+        "test"
     ]
 }

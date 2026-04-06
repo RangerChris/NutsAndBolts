@@ -1,10 +1,10 @@
 # Data model
 
-Runtime structures (suggested)
+Runtime structures (implemented)
 
 - `Bolt`
   - `id: string`
-  - `nuts: string[]` — top at end or start (choose and document consistently)
+  - `nuts: string[]` — the implementation stores the top of the stack at the array end (push/pop semantics). See `src/lib/types.ts` and `src/components/BoltView.tsx`.
   - `capacity: number`
 
 - `GameState`
@@ -16,12 +16,13 @@ Runtime structures (suggested)
   - `moveHistory: Move[]` — optional for undo/analytics
   - Note: active distinct color count for a level should match `bolts.length` for that level per PRD rules (including the player-created extra bolt when present)
 
-- `Move`
-  - `fromBoltId: string`
-  - `toBoltId: string`
-  - `colorsMoved: string` — color identifier
-  - `count: number`
-  - `timestamp?: number`
+-- `Move`
+
+- `fromBoltId: string`
+- `toBoltId: string`
+- `color: string` — color identifier (single color moved)
+- `count: number`
+- `timestamp?: number`
 
 Persisted structures (localStorage)
 
