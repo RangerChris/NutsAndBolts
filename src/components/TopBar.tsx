@@ -61,7 +61,7 @@ export default function TopBar({ level, difficulty, seed, paletteId, showDebug =
                         </span>
                     )}
                 </div>
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', zIndex: 400 }}>
                     <button
                         aria-haspopup="true"
                         aria-expanded={open}
@@ -76,7 +76,7 @@ export default function TopBar({ level, difficulty, seed, paletteId, showDebug =
                         <span style={{ marginLeft: 8 }}>{PALETTES.find((p) => p.id === paletteId)?.name}</span>
                     </button>
                     {open && (
-                        <div style={{ position: 'absolute', right: 0, marginTop: 8, background: 'var(--surface-container-high)', border: '1px solid var(--ghost-stroke)', borderRadius: 8, padding: 8, boxShadow: '0 6px 18px rgba(0,0,0,0.08)', color: 'var(--text)' }}>
+                        <div style={{ position: 'absolute', right: 0, marginTop: 8, background: 'var(--surface-container-high)', border: '1px solid var(--ghost-stroke)', borderRadius: 8, padding: 8, boxShadow: '0 6px 18px rgba(0,0,0,0.08)', color: 'var(--text)', zIndex: 500 }}>
                             {PALETTES.map((p) => (
                                 <button
                                     key={p.id}
