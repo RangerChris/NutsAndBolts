@@ -53,13 +53,13 @@ export function _clearStorage() {
 export type PersistedProgress = {
   version: number;
   difficulties: Record<string, { currentLevel: number; maxReached: number }>;
-  settings: { paletteId: number; difficulty?: string };
+  settings: { paletteId: number; difficulty?: string; seeds?: Record<string, string> };
 };
 
 export const DEFAULT_PROGRESS: PersistedProgress = {
   version: 1,
   difficulties: { easy: { currentLevel: 1, maxReached: 1 } },
-  settings: { paletteId: 0, difficulty: 'easy' },
+  settings: { paletteId: 0, difficulty: 'easy', seeds: {} },
 };
 
 export function saveProgress(payload: PersistedProgress) {
@@ -141,6 +141,21 @@ export function setPaletteId(paletteId: number) {
   const p = loadProgress();
   p.settings = p.settings || DEFAULT_PROGRESS.settings;
   p.settings.paletteId = paletteId;
+  saveProgress(p);
+  return p;
+}
+
+export function getSeedForDifficulty(difficulty: string): string | null {
+  const p = loadProgress();
+  if (p.settings && p.settings.seeds && p.settings.seeds[difficulty]) return p.settings.seeds[difficulty];
+  return null;
+}
+
+export function setSeedForDifficulty(difficulty: string, seed: string) {
+  const p = loadProgress();
+  p.settings = p.settings || DEFAULT_PROGRESS.settings;
+  p.settings.seeds = p.settings.seeds || {};
+  p.settings.seeds[difficulty] = seed;
   saveProgress(p);
   return p;
 }

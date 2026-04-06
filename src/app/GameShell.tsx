@@ -28,7 +28,16 @@ export default function GameShell(): ReactElement {
     const [state, setState] = useState<GameState | null>(null);
     const progress = loadProgress();
     const [paletteId, setPalette] = useState<number>(progress.settings?.paletteId ?? 0);
-    const [seed, setSeed] = useState<string>(() => `seed-${Date.now()}`);
+    const [seed, setSeed] = useState<string>(() => {
+        // prefer persisted seed for the selected difficulty so reloads restore the same level
+        try {
+            const s = require('../lib/persistence').getSeedForDifficulty(persistedDifficulty as string);
+            if (s) return s;
+        } catch {
+            // ignore
+        }
+        return `seed-${Date.now()}`;
+    });
     const persistedDifficulty = getSelectedDifficulty();
     const [difficulty, setDifficulty] = useState<GameState['difficulty']>(
         persistedDifficulty as GameState['difficulty']
@@ -39,11 +48,20 @@ export default function GameShell(): ReactElement {
 
     useEffect(() => {
         const { state: s } = createLevel({ difficulty, level: currentLevel, seed });
+        // ensure seed is persisted for this difficulty so reloads will recreate same level
+        try {
+            const { setSeedForDifficulty } = require('../lib/persistence');
+            setSeedForDifficulty(difficulty, seed);
+        } catch {
+            // ignore in non-browser/tests
+        }
         setState(s);
     }, [seed, difficulty, currentLevel]);
 
     const [selected, setSelected] = useState<string | null>(null);
     const [invalidTarget, setInvalidTarget] = useState<string | null>(null);
+    // Prevent accidental immediate double-taps on the same bolt
+    const lastClickRef = useRef<{ id: string | null; time: number }>({ id: null, time: 0 });
     // Animation state for FLIP clone animations — keep hooks unconditional
     const [animMove, setAnimMove] = useState<AnimMove | null>(null);
     const [showComplete, setShowComplete] = useState(false);
@@ -113,6 +131,13 @@ export default function GameShell(): ReactElement {
     };
 
     const handleBoltClick = (id: string) => {
+        const now = Date.now();
+        const THROTTLE_MS = 120; // small window to prevent accidental double taps
+        if (lastClickRef.current.id === id && now - lastClickRef.current.time < THROTTLE_MS) {
+            return;
+        }
+        lastClickRef.current = { id, time: now };
+
         if (!selected) {
             // select source if it has nuts
             const b = state.bolts.find((x) => x.id === id);
@@ -216,6 +241,13 @@ export default function GameShell(): ReactElement {
         // generate a fresh seed for the next level — effect will create the level
         const newSeed = `seed-${Date.now()}`;
         setSeed(newSeed);
+        // persist the new seed for this difficulty so reload will not recreate the old level
+        try {
+            const { setSeedForDifficulty } = require('../lib/persistence');
+            setSeedForDifficulty(difficulty, newSeed);
+        } catch {
+            // ignore
+        }
         setShowComplete(false);
     };
 
@@ -235,6 +267,12 @@ export default function GameShell(): ReactElement {
                     }}
                     onSeedChange={(s) => {
                         setSeed(s);
+                        try {
+                            const { setSeedForDifficulty } = require('../lib/persistence');
+                            setSeedForDifficulty(difficulty, s);
+                        } catch {
+                            // ignore
+                        }
                     }}
                     onDifficultyChange={(d) => {
                         const newDiff = d as GameState['difficulty'];
@@ -243,8 +281,20 @@ export default function GameShell(): ReactElement {
                         // switch to stored level for the new difficulty (or 1)
                         const lvl = loadProgress().difficulties?.[newDiff]?.currentLevel ?? 1;
                         setCurrentLevelState(lvl);
-                        const newSeed = `seed-${Date.now()}`;
-                        setSeed(newSeed);
+                        // load persisted seed for the new difficulty, or create+persist one
+                        try {
+                            const { getSeedForDifficulty, setSeedForDifficulty } = require('../lib/persistence');
+                            const ps = getSeedForDifficulty(newDiff);
+                            if (ps) setSeed(ps);
+                            else {
+                                const gen = `seed-${Date.now()}`;
+                                setSeed(gen);
+                                setSeedForDifficulty(newDiff, gen);
+                            }
+                        } catch {
+                            const gen = `seed-${Date.now()}`;
+                            setSeed(gen);
+                        }
                     }}
                 />
             </div>

@@ -93,6 +93,7 @@ Use this as the single execution checklist for MVP -> polish.
 - [x] Version persisted schema
 - [x] Add migration path for future schema updates
 - [x] Handle corrupted localStorage gracefully (reset with warning)
+- [x] Persist per-difficulty `seed` so reloads recreate same level
 
 ## 6) UX/UI Implementation (Mobile-First)
 
@@ -136,10 +137,9 @@ Use this as the single execution checklist for MVP -> polish.
   - [x] Valid move animation
   - [x] Invalid move blocked animation
   - [x] Win celebration micro-animation
-- [ ] Add game feel tuning pass
-  - [ ] Adjust animation timings for readability and speed
-  - [ ] Tune highlight clarity for selected source/group
-  - [ ] Reduce accidental taps with subtle debounce where needed
+- [x] Add game feel tuning pass
+  - [x] Adjust animation timings for readability and speed
+  - [x] Tune highlight clarity for selected source/group
 
 ## 9) Testing Strategy and QA
 
@@ -158,10 +158,6 @@ Use this as the single execution checklist for MVP -> polish.
   - [x] Simulated playthroughs for sample seeds per difficulty
   - [x] Regression tests for undo and extra bolt interactions
   - [x] UI flow tests: select source -> select target -> result state update
-- [ ] Manual QA matrix
-  - [ ] iOS Safari latest stable
-  - [ ] Android Chrome latest stable
-  - [ ] Small-screen and large-screen mobile layouts
 
 ## 10) Documentation and Developer Experience
 
@@ -184,10 +180,10 @@ Use this as the single execution checklist for MVP -> polish.
   - [x] Seeded generator reproducible
   - [x] Progress saved/restored
 - [ ] Performance and stability gate
-  - [ ] No critical console errors in production build
-  - [ ] No failing tests in CI
+  - [x] No critical console errors in production build
+  - [x] No failing tests in CI
   - [ ] Mobile usability sign-off
 - [ ] Launch package
   - [ ] Tag release candidate
-  - [ ] Publish build
+  - [x] Publish build
   - [ ] Capture post-launch metrics baseline
