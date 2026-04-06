@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.3](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.2...v0.1.3) (2026-04-06)
+
+
+### Features
+
+* Implement "Hidden Nuts" feature with gameplay mechanics and UI updates ([3d5fa1a](https://github.com/RangerChris/NutsAndBolts/commit/3d5fa1a5b3c2e145cc505c0360822dfe1af8ee0b))
+* Update GitHub Actions workflows for deployment and versioning; remove obsolete release-on-merge workflow ([05b4abb](https://github.com/RangerChris/NutsAndBolts/commit/05b4abb8b6aad49b2d8bdeb17a89b587b4d72f2d))
+
 ### [0.1.2](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.1...v0.1.2) (2026-04-06)
 
 ### 0.1.1 (2026-04-06)
