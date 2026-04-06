@@ -2,7 +2,7 @@ import { seededRandom, randomInt } from './rng';
 import type { GameState, Bolt } from './types';
 import { DIFFICULTY_CONFIG } from './constants';
 import { getLevelParams } from './progression';
-import { pickTopGroup, normalizeState, checkStateInvariants } from './engine';
+import { pickTopGroup, normalizeState, checkStateInvariants, computeOptimalMoves } from './engine';
 import { emitBalancerEvent } from './balancer';
 
 type CreateLevelOpts = { difficulty: GameState['difficulty']; level?: number; seed?: string | number };
@@ -161,6 +161,14 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
     });
   } catch (e) {
     // ignore
+  }
+
+  // Pre-calculate optimal moves for this generated level (bounded by shuffleMoves)
+  try {
+    const optimal = computeOptimalMoves(normalized, Math.max(12, shuffleMoves));
+    normalized.optimalMoves = optimal;
+  } catch (e) {
+    normalized.optimalMoves = null;
   }
 
   return { state: normalized, seed };
