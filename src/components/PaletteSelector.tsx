@@ -16,10 +16,11 @@ export default function PaletteSelector({ selected, onChange }: Props) {
                     onClick={() => onChange(p.id)}
                     aria-pressed={p.id === selected}
                     style={{
-                        border: p.id === selected ? '2px solid #111' : '1px solid rgba(0,0,0,0.08)',
+                        border: p.id === selected ? '2px solid var(--primary-container)' : '1px solid var(--ghost-stroke)',
                         padding: 6,
                         borderRadius: 6,
-                        background: '#fff',
+                        background: 'var(--surface-container-high)',
+                        color: 'var(--text)',
                         display: 'flex',
                         gap: 4,
                         alignItems: 'center',

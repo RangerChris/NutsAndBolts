@@ -79,3 +79,11 @@ Design notes
 - The UI uses a FLIP-style clone animation for moving nuts to give smooth visual feedback. Animations must be cancelled/cleaned up when the game resets or navigates away.
 
 - The engine returns structured success/failure results for actions (move, addExtraBolt, undo) so the UI can show contextual feedback without guessing engine internals.
+
+Implementation notes (current codebase)
+
+- Bolt stack representation: nuts are stored with the top at the array end (push/pop semantics). See `src/lib/types.ts` and `src/components/BoltView.tsx`.
+- Extra bolt guard: `addExtraBolt` checks `state.extraBoltUsed` and for existing bolt ids prefixed with `extra-` and will refuse a second extra. See `src/lib/engine.ts`.
+- Win predicate: the implemented `isWin` requires each non-empty bolt to be uniform and for no color to appear on more than one bolt.
+- Generator behavior: the reverse-play generator (`src/lib/generator.ts`) may add a temporary helper bolt (`__temp_extra`) while shuffling and removes it before returning the starting board; the generator normalizes state and attempts to ensure the returned start has at least one mixed bolt.
+- Telemetry: the code uses `src/lib/balancer.ts` to emit generator and game events (including `levelComplete` details). Designers can subscribe to `onBalancerEvent` to capture playtest data.

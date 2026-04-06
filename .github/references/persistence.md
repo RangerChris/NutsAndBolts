@@ -2,7 +2,7 @@
 
 Storage key
 
-- Use `nuts-and-bolts:progress` as the single top-level key in `localStorage`.
+- The implementation uses `nuts-and-bolts:progress` as the single top-level key in `localStorage` (see `src/lib/constants.ts` and `src/lib/persistence.ts`).
 
 Minimal persisted payload
 
@@ -12,14 +12,14 @@ Minimal persisted payload
 
 When to save
 
-- Save on these events:
+- The runtime saves progress during these events (current behaviour):
   - level complete
-  - explicit settings change (palette, accessibility)
-  - visibilitychange/unload (best-effort autosave)
+  - explicit settings change (palette, difficulty)
+  - `visibilitychange` (the app registers a visibility listener via `initPersistence` for best-effort autosave)
 
 Load behavior
 
-- On app start, read and validate the schema version. If missing or invalid, initialize defaults.
+- On app start the code reads `localStorage`, attempts a migration via `migrateProgress`, and falls back to a `DEFAULT_PROGRESS` (defined in `src/lib/persistence.ts`) when the payload is missing or invalid. `migrateProgress` includes logic for older schema shapes (e.g., `levels`).
 
 Migration
 

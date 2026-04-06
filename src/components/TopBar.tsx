@@ -61,12 +61,12 @@ export default function TopBar({ level, difficulty, seed, paletteId, showDebug =
                         </span>
                     )}
                 </div>
-                <div style={{ position: 'relative' }}>
+                <div style={{ position: 'relative', zIndex: 400 }}>
                     <button
                         aria-haspopup="true"
                         aria-expanded={open}
                         onClick={() => setOpen((o) => !o)}
-                        style={{ display: 'inline-flex', gap: 8, alignItems: 'center', padding: '6px 8px', borderRadius: 6, background: '#fff', border: '1px solid rgba(0,0,0,0.08)' }}
+                        style={{ display: 'inline-flex', gap: 8, alignItems: 'center', padding: '6px 8px', borderRadius: 8, background: 'var(--surface-container-high)', border: '1px solid var(--ghost-stroke)', color: 'var(--text)' }}
                     >
                         <div style={{ display: 'flex', gap: 4 }}>
                             {PALETTES.find((p) => p.id === paletteId)?.colors.slice(0, 5).map((c, i) => (
@@ -76,12 +76,12 @@ export default function TopBar({ level, difficulty, seed, paletteId, showDebug =
                         <span style={{ marginLeft: 8 }}>{PALETTES.find((p) => p.id === paletteId)?.name}</span>
                     </button>
                     {open && (
-                        <div style={{ position: 'absolute', right: 0, marginTop: 8, background: '#fff', border: '1px solid rgba(0,0,0,0.08)', borderRadius: 8, padding: 8, boxShadow: '0 6px 18px rgba(0,0,0,0.08)' }}>
+                        <div style={{ position: 'absolute', right: 0, marginTop: 8, background: 'var(--surface-container-high)', border: '1px solid var(--ghost-stroke)', borderRadius: 8, padding: 8, boxShadow: '0 6px 18px rgba(0,0,0,0.08)', color: 'var(--text)', zIndex: 500 }}>
                             {PALETTES.map((p) => (
                                 <button
                                     key={p.id}
                                     onClick={() => { onPaletteChange(p.id); setOpen(false); }}
-                                    style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '6px 8px', width: '100%', background: 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer' }}
+                                    style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '6px 8px', width: '100%', background: 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer', color: 'var(--text)' }}
                                 >
                                     <div style={{ display: 'flex', gap: 4 }}>
                                         {p.colors.slice(0, 5).map((c, i) => (

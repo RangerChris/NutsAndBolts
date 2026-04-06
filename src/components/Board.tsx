@@ -4,7 +4,7 @@ import BoltView from './BoltView';
 
 type AnimMove = {
     move: any;
-    preRects: Array<{ left: number; top: number; width: number; height: number; color: string }>;
+    preRects: Array<{ left: number; top: number; width: number; height: number; color: string; colorLabel?: string }>;
 };
 
 type Props = {
@@ -51,7 +51,7 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
             // Side-view nut clone (66×20 viewBox matches BoltView NUT_W×NUT_H)
             // include data-nut-id text so clones mirror BoltView labels
             const cid = pr.colorLabel || '';
-            clone.innerHTML = `<svg width="${pr.width}" height="${pr.height}" viewBox="0 0 66 20" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="66" height="20" rx="2" fill="${pr.color}" stroke="rgba(0,0,0,0.35)" stroke-width="0.8"/><line x1="0" y1="0" x2="8" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/><line x1="66" y1="0" x2="58" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/><rect x="3" y="2" width="60" height="2" rx="1" fill="rgba(255,255,255,0.28)"/>` + (cid ? `<text x="33" y="14" text-anchor="middle" font-size="8" fill="#fff" data-nut-id="${cid}">${cid}</text>` : '') + `</svg>`;
+            clone.innerHTML = `<svg width="${pr.width}" height="${pr.height}" viewBox="0 0 66 20" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="66" height="20" rx="2" fill="${pr.color}" stroke="rgba(0,0,0,0.35)" stroke-width="0.8"/><line x1="0" y1="0" x2="8" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/><line x1="66" y1="0" x2="58" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/><rect x="3" y="2" width="60" height="2" rx="1" fill="rgba(255,255,255,0.28)"/>` + (cid ? `<text x="33" y="14" text-anchor="middle" font-size="8" fill="var(--text)" data-nut-id="${cid}">${cid}</text>` : '') + `</svg>`;
             document.body.appendChild(clone);
             clones.push(clone);
 
@@ -89,7 +89,7 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
     // shown per row and the remaining bolts wrap to the next line.
     return (
         <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }} ref={containerRef}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, padding: 8, alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, padding: 8, alignItems: 'flex-start', justifyContent: 'center' }}>
                 {state.bolts.map((b) => (
                     <div key={b.id} style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
                         <BoltView
