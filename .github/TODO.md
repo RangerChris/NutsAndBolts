@@ -67,6 +67,13 @@ Use this as the single execution checklist for MVP -> polish.
 - [x] Add deterministic seed format for sharing/replay
 - [x] Store generation metadata for debugging
 
+- [x] Add "Hidden Nuts" modifier
+  - [x] Generator: add per-level `hiddenNuts` flag (25% enable chance) and allow forcing for tests
+  - [x] `createLevel` accepts override to force enable/disable for QA
+  - [x] Persist `hiddenNuts` in returned `GameState` metadata
+  - [x] Unit tests: generator reproducibility when `hiddenNuts` enabled and forced
+  - [x] UI: `BoltView` renders non-top nuts grey and reveals underneath nut when top is moved
+
 ## 4) Progression and Difficulty Scaling
 
 - [x] Define progression formulas

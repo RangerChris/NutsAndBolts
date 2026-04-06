@@ -5,13 +5,19 @@ import { getLevelParams } from './progression';
 import { pickTopGroup, normalizeState, checkStateInvariants, computeOptimalMoves } from './engine';
 import { emitBalancerEvent } from './balancer';
 
-type CreateLevelOpts = { difficulty: GameState['difficulty']; level?: number; seed?: string | number };
+type CreateLevelOpts = { difficulty: GameState['difficulty']; level?: number; seed?: string | number; hiddenNuts?: boolean | null };
+
+import type { Nut } from './types';
 
 export function createSolvedBoard(numBolts: number, stackHeight: number): Bolt[] {
   const bolts: Bolt[] = [];
   for (let i = 0; i < numBolts; i++) {
     const color = `c${i}`;
-    const nuts = new Array(stackHeight).fill(color);
+    const nuts: Nut[] = [];
+    for (let j = 0; j < stackHeight; j++) {
+      // id encodes bolt and slot so it is stable per generation
+      nuts.push({ id: `b${i}-n${j}`, color, revealed: j === stackHeight - 1 });
+    }
     bolts.push({ id: `b${i}`, capacity: stackHeight, nuts });
   }
   return bolts;
@@ -37,7 +43,7 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
 
   let lastMove: { from?: string; to?: string } | null = null;
   const hasMixedBolt = (arr: Bolt[]) =>
-    arr.some((b) => b.nuts.length > 1 && !b.nuts.every((n) => n === b.nuts[0]));
+    arr.some((b) => b.nuts.length > 1 && !b.nuts.every((n) => n.color === b.nuts[0].color));
 
   for (let i = 0; i < shuffleMoves; i++) {
     // pick random source with movable top group
@@ -59,7 +65,9 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
     const pickFrom = candidates.length > 0 ? candidates : mixedCandidates.length > 0 ? mixedCandidates : targets;
     const tgt = pickFrom[Math.floor(rng() * pickFrom.length)];
     // perform a partial move of `moveCount` nuts
-    const moved = src.nuts.splice(Math.max(0, src.nuts.length - moveCount), moveCount);
+    const moved = src.nuts.splice(Math.max(0, src.nuts.length - moveCount), moveCount) as any[];
+    // ensure moved nuts remain revealed (they were top elements)
+    for (const m of moved) m.revealed = true;
     tgt.nuts.push(...moved);
     const mv = moved.length
       ? {
@@ -86,6 +94,24 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
   // so start fresh. Undo only covers moves made during gameplay.
   const filteredMoves: Move[] = [];
 
+  // Decide whether hidden-nuts modifier is enabled for this generated level.
+  // When opts.hiddenNuts is `true` or `false` we force the value; when null/undefined
+  // we use the seeded RNG to pick ~25% probability.
+  const hiddenNutsEnabled =
+    typeof opts.hiddenNuts === 'boolean' ? opts.hiddenNuts : rng() < 0.25;
+
+  // Reset all per-nut revealed flags (shuffle may have marked moved nuts revealed)
+  // then mark only the current top nut on each bolt as revealed at level start.
+  for (const b of boltsToReturn) {
+    for (const n of b.nuts) {
+      (n as any).revealed = false;
+    }
+    if (b.nuts.length > 0) {
+      const top = b.nuts[b.nuts.length - 1] as any;
+      if (top) top.revealed = true;
+    }
+  }
+
   const state: GameState = {
     bolts: boltsToReturn || bolts,
     // An empty extra bolt is included at creation; still mark as not 'used' —
@@ -94,6 +120,7 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
     level: opts.level || 1,
     difficulty: opts.difficulty,
     seed,
+    hiddenNuts: hiddenNutsEnabled,
     moveHistory: filteredMoves,
   };
 

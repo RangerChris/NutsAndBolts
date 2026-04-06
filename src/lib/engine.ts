@@ -5,12 +5,14 @@ import { emitBalancerEvent } from './balancer';
 export function pickTopGroup(bolt: Bolt): { color?: string; count: number } {
   if (!bolt.nuts || bolt.nuts.length === 0) return { color: undefined, count: 0 };
   const top = bolt.nuts[bolt.nuts.length - 1];
+  const topColor = typeof top === 'string' ? top : (top as any).color;
   let count = 1;
   for (let i = bolt.nuts.length - 2; i >= 0; i--) {
-    if (bolt.nuts[i] === top) count++;
+    const c = typeof bolt.nuts[i] === 'string' ? (bolt.nuts[i] as any) : (bolt.nuts[i] as any).color;
+    if (c === topColor) count++;
     else break;
   }
-  return { color: top, count };
+  return { color: topColor, count };
 }
 
 export function canPlaceGroup(
@@ -22,8 +24,8 @@ export function canPlaceGroup(
   const free = target.capacity - target.nuts.length;
   if (free < groupCount) return { ok: false, reason: 'capacity' };
   if (target.nuts.length === 0) return { ok: true };
-  const targetTop = target.nuts[target.nuts.length - 1];
-  const sourceTop = source.nuts[source.nuts.length - 1];
+  const targetTop = typeof target.nuts[target.nuts.length - 1] === 'string' ? (target.nuts[target.nuts.length - 1] as any) : (target.nuts[target.nuts.length - 1] as any).color;
+  const sourceTop = typeof source.nuts[source.nuts.length - 1] === 'string' ? (source.nuts[source.nuts.length - 1] as any) : (source.nuts[source.nuts.length - 1] as any).color;
   if (sourceTop === targetTop) return { ok: true };
   return { ok: false, reason: 'color-mismatch' };
 }
@@ -34,8 +36,17 @@ export function performMove(source: Bolt, target: Bolt): Move | null {
   const can = canPlaceGroup(source, target, count);
   if (!can.ok) return null;
   // remove from source
-  const moved = source.nuts.splice(source.nuts.length - count, count);
+  const moved = source.nuts.splice(source.nuts.length - count, count) as any[];
   // append to target
+  // ensure moved items are Nut objects and mark revealed
+  for (let i = 0; i < moved.length; i++) {
+    const m = moved[i];
+    if (typeof m === 'string') {
+      moved[i] = { id: `${source.id}-moved-${Date.now()}-${i}`, color: m, revealed: true } as any;
+    } else {
+      (m as any).revealed = true;
+    }
+  }
   target.nuts.push(...moved);
   const move: Move = {
     fromBoltId: source.id,
@@ -71,10 +82,40 @@ export function executeMoveOnState(state: GameState, fromId: string, toId: strin
   if (!color || count === 0) return { success: false, reason: 'empty-source' };
   const can = canPlaceGroup(src, tgt, count);
   if (!can.ok) return { success: false, reason: can.reason };
+  // capture source length before move to detect if a hidden nut becomes exposed
+  const srcLenBefore = src.nuts.length;
   const move = performMove(src, tgt);
   if (!move) return { success: false, reason: 'perform-failed' };
   state.moveHistory = state.moveHistory || [];
   state.moveHistory.push(move);
+  // If hiddenNuts is active and the move exposed a new top nut on the source bolt,
+  // mark that nut color as revealed (persisting knowledge) and emit telemetry.
+  try {
+    if (state.hiddenNuts && srcLenBefore - move.count > 0) {
+      const revealedBolt = findBolt(state, fromId);
+      let revealedNut = revealedBolt && revealedBolt.nuts.length > 0 ? revealedBolt.nuts[revealedBolt.nuts.length - 1] as any : undefined;
+      const revealedColor = revealedNut ? (typeof revealedNut === 'string' ? revealedNut : revealedNut.color) : undefined;
+      if (revealedNut && typeof revealedNut === 'string') {
+        // migrate legacy string nut to Nut object so we can set revealed
+        const idx = revealedBolt!.nuts.length - 1;
+        revealedNut = { id: `${revealedBolt!.id}-n${idx}`, color: revealedNut, revealed: true } as any;
+        revealedBolt!.nuts[idx] = revealedNut;
+      } else if (revealedNut) {
+        revealedNut.revealed = true;
+      }
+      emitBalancerEvent('game', {
+        event: 'nutRevealed',
+        level: state.level,
+        difficulty: state.difficulty,
+        seed: state.seed,
+        boltId: fromId,
+        revealedNutId: revealedNut ? revealedNut.id : undefined,
+        revealedColor,
+      });
+    }
+  } catch {
+    // swallow telemetry errors
+  }
   // Emit level-complete event if this move solved the level
   try {
     if (isWin(state)) {
@@ -123,12 +164,17 @@ export function executeMoveOnState(state: GameState, fromId: string, toId: strin
 
 // Compute minimal moves to reach a win state using BFS up to maxDepth.
 export function computeOptimalMoves(startState: GameState, maxDepth = 20): number | null {
-  // canonicalize a state to string
-  const canon = (s: GameState) => s.bolts.map((b) => b.nuts.join(',')).join('|');
+  // canonicalize a state to string (handle string nuts or Nut objects)
+  const nutColor = (n: any) => (typeof n === 'string' ? n : n?.color);
+  const canon = (s: GameState) => s.bolts.map((b) => b.nuts.map((n: any) => nutColor(n) || '').join(',')).join('|');
 
-  // shallow clone a GameState (bolts deep copied)
+  // shallow clone a GameState (bolts deep copied). Ensure nuts are objects.
   const cloneState = (s: GameState): GameState => ({
-    bolts: s.bolts.map((b) => ({ id: b.id, capacity: b.capacity, nuts: b.nuts.slice() })),
+    bolts: s.bolts.map((b) => ({
+      id: b.id,
+      capacity: b.capacity,
+      nuts: b.nuts.map((n: any, i: number) => (typeof n === 'string' ? { id: `${b.id}-n${i}`, color: n, revealed: false } : { ...n })),
+    } as Bolt)),
     extraBoltUsed: Boolean(s.extraBoltUsed),
     level: s.level,
     difficulty: s.difficulty,
@@ -202,7 +248,8 @@ export function undoLastMove(state: GameState): { success: boolean; reason?: str
   if (!src || !tgt) return { success: false, reason: 'bolt-not-found' };
   // verify top of target matches expected moved color
   const topSlice = tgt.nuts.slice(tgt.nuts.length - last.count);
-  if (topSlice.length !== last.count || topSlice.some((c) => c !== last.color)) {
+  const nutColor = (n: any) => (typeof n === 'string' ? n : n?.color);
+  if (topSlice.length !== last.count || topSlice.some((c) => nutColor(c) !== last.color)) {
     return { success: false, reason: 'mismatch-target-state' };
   }
   const moved = tgt.nuts.splice(tgt.nuts.length - last.count, last.count);
@@ -229,9 +276,9 @@ export function isWin(state: GameState): boolean {
   const seenColors = new Set<string>();
   for (const b of state.bolts) {
     if (b.nuts.length === 0) continue;
-    const first = b.nuts[0];
+    const first = typeof b.nuts[0] === 'string' ? (b.nuts[0] as any) : (b.nuts[0] as any).color;
     // all nuts on the bolt must be the same color
-    if (!b.nuts.every((n) => n === first)) return false;
+    if (!b.nuts.every((n) => (typeof n === 'string' ? (n as any) : (n as any).color) === first)) return false;
     // the color must not already appear on another bolt
     if (seenColors.has(first)) return false;
     seenColors.add(first);
@@ -253,7 +300,7 @@ export function checkStateInvariants(state: GameState): { ok: boolean; problems:
     if (typeof b.capacity !== 'number' || b.capacity < 0) problems.push('invalid-bolt-capacity');
     if (!Array.isArray(b.nuts)) problems.push('invalid-bolt-nuts');
     else if (b.nuts.length > b.capacity) problems.push('bolt-over-capacity');
-    else if (b.nuts.some((n) => typeof n !== 'string')) problems.push('invalid-nut-type');
+    else if (b.nuts.some((n) => typeof (n as any).color !== 'string' || typeof (n as any).id !== 'string')) problems.push('invalid-nut-type');
   }
   // moveHistory structure
   if (state.moveHistory && !Array.isArray(state.moveHistory)) problems.push('invalid-moveHistory');
@@ -279,7 +326,13 @@ export function normalizeState(state: Partial<GameState>): GameState {
   const bolts = (state.bolts || []).map((b: Partial<Bolt> | undefined, idx: number) => ({
     id: b?.id ?? `b${idx}`,
     capacity: typeof b?.capacity === 'number' ? b.capacity : 4,
-    nuts: Array.isArray(b?.nuts) ? (b.nuts as string[]).slice() : [],
+    nuts: Array.isArray(b?.nuts)
+      ? (b.nuts as any[]).map((n, i) => {
+          // migrate old string-form nuts into Nut objects
+          if (typeof n === 'string') return { id: `${b?.id ?? `b${idx}`}-n${i}`, color: n, revealed: i === ((b?.nuts as any[]).length - 1) };
+          return { id: (n as any).id ?? `${b?.id ?? `b${idx}`}-n${i}`, color: (n as any).color ?? String(n), revealed: Boolean((n as any).revealed) };
+        })
+      : [],
   }));
   const normalized: GameState = {
     bolts,
@@ -290,5 +343,7 @@ export function normalizeState(state: Partial<GameState>): GameState {
     moveHistory: Array.isArray(state.moveHistory) ? (state.moveHistory as Move[]).slice() : [],
     optimalMoves: (state.optimalMoves as number | null | undefined) ?? null,
   } as GameState;
+  // preserve optional hiddenNuts flag when present on partial state
+  if (typeof (state as any).hiddenNuts === 'boolean') normalized.hiddenNuts = (state as any).hiddenNuts;
   return normalized;
 }
