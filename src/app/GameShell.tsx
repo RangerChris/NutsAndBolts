@@ -17,6 +17,7 @@ export default function GameShell(): JSX.Element {
     const [difficulty, setDifficulty] = useState<GameState['difficulty']>(persistedDifficulty as GameState['difficulty']);
     const initialLevel = progress.difficulties?.[difficulty]?.currentLevel ?? 1;
     const [currentLevel, setCurrentLevelState] = useState<number>(initialLevel);
+    const [showDebug, setShowDebug] = useState<boolean>(false);
 
     useEffect(() => {
         const { state: s } = createLevel({ difficulty, level: currentLevel, seed });
@@ -90,9 +91,12 @@ export default function GameShell(): JSX.Element {
                     // First child rect of the nut <g> is the body with the palette color
                     const nutRect = sel.querySelector('rect');
                     if (nutRect) color = (nutRect as SVGElement).getAttribute('fill') || color;
-                    // prefer explicit data-nut-id attribute on inner text
-                    const labelEl = sel.querySelector('[data-nut-id]');
-                    if (labelEl) colorLabel = (labelEl as Element).getAttribute('data-nut-id') || undefined;
+                    // data-nut-id is on the nut group (and may also exist on descendants)
+                    colorLabel = sel.getAttribute('data-nut-id') || undefined;
+                    if (!colorLabel) {
+                        const labelEl = sel.querySelector('[data-nut-id]');
+                        if (labelEl) colorLabel = (labelEl as Element).getAttribute('data-nut-id') || undefined;
+                    }
                 } catch (e) {
                     // ignore
                 }
@@ -154,6 +158,8 @@ export default function GameShell(): JSX.Element {
                     difficulty={difficulty}
                     seed={seed}
                     paletteId={paletteId}
+                    showDebug={showDebug}
+                    onShowDebugChange={setShowDebug}
                     onPaletteChange={(id) => {
                         setPalette(id);
                         setPaletteId(id);
@@ -193,7 +199,7 @@ export default function GameShell(): JSX.Element {
 
             <div>
                 <strong>Bolts</strong> ({state.bolts.length}):
-                <Board state={state} paletteId={paletteId} selectedBoltId={selected} invalidBoltId={invalidTarget} onBoltClick={handleBoltClick} animMove={animMove} onAnimDone={handleAnimDone} />
+                <Board state={state} paletteId={paletteId} showDebug={showDebug} selectedBoltId={selected} invalidBoltId={invalidTarget} onBoltClick={handleBoltClick} animMove={animMove} onAnimDone={handleAnimDone} />
             </div>
             {showComplete && (
                 <div role="dialog" aria-modal="true" style={{ position: 'fixed', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)' }}>

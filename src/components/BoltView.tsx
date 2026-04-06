@@ -7,6 +7,7 @@ type Props = {
     paletteId: number;
     selected?: boolean;
     invalid?: boolean;
+    showDebug?: boolean;
     onClick?: (id: string) => void;
 };
 
@@ -41,7 +42,7 @@ function nutTop(slotIdx: number, capacity: number): number {
     return slotTop(slotIdx, capacity) + NUT_Y_PAD;
 }
 
-export default function BoltView({ bolt, paletteId, selected = false, invalid = false, onClick }: Props) {
+export default function BoltView({ bolt, paletteId, selected = false, invalid = false, showDebug = false, onClick }: Props) {
     const palette = getPalette(paletteId);
     const capacity = bolt.capacity;
     // Safety net: if the bolt state is somehow over-capacity, use the actual
@@ -149,7 +150,7 @@ export default function BoltView({ bolt, paletteId, selected = false, invalid = 
                             const y = nutTop(slotIdx, effectiveCapacity);
                             const holeCY = y + NUT_H / 2;
                             return (
-                                <g key={`${bolt.id}-${slotIdx}-${colorId}`} data-nut-index={slotIdx}>
+                                <g key={`${bolt.id}-${slotIdx}-${colorId}`} data-nut-index={slotIdx} data-nut-id={colorId}>
                                     {/* Nut body */}
                                     <rect x={NUT_X} y={y} width={NUT_W} height={NUT_H} rx="2"
                                         fill={color} stroke="rgba(0,0,0,0.35)" strokeWidth="0.8" />
@@ -158,20 +159,10 @@ export default function BoltView({ bolt, paletteId, selected = false, invalid = 
                                         stroke="rgba(0,0,0,0.15)" strokeWidth="0.8" />
                                     <line x1={NUT_X + NUT_W} y1={y} x2={NUT_X + NUT_W - 8} y2={y + NUT_H}
                                         stroke="rgba(0,0,0,0.15)" strokeWidth="0.8" />
-                                    {/* Thread hole (where bolt shaft passes through the nut) */}
-                                    <ellipse cx={CX} cy={holeCY} rx={7} ry={NUT_H / 2 - 1}
-                                        fill="rgba(0,0,0,0.30)" />
-                                    <ellipse cx={CX} cy={holeCY} rx={5} ry={NUT_H / 2 - 2}
-                                        fill="rgba(0,0,0,0.15)" stroke="#333" strokeWidth="0.3" />
+                                    {/* thread hole removed — simplified nut appearance */}
                                     {/* Top-edge highlight */}
                                     <rect x={NUT_X + 3} y={y + 2} width={NUT_W - 6} height={2} rx="1"
                                         fill="rgba(255,255,255,0.28)" />
-                                    {/* Nut label: show color id (e.g. c0) centered */}
-                                    <text x={CX} y={holeCY + 4} textAnchor="middle" fontSize={10} fontWeight={600}
-                                        fill={readableTextColor(color)} style={{ userSelect: 'none', pointerEvents: 'none', fontFamily: 'Inter, Arial, sans-serif' }}
-                                        data-nut-id={colorId}>
-                                        {colorId}
-                                    </text>
                                 </g>
                             );
                         })}
@@ -196,19 +187,18 @@ export default function BoltView({ bolt, paletteId, selected = false, invalid = 
                 </svg>
             </div>
 
-            {/* Debug labels shown below the bolt: index:colorId (bottom->top) */}
-            <div style={{ marginTop: 8, display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }} aria-hidden="true">
-                {bolt.nuts.map((nid, i) => {
-                    const colorIndex = parseInt(nid.replace(/^c/, ''), 10) || 0;
-                    const bg = palette.colors[colorIndex % palette.colors.length];
-                    const fg = readableTextColor(bg);
-                    return (
-                        <div key={`${bolt.id}-lbl-${i}`} style={{ fontSize: 11, padding: '2px 6px', borderRadius: 6, background: bg, color: fg, boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.12)' }}>
-                            {i}:{nid}
-                        </div>
-                    );
-                })}
-            </div>
+            {/* Debug labels shown below the bolt: stack index only (bottom->top) */}
+            {showDebug && (
+                <div style={{ marginTop: 8, display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }} aria-hidden="true">
+                    {bolt.nuts.map((_, i) => {
+                        return (
+                            <div key={`${bolt.id}-lbl-${i}`} style={{ fontSize: 11, padding: '2px 6px', borderRadius: 6, background: '#e5e7eb', color: '#111827', boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.08)' }}>
+                                {i}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
         </div >
     );
 }

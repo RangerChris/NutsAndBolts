@@ -7,12 +7,14 @@ type Props = {
     difficulty: string;
     seed?: string;
     paletteId: PaletteId;
+    showDebug?: boolean;
+    onShowDebugChange?: (show: boolean) => void;
     onPaletteChange: (id: PaletteId) => void;
     onDifficultyChange?: (d: string) => void;
     onSeedChange?: (seed: string) => void;
 };
 
-export default function TopBar({ level, difficulty, seed, paletteId, onPaletteChange, onDifficultyChange, onSeedChange }: Props) {
+export default function TopBar({ level, difficulty, seed, paletteId, showDebug = false, onShowDebugChange, onPaletteChange, onDifficultyChange, onSeedChange }: Props) {
     const [editingSeed, setEditingSeed] = useState(false);
     const [seedValue, setSeedValue] = useState(seed || '');
     const [open, setOpen] = useState(false);
@@ -37,6 +39,14 @@ export default function TopBar({ level, difficulty, seed, paletteId, onPaletteCh
                 </div>
             </div>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginLeft: 'auto' }}>
+                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                    <input
+                        type="checkbox"
+                        checked={showDebug}
+                        onChange={(e) => onShowDebugChange?.(e.target.checked)}
+                    />
+                    <span>Show debug</span>
+                </label>
                 <div>
                     <strong>Seed</strong>:{' '}
                     {!editingSeed ? (
