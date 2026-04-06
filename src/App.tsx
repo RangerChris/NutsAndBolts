@@ -45,6 +45,9 @@ export default function App(): ReactElement {
                 <GameShell />
                 {!progressLoaded && <div>Loading progress...</div>}
             </main>
+            <footer className="app-footer">
+                <div className="container">Version: {typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0'}</div>
+            </footer>
         </div>
     );
 }
