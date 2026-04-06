@@ -115,7 +115,7 @@ export function executeMoveOnState(state: GameState, fromId: string, toId: strin
         bolts: state.bolts.length,
       });
     }
-  } catch (e) {
+  } catch {
     // swallow
   }
   return { success: true, move };
@@ -276,19 +276,19 @@ export function checkStateInvariants(state: GameState): { ok: boolean; problems:
 }
 
 export function normalizeState(state: Partial<GameState>): GameState {
-  const bolts = (state.bolts || []).map((b: any, idx: number) => ({
+  const bolts = (state.bolts || []).map((b: Partial<Bolt> | undefined, idx: number) => ({
     id: b?.id ?? `b${idx}`,
     capacity: typeof b?.capacity === 'number' ? b.capacity : 4,
-    nuts: Array.isArray(b?.nuts) ? b.nuts.slice() : [],
+    nuts: Array.isArray(b?.nuts) ? (b.nuts as string[]).slice() : [],
   }));
   const normalized: GameState = {
     bolts,
     extraBoltUsed: Boolean(state.extraBoltUsed),
     level: state.level ?? 1,
-    difficulty: (state as any).difficulty ?? 'easy',
-    seed: (state as any).seed ?? '',
-    moveHistory: Array.isArray(state.moveHistory) ? (state.moveHistory as any[]).slice() : [],
-    optimalMoves: (state as any).optimalMoves ?? null,
+    difficulty: (state.difficulty as GameState['difficulty']) ?? 'easy',
+    seed: (state.seed as string) ?? '',
+    moveHistory: Array.isArray(state.moveHistory) ? (state.moveHistory as Move[]).slice() : [],
+    optimalMoves: (state.optimalMoves as number | null | undefined) ?? null,
   } as GameState;
   return normalized;
 }

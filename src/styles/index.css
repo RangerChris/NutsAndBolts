@@ -42,8 +42,8 @@
 /* hardware-style utilities (from design) */
 .glass-effect {
     background: rgba(31, 31, 34, 0.8);
-    backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
 }
 
 .metallic-brushed {
@@ -125,6 +125,7 @@ body {
     flex-direction: column;
     align-items: center;
     border: none;
+    -webkit-user-select: none;
     user-select: none;
     transition: transform 120ms ease, box-shadow 120ms ease;
 }
@@ -172,8 +173,8 @@ body {
     justify-content: center;
     gap: 12px;
     border-radius: var(--radius-lg);
-    backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
 }
 
@@ -238,6 +239,32 @@ body {
         opacity 260ms ease;
 }
 
+/* BoltView helpers */
+.bolt-root-inline {
+    display: inline-block;
+}
+
+.bolt-scale {
+    transform-origin: top center;
+}
+
+.debug-labels {
+    margin-top: 8px;
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.debug-label {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: var(--on-surface-variant);
+    color: #111827;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.08);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .bolt-selected {
         transform: none;
@@ -262,6 +289,7 @@ body {
     align-items: center;
     justify-content: center;
     background: rgba(0, 0, 0, 0.45);
+    -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
     z-index: 60;
 }
@@ -408,4 +436,232 @@ body {
 .muted {
     color: rgba(228, 226, 229, 0.65);
     font-weight: 700;
+}
+
+/* TopBar layout and palette controls (migrated from inline styles) */
+.topbar-root {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.topbar-left {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.topbar-difficulty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.topbar-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-left: auto;
+}
+
+.topbar-debug {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.topbar-seed {
+    display: block;
+}
+
+.topbar-btn-edit {
+    margin-left: 8px;
+}
+
+.topbar-input-seed {
+    margin-right: 8px;
+}
+
+.palette-root {
+    position: relative;
+    z-index: 400;
+}
+
+.palette-button {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: var(--surface-container-high);
+    border: 1px solid var(--ghost-stroke);
+    color: var(--text);
+}
+
+.palette-preview {
+    display: flex;
+    gap: 4px;
+}
+
+.palette-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    display: inline-block;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.palette-name {
+    margin-left: 8px;
+}
+
+.palette-popover {
+    position: absolute;
+    right: 0;
+    margin-top: 8px;
+    background: var(--surface-container-high);
+    border: 1px solid var(--ghost-stroke);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    color: var(--text);
+    z-index: 500;
+}
+
+.palette-list-button {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 8px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text);
+}
+
+/* Palette selector */
+.palette-selector {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.palette-select-btn {
+    padding: 6px;
+    border-radius: 6px;
+    background: var(--surface-container-high);
+    color: var(--text);
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    border: 1px solid var(--ghost-stroke);
+}
+
+.palette-select-btn.selected {
+    border: 2px solid var(--primary-container);
+}
+
+.palette-swatch-lg {
+    display: inline-block;
+}
+
+.palette-name {
+    margin-left: 8px;
+}
+
+/* Board layout utilities */
+.board-container {
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: calc(100vh - 220px);
+}
+
+.board-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 8px;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.board-item {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* GameShell layout */
+.game-loading {
+    padding: 16px;
+}
+
+.game-shell-root {
+    padding: 16px;
+}
+
+.game-shell-header {
+    margin-bottom: 12px;
+}
+
+.game-info-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.game-info-left {
+    margin-left: 12px;
+}
+
+.game-actions {
+    margin-top: 12px;
+}
+
+.star-img.small {
+    width: 28px;
+    height: 28px;
+    opacity: 0.9;
+}
+
+.star-img.big {
+    width: 36px;
+    height: 36px;
+}
+
+.star-holder {
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--complete-accent);
+    border: 4px solid rgba(0, 0, 0, 0.12);
+}
+
+.divider-vertical {
+    width: 1px;
+    height: 36px;
+    background: var(--ghost-stroke);
+}
+
+.centered-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+}
+
+/* App header utilities */
+.topbar-header-padding {
+    padding: 12px 18px;
+}
+
+.topbar-title {
+    margin: 0;
 }

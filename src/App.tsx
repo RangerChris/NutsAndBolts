@@ -9,7 +9,7 @@ export default function App(): ReactElement {
     const [progressLoaded, setProgressLoaded] = useState(false);
 
     useEffect(() => {
-        const { progress, unsubscribe } = initPersistence();
+        const { unsubscribe } = initPersistence();
         // keep progress if needed — for now we just mark loaded
         setProgressLoaded(true);
 
@@ -25,7 +25,7 @@ export default function App(): ReactElement {
                     // advance to next level
                     setCurrentLevel(diff, level + 1);
                 }
-            } catch (e) {
+            } catch {
                 // ignore
             }
         });
@@ -38,8 +38,8 @@ export default function App(): ReactElement {
 
     return (
         <div className="app-root hardware-texture">
-            <header className="topbar glass-effect metallic-brushed" style={{ padding: '12px 18px' }}>
-                <h1 style={{ margin: 0 }}>Nuts & Bolts</h1>
+            <header className="topbar glass-effect metallic-brushed topbar-header-padding">
+                <h1 className="topbar-title">Nuts & Bolts</h1>
             </header>
             <main className="app-main glass-effect metallic-brushed">
                 <GameShell />

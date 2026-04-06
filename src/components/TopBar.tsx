@@ -21,13 +21,13 @@ export default function TopBar({ level, difficulty, seed, paletteId, showDebug =
 
 
     return (
-        <div className="topbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+        <div className="topbar topbar-root">
+            <div className="topbar-left">
                 <div>
                     <strong>Level</strong>: {level}
                 </div>
                 <div>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <label className="topbar-difficulty">
                         <strong>Difficulty</strong>:
                         <select value={difficulty} onChange={(e) => onDifficultyChange?.(e.target.value)}>
                             <option value="easy">easy</option>
@@ -38,8 +38,8 @@ export default function TopBar({ level, difficulty, seed, paletteId, showDebug =
                     </label>
                 </div>
             </div>
-            <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginLeft: 'auto' }}>
-                <label style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <div className="topbar-controls">
+                <label className="topbar-debug">
                     <input
                         type="checkbox"
                         checked={showDebug}
@@ -47,48 +47,51 @@ export default function TopBar({ level, difficulty, seed, paletteId, showDebug =
                     />
                     <span>Show debug</span>
                 </label>
-                <div>
+                <div className="topbar-seed">
                     <strong>Seed</strong>:{' '}
                     {!editingSeed ? (
                         <span>
                             {seedValue || '—'}{' '}
-                            <button onClick={() => setEditingSeed(true)} style={{ marginLeft: 8 }}>Edit</button>
+                            <button onClick={() => setEditingSeed(true)} className="topbar-btn-edit">Edit</button>
                         </span>
                     ) : (
                         <span>
-                            <input value={seedValue} onChange={(e) => setSeedValue(e.target.value)} style={{ marginRight: 8 }} />
+                            <input aria-label="Seed" value={seedValue} onChange={(e) => setSeedValue(e.target.value)} className="topbar-input-seed" />
                             <button onClick={() => { setEditingSeed(false); onSeedChange?.(seedValue); }}>Save</button>
                         </span>
                     )}
                 </div>
-                <div style={{ position: 'relative', zIndex: 400 }}>
+                <div className="palette-root">
                     <button
                         aria-haspopup="true"
-                        aria-expanded={open}
                         onClick={() => setOpen((o) => !o)}
-                        style={{ display: 'inline-flex', gap: 8, alignItems: 'center', padding: '6px 8px', borderRadius: 8, background: 'var(--surface-container-high)', border: '1px solid var(--ghost-stroke)', color: 'var(--text)' }}
+                        className="palette-button"
                     >
-                        <div style={{ display: 'flex', gap: 4 }}>
+                        <div className="palette-preview">
                             {PALETTES.find((p) => p.id === paletteId)?.colors.slice(0, 5).map((c, i) => (
-                                <span key={i} style={{ width: 14, height: 14, background: c, borderRadius: 3, display: 'inline-block', border: '1px solid rgba(0,0,0,0.06)' }} />
+                                <svg key={i} width={14} height={14} className="palette-swatch" aria-hidden>
+                                    <rect width="100%" height="100%" rx="3" fill={c} stroke="rgba(0,0,0,0.06)" />
+                                </svg>
                             ))}
                         </div>
-                        <span style={{ marginLeft: 8 }}>{PALETTES.find((p) => p.id === paletteId)?.name}</span>
+                        <span className="palette-name">{PALETTES.find((p) => p.id === paletteId)?.name}</span>
                     </button>
                     {open && (
-                        <div style={{ position: 'absolute', right: 0, marginTop: 8, background: 'var(--surface-container-high)', border: '1px solid var(--ghost-stroke)', borderRadius: 8, padding: 8, boxShadow: '0 6px 18px rgba(0,0,0,0.08)', color: 'var(--text)', zIndex: 500 }}>
+                        <div className="palette-popover">
                             {PALETTES.map((p) => (
                                 <button
                                     key={p.id}
                                     onClick={() => { onPaletteChange(p.id); setOpen(false); }}
-                                    style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '6px 8px', width: '100%', background: 'transparent', border: 'none', textAlign: 'left', cursor: 'pointer', color: 'var(--text)' }}
+                                    className="palette-list-button"
                                 >
-                                    <div style={{ display: 'flex', gap: 4 }}>
+                                    <div className="palette-preview">
                                         {p.colors.slice(0, 5).map((c, i) => (
-                                            <span key={i} style={{ width: 14, height: 14, background: c, borderRadius: 3, display: 'inline-block', border: '1px solid rgba(0,0,0,0.06)' }} />
+                                            <svg key={i} width={14} height={14} className="palette-swatch" aria-hidden>
+                                                <rect width="100%" height="100%" rx="3" fill={c} stroke="rgba(0,0,0,0.06)" />
+                                            </svg>
                                         ))}
                                     </div>
-                                    <span style={{ marginLeft: 8 }}>{p.name}</span>
+                                    <span className="palette-name">{p.name}</span>
                                 </button>
                             ))}
                         </div>

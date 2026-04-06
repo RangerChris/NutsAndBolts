@@ -2,8 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import type { GameState } from '../lib/types';
 import BoltView from './BoltView';
 
-type AnimMove = {
-    move: any;
+export type AnimMove = {
+    move: { toBoltId: string };
     preRects: Array<{ left: number; top: number; width: number; height: number; color: string; colorLabel?: string }>;
 };
 
@@ -50,8 +50,65 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
             clone.style.transition = 'transform 360ms ease, opacity 260ms ease';
             // Side-view nut clone (66×20 viewBox matches BoltView NUT_W×NUT_H)
             // include data-nut-id text so clones mirror BoltView labels
+            // Build SVG via DOM APIs to avoid HTML injection
+            const SVG_NS = 'http://www.w3.org/2000/svg';
+            const svg = document.createElementNS(SVG_NS, 'svg');
+            svg.setAttribute('width', String(pr.width));
+            svg.setAttribute('height', String(pr.height));
+            svg.setAttribute('viewBox', '0 0 66 20');
+
+            const rect = document.createElementNS(SVG_NS, 'rect');
+            rect.setAttribute('x', '0');
+            rect.setAttribute('y', '0');
+            rect.setAttribute('width', '66');
+            rect.setAttribute('height', '20');
+            rect.setAttribute('rx', '2');
+            rect.setAttribute('fill', pr.color);
+            rect.setAttribute('stroke', 'rgba(0,0,0,0.35)');
+            rect.setAttribute('stroke-width', '0.8');
+            svg.appendChild(rect);
+
+            const line1 = document.createElementNS(SVG_NS, 'line');
+            line1.setAttribute('x1', '0');
+            line1.setAttribute('y1', '0');
+            line1.setAttribute('x2', '8');
+            line1.setAttribute('y2', '20');
+            line1.setAttribute('stroke', 'rgba(0,0,0,0.15)');
+            line1.setAttribute('stroke-width', '0.8');
+            svg.appendChild(line1);
+
+            const line2 = document.createElementNS(SVG_NS, 'line');
+            line2.setAttribute('x1', '66');
+            line2.setAttribute('y1', '0');
+            line2.setAttribute('x2', '58');
+            line2.setAttribute('y2', '20');
+            line2.setAttribute('stroke', 'rgba(0,0,0,0.15)');
+            line2.setAttribute('stroke-width', '0.8');
+            svg.appendChild(line2);
+
+            const shine = document.createElementNS(SVG_NS, 'rect');
+            shine.setAttribute('x', '3');
+            shine.setAttribute('y', '2');
+            shine.setAttribute('width', '60');
+            shine.setAttribute('height', '2');
+            shine.setAttribute('rx', '1');
+            shine.setAttribute('fill', 'rgba(255,255,255,0.28)');
+            svg.appendChild(shine);
+
             const cid = pr.colorLabel || '';
-            clone.innerHTML = `<svg width="${pr.width}" height="${pr.height}" viewBox="0 0 66 20" xmlns="http://www.w3.org/2000/svg"><rect x="0" y="0" width="66" height="20" rx="2" fill="${pr.color}" stroke="rgba(0,0,0,0.35)" stroke-width="0.8"/><line x1="0" y1="0" x2="8" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/><line x1="66" y1="0" x2="58" y2="20" stroke="rgba(0,0,0,0.15)" stroke-width="0.8"/><rect x="3" y="2" width="60" height="2" rx="1" fill="rgba(255,255,255,0.28)"/>` + (cid ? `<text x="33" y="14" text-anchor="middle" font-size="8" fill="var(--text)" data-nut-id="${cid}">${cid}</text>` : '') + `</svg>`;
+            if (cid) {
+                const text = document.createElementNS(SVG_NS, 'text');
+                text.setAttribute('x', '33');
+                text.setAttribute('y', '14');
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('font-size', '8');
+                text.setAttribute('fill', 'var(--text)');
+                text.setAttribute('data-nut-id', cid);
+                text.textContent = cid;
+                svg.appendChild(text);
+            }
+
+            clone.appendChild(svg);
             document.body.appendChild(clone);
             clones.push(clone);
 
@@ -88,10 +145,10 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
     // Render bolts in a wrapping flex container so as many bolts as fit are
     // shown per row and the remaining bolts wrap to the next line.
     return (
-        <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: 'calc(100vh - 220px)' }} ref={containerRef}>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, padding: 8, alignItems: 'flex-start', justifyContent: 'center' }}>
+        <div className="board-container" ref={containerRef}>
+            <div className="board-row">
                 {state.bolts.map((b) => (
-                    <div key={b.id} style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+                    <div key={b.id} className="board-item">
                         <BoltView
                             bolt={b}
                             paletteId={paletteId}

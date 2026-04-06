@@ -1,7 +1,7 @@
 type BalancerEvent = {
   timestamp: number;
   source: string;
-  payload: Record<string, any>;
+  payload: Record<string, unknown>;
 };
 
 type Listener = (ev: BalancerEvent) => void;
@@ -16,14 +16,14 @@ export function onBalancerEvent(fn: Listener) {
   };
 }
 
-export function emitBalancerEvent(source: BalancerEvent['source'], payload: Record<string, any>) {
+export function emitBalancerEvent(source: BalancerEvent['source'], payload: Record<string, unknown>) {
   const ev: BalancerEvent = { timestamp: Date.now(), source, payload };
   for (const l of listeners.slice()) {
     try {
       l(ev);
     } catch (e) {
       // swallow listener errors to avoid breaking generator
-      // eslint-disable-next-line no-console
+       
       console.error('balancer listener error', e);
     }
   }

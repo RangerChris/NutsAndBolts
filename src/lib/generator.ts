@@ -1,5 +1,5 @@
 import { seededRandom, randomInt } from './rng';
-import type { GameState, Bolt } from './types';
+import type { GameState, Bolt, Move } from './types';
 import { DIFFICULTY_CONFIG } from './constants';
 import { getLevelParams } from './progression';
 import { pickTopGroup, normalizeState, checkStateInvariants, computeOptimalMoves } from './engine';
@@ -33,7 +33,7 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
   // level does not start with the extra bolt present.
   const TEMP_EXTRA_ID = '__temp_extra';
   bolts.push({ id: TEMP_EXTRA_ID, capacity: stackHeight, nuts: [] });
-  const moveHistory: any[] = [];
+  const moveHistory: Move[] = [];
 
   let lastMove: { from?: string; to?: string } | null = null;
   const hasMixedBolt = (arr: Bolt[]) =>
@@ -84,7 +84,7 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
   const boltsToReturn = bolts.filter((b) => b.id !== TEMP_EXTRA_ID);
   // Move history cannot be reliably reconstructed without temp-bolt moves,
   // so start fresh. Undo only covers moves made during gameplay.
-  const filteredMoves: any[] = [];
+  const filteredMoves: Move[] = [];
 
   const state: GameState = {
     bolts: boltsToReturn || bolts,
@@ -159,7 +159,7 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
       },
       invariants,
     });
-  } catch (e) {
+  } catch {
     // ignore
   }
 
@@ -167,7 +167,7 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
   try {
     const optimal = computeOptimalMoves(normalized, Math.max(12, shuffleMoves));
     normalized.optimalMoves = optimal;
-  } catch (e) {
+  } catch {
     normalized.optimalMoves = null;
   }
 

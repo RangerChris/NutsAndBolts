@@ -15,7 +15,7 @@ try {
   } else {
     throw new Error('no localStorage');
   }
-} catch (_) {
+} catch {
   const store = new Map<string, string>();
   storageImpl = {
     getItem(key: string) {
@@ -31,7 +31,8 @@ try {
     clear() {
       store.clear();
     },
-    key(_index: number) {
+    key(index: number) {
+      void index;
       return null;
     },
     get length() {
@@ -65,7 +66,7 @@ export function saveProgress(payload: PersistedProgress) {
   try {
     storageImpl.setItem(STORAGE_KEY, JSON.stringify(payload));
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
@@ -77,31 +78,35 @@ export function loadProgress(): PersistedProgress {
     const parsed = JSON.parse(raw);
     const migrated = migrateProgress(parsed);
     return migrated;
-  } catch (e) {
+  } catch {
     return DEFAULT_PROGRESS;
   }
 }
 
-export function migrateProgress(obj: any): PersistedProgress {
+export function migrateProgress(obj: unknown): PersistedProgress {
   if (!obj || typeof obj !== 'object') return DEFAULT_PROGRESS;
+  const o = obj as Record<string, unknown>;
   // If already has a version and matches our shape, accept it
-  if (typeof obj.version === 'number' && obj.difficulties && obj.settings) {
-    return obj as PersistedProgress;
+  if (typeof o.version === 'number' && o.difficulties && o.settings) {
+    return o as PersistedProgress;
   }
 
   // Migration: older schema might have 'levels' keyed by difficulty
-  if (obj.levels && typeof obj.levels === 'object') {
+  if (o.levels && typeof o.levels === 'object') {
     const difficulties: Record<string, { currentLevel: number; maxReached: number }> = {};
-    for (const k of Object.keys(obj.levels)) {
-      const v = obj.levels[k];
-      difficulties[k] = { currentLevel: v.current || 1, maxReached: v.max || v.current || 1 };
+    const levels = o.levels as Record<string, unknown>;
+    for (const k of Object.keys(levels)) {
+      const v = levels[k] as Record<string, unknown>;
+      const current = typeof v?.current === 'number' ? (v.current as number) : 1;
+      const max = typeof v?.max === 'number' ? (v.max as number) : current;
+      difficulties[k] = { currentLevel: current, maxReached: max };
     }
-    return { version: 1, difficulties, settings: obj.settings || DEFAULT_PROGRESS.settings };
+    return { version: 1, difficulties, settings: (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings };
   }
 
   // Fallback: try to salvage partial fields
-  const difficulties = obj.difficulties || DEFAULT_PROGRESS.difficulties;
-  const settings = obj.settings || DEFAULT_PROGRESS.settings;
+  const difficulties = (o.difficulties as PersistedProgress['difficulties']) || DEFAULT_PROGRESS.difficulties;
+  const settings = (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings;
   return { version: 1, difficulties, settings };
 }
 
@@ -115,7 +120,7 @@ export function initPersistence() {
       window.addEventListener('visibilitychange', onVisibility);
       unsub = () => window.removeEventListener('visibilitychange', onVisibility);
     }
-  } catch (e) {
+  } catch {
     // ignore in non-browser environments
   }
   return { progress, unsubscribe: unsub };

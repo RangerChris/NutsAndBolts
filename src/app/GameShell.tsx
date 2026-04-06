@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { GameState, Bolt } from '../lib/types';
+import type { GameState } from '../lib/types';
 import { createLevel } from '../lib/generator';
 import {
     addExtraBolt,
@@ -10,7 +10,7 @@ import {
     canPlaceGroup,
     computeStars,
 } from '../lib/engine';
-import Board from '../components/Board';
+import Board, { AnimMove } from '../components/Board';
 import BottomBar from '../components/BottomBar';
 import TopBar from '../components/TopBar';
 import starUrl from '../assets/icons/star.svg'; // Keep star asset
@@ -21,7 +21,6 @@ import {
     setSelectedDifficulty,
     setCurrentLevel,
 } from '../lib/persistence';
-import { getPalette } from '../lib/palettes';
 
 import type { ReactElement } from 'react';
 
@@ -46,7 +45,7 @@ export default function GameShell(): ReactElement {
     const [selected, setSelected] = useState<string | null>(null);
     const [invalidTarget, setInvalidTarget] = useState<string | null>(null);
     // Animation state for FLIP clone animations — keep hooks unconditional
-    const [animMove, setAnimMove] = useState<any | null>(null);
+    const [animMove, setAnimMove] = useState<AnimMove | null>(null);
     const [showComplete, setShowComplete] = useState(false);
 
     const handleAnimDone = () => {
@@ -59,7 +58,7 @@ export default function GameShell(): ReactElement {
         else setShowComplete(false);
     }, [state]);
 
-    if (!state) return <div style={{ padding: 16 }}>Loading...</div>;
+    if (!state) return <div className="game-loading">Loading...</div>;
 
     const handleExtra = () => {
         const res = addExtraBolt(state);
@@ -123,7 +122,7 @@ export default function GameShell(): ReactElement {
                         const labelEl = sel.querySelector('[data-nut-id]');
                         if (labelEl) colorLabel = (labelEl as Element).getAttribute('data-nut-id') || undefined;
                     }
-                } catch (e) {
+                } catch {
                     // ignore
                 }
                 preRects.push({
@@ -184,8 +183,8 @@ export default function GameShell(): ReactElement {
     };
 
     return (
-        <div style={{ padding: 16 }}>
-            <div style={{ marginBottom: 12 }}>
+        <div className="game-shell-root">
+            <div className="game-shell-header">
                 <TopBar
                     level={state.level}
                     difficulty={difficulty}
@@ -213,8 +212,8 @@ export default function GameShell(): ReactElement {
                 />
             </div>
 
-            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-                <div style={{ marginLeft: 12 }}>
+            <div className="game-info-row">
+                <div className="game-info-left">
                     {isWin(state) ? <span>🎉 Solved</span> : <span>In play</span>}
                 </div>
             </div>
@@ -231,7 +230,7 @@ export default function GameShell(): ReactElement {
                     onAnimDone={handleAnimDone}
                 />
             </div>
-            <div style={{ marginTop: 12 }}>
+            <div className="game-actions">
                 <BottomBar
                     onExtra={handleExtra}
                     onUndo={handleUndo}
@@ -247,26 +246,15 @@ export default function GameShell(): ReactElement {
                     <div className="complete-modal">
                         <div className="hardware-stars">
                             <div className="nut-hex small" aria-hidden>
-                                <img src={starUrl} alt="star" style={{ width: 28, height: 28, opacity: 0.9 }} />
+                                <img src={starUrl} alt="star" className="star-img small" />
                             </div>
                             <div className="nut-hex big" aria-hidden>
-                                <div
-                                    style={{
-                                        width: 56,
-                                        height: 56,
-                                        borderRadius: 28,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        background: 'var(--complete-accent)',
-                                        border: '4px solid rgba(0,0,0,0.12)',
-                                    }}
-                                >
-                                    <img src={starUrl} alt="star" style={{ width: 36, height: 36 }} />
+                                <div className="star-holder">
+                                    <img src={starUrl} alt="star" className="star-img big" />
                                 </div>
                             </div>
                             <div className="nut-hex small" aria-hidden>
-                                <img src={starUrl} alt="star" style={{ width: 28, height: 28, opacity: 0.9 }} />
+                                <img src={starUrl} alt="star" className="star-img small" />
                             </div>
                         </div>
 
@@ -285,12 +273,12 @@ export default function GameShell(): ReactElement {
                                                 {s.optimal ? ` (opt ${s.optimal})` : ''}
                                             </div>
                                         </div>
-                                        <div style={{ width: 1, height: 36, background: 'var(--ghost-stroke)' }} />
+                                        <div className="divider-vertical" />
                                         <div className="stat">
                                             <div className="label">Time</div>
                                             <div className="value">{Math.round(s.timeSpentMs / 1000)}s</div>
                                         </div>
-                                        <div style={{ width: 1, height: 36, background: 'var(--ghost-stroke)' }} />
+                                        <div className="divider-vertical" />
                                         <div className="stat">
                                             <div className="label">Stars</div>
                                             <div className="value">
@@ -300,7 +288,7 @@ export default function GameShell(): ReactElement {
                                         </div>
                                     </div>
 
-                                    <div style={{ display: 'flex', justifyContent: 'center', marginTop: 12 }}>
+                                    <div className="centered-row">
                                         <button className="control-btn" onClick={handleContinue}>
                                             Next Level
                                         </button>

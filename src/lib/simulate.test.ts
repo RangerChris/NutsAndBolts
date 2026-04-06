@@ -30,25 +30,25 @@ async function runSim() {
     }
     const avg = stats.totalShuffle / stats.runs;
     // Print summary
-    // eslint-disable-next-line no-console
+     
     console.log(`\nDifficulty: ${d} — runs=${stats.runs} avg=${avg.toFixed(2)} min=${stats.min} max=${stats.max}`);
     const sorted = Object.entries(stats.buckets).sort((a, b) => b[1] - a[1]).slice(0, 8);
-    // eslint-disable-next-line no-console
+     
     console.log('Top buckets:', sorted.slice(0, 8).map(([k, v]) => `${k}:${v}`).join(', '));
     // sample level params
-    // eslint-disable-next-line no-console
+     
     console.log('Sample params:');
     for (const L of [1, 5, 10, 20]) {
-      const p = getLevelParams(d as any, L);
-      // eslint-disable-next-line no-console
+      const p = getLevelParams(d, L);
+       
       console.log(` L${L}: bolts=${p.numBolts}, height=${p.stackHeight}, shuffleMoves=${p.shuffleMoves}`);
     }
   }
   unsubscribe();
   if (csvLines.length > 0) {
-    // eslint-disable-next-line no-console
+     
     console.log('\nCSV sample (first 5):');
-    // eslint-disable-next-line no-console
+     
     console.log(['seed,difficulty,level,shuffleMoves,shufflePerformed', ...csvLines.slice(0, 5)].join('\n'));
   }
 }

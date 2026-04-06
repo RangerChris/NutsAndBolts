@@ -60,7 +60,7 @@ describe('extra bolt and undo', () => {
     winState.bolts = [
       { id: 'a', capacity: 3, nuts: ['x', 'x', 'x'] },
       { id: 'b', capacity: 3, nuts: [] },
-    ] as any;
+    ];
     expect(isWin(winState)).toBe(true);
 
     winState.bolts[0].nuts = ['x', 'y'];

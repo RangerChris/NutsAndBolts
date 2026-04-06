@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { createLevel } from './generator';
-import { undoLastMove, isWin } from './engine';
 
 describe('level generator', () => {
   it('generates reproducible board for same seed', () => {

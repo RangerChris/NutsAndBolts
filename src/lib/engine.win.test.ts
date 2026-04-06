@@ -1,10 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { onBalancerEvent } from './balancer';
 import { executeMoveOnState } from './engine';
+import type { GameState } from './types';
 
 describe('level completion event', () => {
   it('emits levelComplete when move solves the level', () => {
-    const state: any = {
+    const state: GameState = {
       bolts: [
         { id: 'b0', capacity: 4, nuts: ['x', 'x'] },
         { id: 'b1', capacity: 4, nuts: ['x'] },
@@ -15,9 +16,10 @@ describe('level completion event', () => {
       difficulty: 'easy',
       seed: 'win-seed',
       moveHistory: [],
+      optimalMoves: null,
     };
 
-    let seen: any = null;
+    let seen: unknown = null;
     const unsub = onBalancerEvent((ev) => {
       if (ev.payload && ev.payload.event === 'levelComplete') seen = ev.payload;
     });
@@ -25,9 +27,9 @@ describe('level completion event', () => {
     const res = executeMoveOnState(state, 'b1', 'b0');
     expect(res.success).toBe(true);
     expect(seen).not.toBeNull();
-    expect(seen.event).toBe('levelComplete');
-    expect(seen.level).toBe(2);
-    expect(seen.seed).toBe('win-seed');
+    expect((seen as { event?: string }).event).toBe('levelComplete');
+    expect((seen as { level?: number }).level).toBe(2);
+    expect((seen as { seed?: string }).seed).toBe('win-seed');
 
     unsub();
   });

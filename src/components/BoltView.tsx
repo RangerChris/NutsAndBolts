@@ -64,55 +64,6 @@ function nutTop(slotIdx: number, capacity: number): number {
   return slotTop(slotIdx, capacity) + NUT_Y_PAD;
 }
 
-/**
- * Build an SVG path string for a rounded polygon given vertex points.
- * Uses quadratic bezier at each corner with radius `r`.
- */
-function roundedPath(points: Array<{ x: number; y: number }>, r = 6) {
-  if (!points || points.length === 0) return '';
-  const n = points.length;
-  // clamp radius to edge lengths
-  const pts = points;
-  const getPrev = (i: number) => pts[(i - 1 + n) % n];
-  const getNext = (i: number) => pts[(i + 1) % n];
-
-  const segPoints: Array<{ x: number; y: number; sx: number; sy: number; ex: number; ey: number }> = [];
-  for (let i = 0; i < n; i++) {
-    const p = pts[i];
-    const prev = getPrev(i);
-    const next = getNext(i);
-    // vector from p to prev and next
-    const v1x = prev.x - p.x;
-    const v1y = prev.y - p.y;
-    const v2x = next.x - p.x;
-    const v2y = next.y - p.y;
-    const len1 = Math.hypot(v1x, v1y);
-    const len2 = Math.hypot(v2x, v2y);
-    const r1 = Math.min(r, len1 / 2, len2 / 2);
-    // normalize and compute start/end points along edges
-    const sx = p.x + (v1x / len1) * r1;
-    const sy = p.y + (v1y / len1) * r1;
-    const ex = p.x + (v2x / len2) * r1;
-    const ey = p.y + (v2y / len2) * r1;
-    segPoints.push({ x: p.x, y: p.y, sx, sy, ex, ey });
-  }
-
-  // build path
-  let d = '';
-  // move to first start
-  d += `M ${segPoints[0].sx} ${segPoints[0].sy}`;
-  for (let i = 0; i < n; i++) {
-    const cur = segPoints[i];
-    const next = segPoints[(i + 1) % n];
-    // line to corner start
-    d += ` L ${cur.x} ${cur.y}`;
-    // quadratic bezier to next ex,ey with control at corner point cur.x,cur.y
-    d += ` Q ${cur.x} ${cur.y} ${next.sx} ${next.sy}`;
-  }
-  d += ' Z';
-  return d;
-}
-
 export default function BoltView({
   bolt,
   paletteId,
@@ -149,23 +100,14 @@ export default function BoltView({
   const dsFilterId = `ds-${bolt.id}`;
   const platformGradId = `plat-${bolt.id}`;
 
-  function readableTextColor(hex: string) {
-    // strip # if present
-    const h = hex.replace('#', '');
-    const r = parseInt(h.substring(0, 2), 16) / 255;
-    const g = parseInt(h.substring(2, 4), 16) / 255;
-    const b = parseInt(h.substring(4, 6), 16) / 255;
-    // relative luminance
-    const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    return lum > 0.6 ? '#000000' : '#ffffff';
-  }
+  // readableTextColor removed — not used
 
   return (
     <div
       role="button"
       tabIndex={0}
       aria-label={`Bolt ${bolt.id}, ${bolt.nuts.length} of ${capacity} nuts`}
-      className={`bolt ${selected ? 'bolt-selected' : ''} ${invalid ? 'bolt-invalid' : ''}`}
+      className={`bolt ${selected ? 'bolt-selected' : ''} ${invalid ? 'bolt-invalid' : ''} bolt-root-inline`}
       onClick={() => onClick?.(bolt.id)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -174,10 +116,9 @@ export default function BoltView({
         }
       }}
       data-bolt={bolt.id}
-      style={{ display: 'inline-block' }}
     >
-      <div style={{ transform: `scale(${scale})`, transformOrigin: 'top center' }}>
-        <svg width={W} height={svgH} viewBox={`0 0 ${W} ${svgH}`} aria-hidden="true">
+      <svg width={W} height={svgH} viewBox={`0 0 ${W} ${svgH}`} aria-hidden="true">
+        <g transform={`scale(${scale})`}>
           <defs>
             {/* Drop shadow for nuts/head */}
             <filter id={dsFilterId} x="-50%" y="-50%" width="200%" height="200%">
@@ -254,23 +195,7 @@ export default function BoltView({
               if (slotIdx < bolt.nuts.length) return null;
               const y = nutTop(slotIdx, effectiveCapacity);
               // hex points (flat-top hexagon)
-              const x0 = NUT_X + 0.25 * NUT_W;
-              const x1 = NUT_X + 0.75 * NUT_W;
-              const x2 = NUT_X + NUT_W;
-              const x3 = x1;
-              const x4 = x0;
-              const x5 = NUT_X;
-              const y0 = y;
-              const y1 = y + NUT_H / 2;
-              const y2 = y + NUT_H;
-              const points = [
-                { x: x0, y: y0 },
-                { x: x1, y: y0 },
-                { x: x2, y: y1 },
-                { x: x3, y: y2 },
-                { x: x4, y: y2 },
-                { x: x5, y: y1 },
-              ];
+
               // draw a pill (rounded rect) for ghost slot
               return (
                 <rect
@@ -293,25 +218,9 @@ export default function BoltView({
               const colorIndex = parseInt(colorId.replace(/^c/, ''), 10) || 0;
               const color = palette.colors[colorIndex % palette.colors.length];
               const y = nutTop(slotIdx, effectiveCapacity);
-              const holeCY = y + NUT_H / 2;
+
               const gradId = `nutgrad-${bolt.id}-${slotIdx}`;
-              const x0 = NUT_X + 0.25 * NUT_W;
-              const x1 = NUT_X + 0.75 * NUT_W;
-              const x2 = NUT_X + NUT_W;
-              const x3 = x1;
-              const x4 = x0;
-              const x5 = NUT_X;
-              const y0 = y;
-              const y1 = y + NUT_H / 2;
-              const y2 = y + NUT_H;
-              const points = [
-                { x: x0, y: y0 },
-                { x: x1, y: y0 },
-                { x: x2, y: y1 },
-                { x: x3, y: y2 },
-                { x: x4, y: y2 },
-                { x: x5, y: y1 },
-              ];
+
               return (
                 <g key={`${bolt.id}-${slotIdx}-${colorId}`} data-nut-index={slotIdx} data-nut-id={colorId}>
                   <defs>
@@ -426,40 +335,22 @@ export default function BoltView({
               opacity="0.6"
             />
           </g>
-        </svg>
-      </div>
+        </g>
+      </svg>
 
       {/* Debug labels shown below the bolt: stack index only (bottom->top) */}
       {showDebug && (
-        <div
-          style={{
-            marginTop: 8,
-            display: 'flex',
-            gap: 6,
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-          }}
-          aria-hidden="true"
-        >
+        <div className="debug-labels" aria-hidden="true">
           {bolt.nuts.map((_, i) => {
             return (
-              <div
-                key={`${bolt.id}-lbl-${i}`}
-                style={{
-                  fontSize: 11,
-                  padding: '2px 6px',
-                  borderRadius: 6,
-                  background: 'var(--on-surface-variant)',
-                  color: '#111827',
-                  boxShadow: 'inset 0 -1px 0 rgba(0,0,0,0.08)',
-                }}
-              >
+              <div key={`${bolt.id}-lbl-${i}`} className="debug-label">
                 {i}
               </div>
             );
           })}
         </div>
       )}
+
     </div>
   );
 }

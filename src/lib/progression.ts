@@ -32,7 +32,7 @@ export function getLevelParams(difficulty: Difficulty, level: number): LevelPara
   const shuffleMin = cfg.shuffleRange[0];
   const shuffleMax = cfg.shuffleRange[1];
   // difficulty multiplier to slightly reduce extreme growth
-  const difficultyMultiplier: Record<Difficulty, number> = progressionConfig.difficultyMultiplier as any;
+  const difficultyMultiplier: Record<Difficulty, number> = progressionConfig.difficultyMultiplier as Record<Difficulty, number>;
   const base = shuffleMin + easedT * (shuffleMax - shuffleMin);
   const shuffleMoves = Math.round(Math.min(shuffleMax, base * difficultyMultiplier[difficulty]));
 
