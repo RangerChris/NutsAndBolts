@@ -88,8 +88,6 @@ Note: the number of distinct colors in a level matches the number of bolts for t
 - Create README and run instructions
 - Playtest & tune difficulty
 
-## Questions
-
 ## Reference Docs
 
 - [Reference index](.github/references/README.md)
