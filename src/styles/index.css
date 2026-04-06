@@ -623,6 +623,63 @@ body {
     margin-top: 12px;
 }
 
+/* Sorted progress bar between board and bottom bar */
+.sorted-progress-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0 6px 0;
+}
+
+.sorted-progress {
+    width: min(720px, 92%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 999px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--primary-container));
+    width: 0%;
+    transition: width 280ms ease;
+}
+
+.progress-label {
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--text);
+    text-align: center;
+}
+
+/* bump animation when percent increases */
+.progress-label.bump {
+    transform: scale(1.06);
+    transition: transform 340ms cubic-bezier(.2, .9, .2, 1);
+}
+
+/* visually hidden helper for screen readers */
+.visually-hidden {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap;
+    border: 0;
+    padding: 0;
+    margin: -1px;
+}
+
 .star-img.small {
     width: 28px;
     height: 28px;

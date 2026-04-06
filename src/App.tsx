@@ -38,9 +38,6 @@ export default function App(): ReactElement {
 
     return (
         <div className="app-root hardware-texture">
-            <header className="topbar glass-effect metallic-brushed topbar-header-padding">
-                <h1 className="topbar-title">Nuts & Bolts</h1>
-            </header>
             <main className="app-main glass-effect metallic-brushed">
                 <GameShell />
                 {!progressLoaded && <div>Loading progress...</div>}

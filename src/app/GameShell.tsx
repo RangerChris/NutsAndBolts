@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import type { GameState } from '../lib/types';
 import { createLevel } from '../lib/generator';
 import {
@@ -58,6 +58,33 @@ export default function GameShell(): ReactElement {
         else setShowComplete(false);
     }, [state]);
 
+    const computeSortedPercent = (s: GameState) => {
+        const bolts = s.bolts || [];
+        const total = bolts.reduce((acc, b) => acc + (b.nuts?.length || 0), 0);
+        if (total === 0) return 100;
+        let sorted = 0;
+        for (const b of bolts) {
+            if (!b.nuts || b.nuts.length === 0) continue;
+            const first = b.nuts[0];
+            const uniform = b.nuts.every((n) => n === first);
+            if (uniform) sorted += b.nuts.length;
+        }
+        return Math.round((sorted / total) * 100);
+    };
+
+    // compute pct for render and announce changes
+    const pct = state ? computeSortedPercent(state) : 0;
+    const prevPctRef = useRef<number>(pct);
+    const [bump, setBump] = useState(false);
+    useEffect(() => {
+        if (pct > prevPctRef.current) {
+            setBump(true);
+            const t = setTimeout(() => setBump(false), 360);
+            return () => clearTimeout(t);
+        }
+        prevPctRef.current = pct;
+    }, [pct]);
+
     if (!state) return <div className="game-loading">Loading...</div>;
 
     const handleExtra = () => {
@@ -73,6 +100,16 @@ export default function GameShell(): ReactElement {
     const handleUndo = () => {
         const res = undoLastMove(state);
         if (res.success) setState({ ...state });
+    };
+
+    const handleRestart = () => {
+        // Recreate the level exactly as when first loaded using the same seed
+        const { state: s } = createLevel({ difficulty, level: currentLevel, seed });
+        setState(s);
+        setSelected(null);
+        setInvalidTarget(null);
+        setAnimMove(null);
+        setShowComplete(false);
     };
 
     const handleBoltClick = (id: string) => {
@@ -230,11 +267,23 @@ export default function GameShell(): ReactElement {
                     onAnimDone={handleAnimDone}
                 />
             </div>
+
+            <div className="sorted-progress-wrapper">
+                <div className="sorted-progress">
+                    <div className="progress-bar" aria-hidden>
+                        <div className="progress-fill" style={{ width: `${pct}%` }} />
+                    </div>
+                    <div className={`progress-label ${bump ? 'bump' : ''}`}>Sorted: {pct}%</div>
+                    <div className="visually-hidden" aria-live="polite">Sorted {pct} percent</div>
+                </div>
+            </div>
+
             <div className="game-actions">
                 <BottomBar
                     onExtra={handleExtra}
                     onUndo={handleUndo}
                     onHint={handleHint}
+                    onRestart={handleRestart}
                     // Disable the Extra button when an extra bolt is already present
                     extraDisabled={state.bolts.some((b) => String(b.id).startsWith('extra')) || state.bolts.length >= 12}
                     undoDisabled={!state.moveHistory || state.moveHistory.length === 0}
