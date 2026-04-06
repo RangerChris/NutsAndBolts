@@ -113,10 +113,6 @@ Use this as the single execution checklist for MVP -> polish.
   - [x] Extra Bolt action with remaining indicator
   - [x] Undo action
   - [x] Hint placeholder button and disabled-state rules
-- [ ] Responsive and performance polish
-  - [ ] Smooth 60fps animation targets on common mobile devices
-  - [ ] Touch-friendly hit targets
-  - [ ] Minimize layout shift during animations
 
 ## 7) Accessibility and Color System
 
@@ -136,14 +132,10 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 8) Feedback, Audio, and Feel
 
-- [ ] Add interaction feedback
-  - [ ] Valid move animation
-  - [ ] Invalid move blocked animation
-  - [ ] Win celebration micro-animation
-- [ ] Add optional haptics/audio
-  - [ ] Move/click/blocked/win sound placeholders
-  - [ ] Haptic pulse on key actions where supported
-  - [ ] Add settings toggles for audio/haptics
+- [x] Add interaction feedback
+  - [x] Valid move animation
+  - [x] Invalid move blocked animation
+  - [x] Win celebration micro-animation
 - [ ] Add game feel tuning pass
   - [ ] Adjust animation timings for readability and speed
   - [ ] Tune highlight clarity for selected source/group
@@ -151,19 +143,21 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 9) Testing Strategy and QA
 
-- [ ] Unit tests (engine)
-  - [ ] Contiguous top-group detection
-  - [ ] Move legality rules (empty target, matching color, capacity)
-  - [ ] Extra bolt single-use enforcement
-  - [ ] Win condition evaluation
-- [ ] Unit tests (generator + persistence)
-  - [ ] Same seed reproducibility
-  - [ ] Difficulty shuffle range adherence
-  - [ ] Save/load round-trip for progress and palette
-- [ ] Integration tests
-  - [ ] Simulated playthroughs for sample seeds per difficulty
-  - [ ] Regression tests for undo and extra bolt interactions
-  - [ ] UI flow tests: select source -> select target -> result state update
+- [x] Unit tests (engine)
+  - [x] Contiguous top-group detection
+  - [x] Move legality rules (empty target, matching color, capacity)
+  - [x] Extra bolt single-use enforcement
+  - [x] Win condition evaluation
+
+- [x] Unit tests (generator + persistence)
+  - [x] Same seed reproducibility
+  - [x] Difficulty shuffle range adherence
+  - [x] Save/load round-trip for progress and palette
+
+- [x] Integration tests
+  - [x] Simulated playthroughs for sample seeds per difficulty
+  - [x] Regression tests for undo and extra bolt interactions
+  - [x] UI flow tests: select source -> select target -> result state update
 - [ ] Manual QA matrix
   - [ ] iOS Safari latest stable
   - [ ] Android Chrome latest stable
@@ -171,28 +165,24 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 10) Documentation and Developer Experience
 
-- [ ] Update README
-  - [ ] Game overview and controls
-  - [ ] Local run instructions
-  - [ ] Test and build instructions
-- [ ] Add design docs
-  - [ ] Link PRD and this TODO
-  - [ ] Add balancing notes and tunable parameters doc
-  - [ ] Add seed/debug guide for QA reproduction
-- [ ] Add contribution guidance
-  - [ ] Branch/PR checklist
-  - [ ] Definition of done
-  - [ ] Release notes template
+- [x] Update README
+  - [x] Game overview and controls
+  - [x] Local run instructions
+  - [x] Test and build instructions
+- [x] Add design docs
+  - [x] Link PRD and this TODO
+  - [x] Add balancing notes and tunable parameters doc
+  - [x] Add seed/debug guide for QA reproduction
 
 ## 11) Release Readiness
 
 - [ ] Acceptance criteria verification
-  - [ ] Moves follow all PRD rules
-  - [ ] Empty-target moves allowed
-  - [ ] Extra bolt single-use enforced
-  - [ ] Palette selectable and persisted
-  - [ ] Seeded generator reproducible
-  - [ ] Progress saved/restored
+  - [x] Moves follow all PRD rules
+  - [x] Empty-target moves allowed
+  - [x] Extra bolt single-use enforced
+  - [x] Palette selectable and persisted
+  - [x] Seeded generator reproducible
+  - [x] Progress saved/restored
 - [ ] Performance and stability gate
   - [ ] No critical console errors in production build
   - [ ] No failing tests in CI
@@ -201,10 +191,3 @@ Use this as the single execution checklist for MVP -> polish.
   - [ ] Tag release candidate
   - [ ] Publish build
   - [ ] Capture post-launch metrics baseline
-
-## Optional Stretch (Post-MVP)
-
-- [ ] Smart hint system that avoids trivial suggestions
-- [ ] Daily challenge seeded mode
-- [ ] Theme packs and cosmetic unlocks
-- [ ] Lightweight analytics dashboard for balancing insights
