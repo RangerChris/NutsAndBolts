@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { GameState, Bolt } from '../lib/types';
 import { createLevel } from '../lib/generator';
-import { addExtraBolt, undoLastMove, isWin, executeMoveOnState, pickTopGroup, canPlaceGroup } from '../lib/engine';
+import { addExtraBolt, undoLastMove, isWin, executeMoveOnState, pickTopGroup, canPlaceGroup, computeStars } from '../lib/engine';
 import Board from '../components/Board';
 import BottomBar from '../components/BottomBar';
 import TopBar from '../components/TopBar';
@@ -206,6 +206,19 @@ export default function GameShell(): JSX.Element {
                     <div style={{ background: '#fff', padding: 24, borderRadius: 8, minWidth: 360, boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
                         <h2>Level Complete</h2>
                         <p>Nice work — you completed level {state.level}.</p>
+                        <div style={{ marginTop: 8 }}>
+                            {/* move and star summary */}
+                            {(() => {
+                                const s = computeStars(state);
+                                return (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                        <div><strong>Moves:</strong> {s.moveCount}{s.optimal ? ` (optimal ${s.optimal})` : ''}</div>
+                                        <div><strong>Time:</strong> {Math.round(s.timeSpentMs / 1000)}s used of {Math.round(s.timeAvailableMs / 1000)}s available</div>
+                                        <div><strong>Stars:</strong> {'★'.repeat(s.totalStars)}{'☆'.repeat(3 - s.totalStars)}</div>
+                                    </div>
+                                );
+                            })()}
+                        </div>
                         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 12 }}>
                             <button onClick={handleContinue} style={{ fontWeight: '600' }}>Continue</button>
                         </div>

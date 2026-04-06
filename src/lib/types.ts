@@ -25,4 +25,6 @@ export type GameState = {
   difficulty: Difficulty;
   seed?: string;
   moveHistory: Move[];
+  // Precalculated optimal move count for this level, if available
+  optimalMoves?: number | null;
 };

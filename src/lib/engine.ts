@@ -78,12 +78,40 @@ export function executeMoveOnState(state: GameState, fromId: string, toId: strin
   // Emit level-complete event if this move solved the level
   try {
     if (isWin(state)) {
+      // compute move/time based stars
+      const moveCount = state.moveHistory.length;
+      const optimal = typeof state.optimalMoves === 'number' ? state.optimalMoves : null;
+      // move quality stars: 2 stars if within 75% of optimal, otherwise 1
+      let moveStars = 1;
+      if (optimal && optimal > 0) {
+        if (moveCount <= Math.floor(0.75 * optimal)) moveStars = 2;
+        else moveStars = 1;
+      }
+      // time-based star: available time = optimalMoves * 3 seconds
+      let timeStar = 0;
+      const history = state.moveHistory || [];
+      let timeSpent = 0;
+      if (history.length >= 2) {
+        const first = history[0].timestamp || 0;
+        const last = history[history.length - 1].timestamp || 0;
+        timeSpent = Math.max(0, last - first);
+      } else {
+        timeSpent = 0;
+      }
+      const availableMs = ((optimal && optimal > 0 ? optimal : moveCount) * 3) * 1000;
+      if (timeSpent < availableMs) timeStar = 1;
+      const totalStars = Math.min(3, moveStars + timeStar);
+
       emitBalancerEvent('game', {
         event: 'levelComplete',
         level: state.level,
         difficulty: state.difficulty,
         seed: state.seed,
-        moveHistoryLength: state.moveHistory.length,
+        moveHistoryLength: moveCount,
+        optimalMoves: optimal,
+        timeSpentMs: timeSpent,
+        timeAvailableMs: availableMs,
+        stars: totalStars,
         bolts: state.bolts.length,
       });
     }
@@ -91,6 +119,78 @@ export function executeMoveOnState(state: GameState, fromId: string, toId: strin
     // swallow
   }
   return { success: true, move };
+}
+
+// Compute minimal moves to reach a win state using BFS up to maxDepth.
+export function computeOptimalMoves(startState: GameState, maxDepth = 20): number | null {
+  // canonicalize a state to string
+  const canon = (s: GameState) => s.bolts.map((b) => b.nuts.join(',')).join('|');
+
+  // shallow clone a GameState (bolts deep copied)
+  const cloneState = (s: GameState): GameState => ({
+    bolts: s.bolts.map((b) => ({ id: b.id, capacity: b.capacity, nuts: b.nuts.slice() })),
+    extraBoltUsed: Boolean(s.extraBoltUsed),
+    level: s.level,
+    difficulty: s.difficulty,
+    seed: s.seed,
+    moveHistory: [],
+  } as GameState);
+
+  const startCanon = canon(startState);
+  if (isWin(startState)) return 0;
+
+  const queue: Array<{ state: GameState; depth: number }> = [{ state: cloneState(startState), depth: 0 }];
+  const visited = new Set<string>([startCanon]);
+
+  while (queue.length > 0) {
+    const { state, depth } = queue.shift() as { state: GameState; depth: number };
+    if (depth >= maxDepth) continue;
+    // generate moves: for each pair of bolts
+    for (let i = 0; i < state.bolts.length; i++) {
+      for (let j = 0; j < state.bolts.length; j++) {
+        if (i === j) continue;
+        const src = state.bolts[i];
+        const tgt = state.bolts[j];
+        const { color, count } = pickTopGroup(src);
+        if (!color || count === 0) continue;
+        const can = canPlaceGroup(src, tgt, count);
+        if (!can.ok) continue;
+        // apply move on a clone
+        const ns = cloneState(state);
+        const ssrc = ns.bolts[i];
+        const stgt = ns.bolts[j];
+        const moved = ssrc.nuts.splice(ssrc.nuts.length - count, count);
+        stgt.nuts.push(...moved);
+        const c = canon(ns);
+        if (visited.has(c)) continue;
+        if (isWin(ns)) return depth + 1;
+        visited.add(c);
+        queue.push({ state: ns, depth: depth + 1 });
+      }
+    }
+  }
+  return null;
+}
+
+export function computeStars(state: GameState) {
+  const moveCount = (state.moveHistory || []).length;
+  const optimal = typeof state.optimalMoves === 'number' ? state.optimalMoves : null;
+  let moveStars = 1;
+  if (optimal && optimal > 0) {
+    if (moveCount <= Math.floor(0.75 * optimal)) moveStars = 2;
+    else moveStars = 1;
+  }
+  const history = state.moveHistory || [];
+  let timeSpent = 0;
+  if (history.length >= 2) {
+    const first = history[0].timestamp || 0;
+    const last = history[history.length - 1].timestamp || 0;
+    timeSpent = Math.max(0, last - first);
+  }
+  const availableMs = ((optimal && optimal > 0 ? optimal : moveCount) * 3) * 1000;
+  const timeStar = timeSpent < availableMs ? 1 : 0;
+  const totalStars = Math.min(3, moveStars + timeStar);
+  return { moveCount, optimal, moveStars, timeSpentMs: timeSpent, timeAvailableMs: availableMs, timeStar, totalStars };
 }
 
 export function undoLastMove(state: GameState): { success: boolean; reason?: string } {
@@ -167,6 +267,10 @@ export function checkStateInvariants(state: GameState): { ok: boolean; problems:
   }
   // extraBoltUsed is boolean
   if (typeof state.extraBoltUsed !== 'boolean') problems.push('invalid-extraBoltUsed');
+  // optimalMoves if present must be number or null
+  if ('optimalMoves' in state && state.optimalMoves != null && typeof state.optimalMoves !== 'number') {
+    problems.push('invalid-optimalMoves');
+  }
 
   return { ok: problems.length === 0, problems };
 }
@@ -184,6 +288,7 @@ export function normalizeState(state: Partial<GameState>): GameState {
     difficulty: (state as any).difficulty ?? 'easy',
     seed: (state as any).seed ?? '',
     moveHistory: Array.isArray(state.moveHistory) ? (state.moveHistory as any[]).slice() : [],
+    optimalMoves: (state as any).optimalMoves ?? null,
   } as GameState;
   return normalized;
 }
