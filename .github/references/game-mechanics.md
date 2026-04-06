@@ -52,6 +52,23 @@ Engine & generator notes
 
 - Extra bolt in generation: the generator should not return a board with the player's extra bolt pre-added; the extra bolt exists only when the player requests it during play.
 
+Hidden Nuts feature
+--------------------
+
+- Overview: An optional per-level modifier where only the top nut of each stack shows its true color; all other nuts are rendered grey. When a player moves a visible top nut, the nut immediately beneath it (if any) becomes revealed (colored). This creates partial-information puzzles where the player must infer or reveal stacks progressively.
+- Frequency & control: The feature should be enabled for approximately 25% of generated levels. The decision to enable Hidden Nuts is made at level creation time and saved as part of the generated level metadata (so reloads preserve the modifier). For testing and QA it must be possible to force-enable or force-disable the feature via generator parameters (e.g., `createLevel({ ..., hiddenNuts?: boolean | 'force' })` or a seed-flags map).
+- Rendering: UI components (e.g., `BoltView`) render non-top nuts in a neutral grey and only draw the full palette color for the top nut. Pattern/shape overlays used for accessibility still apply when a nut is revealed.
+- Rendering: UI components (e.g., `BoltView`) render non-top nuts in a neutral grey and only draw the full palette color for the top nut. Pattern/shape overlays used for accessibility still apply when a nut is revealed.
+- Reveals are tracked per individual nut instance (not globally by color): when a nut becomes revealed it remains shown in full color for the remainder of the level even if it later moves or is re-covered.
+- Gameplay interaction: Revealing is deterministic and tracked per nut instance. On a successful move that removes the top nut from a bolt:
+  - The moved nut continues to be shown in full color (it remains revealed after the move).
+  - If the source bolt still contains a nut beneath the removed nut, that underlying nut becomes revealed (and is shown in full color).
+  - Reveal state is recorded on the specific nut instance; subsequent appearances of the same color on other nuts are not auto-revealed unless those nuts have themselves been exposed at some point.
+  Hints and solvers should account for per-nut revealed status when computing suggestions.
+- Generator & persistence: The generator records a `hiddenNuts: true|false` flag in the returned `GameState` and seeds initial reveal state for the specific nut instances that are visible at level start (the top nut of each bolt). The engine updates `GameState` to persist per-nut revealed flags as play proceeds so the same level state (seed + move history) deterministically encodes which nut instances have been exposed.
+- Edge cases: If a move uncovers an empty bolt there is no reveal action. Extra-bolt interactions are unchanged: adding a bolt does not reveal or hide nuts.
+- Telemetry: emit `level_started` with `hiddenNuts:true|false`, emit `nut_revealed` events when a hidden nut becomes revealed, and track `hiddenNuts_usage` metrics (e.g., completion rate when enabled).
+
 Edge cases & invariants
 
 - Capacity: moves that would exceed a bolt's capacity are disallowed.

@@ -155,6 +155,7 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
                             showDebug={showDebug}
                             selected={selectedBoltId === b.id}
                             invalid={invalidBoltId === b.id}
+                            hiddenNuts={Boolean(state.hiddenNuts)}
                             onClick={onBoltClick}
                         />
                     </div>

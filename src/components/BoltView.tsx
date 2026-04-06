@@ -9,6 +9,8 @@ type Props = {
   invalid?: boolean;
   showDebug?: boolean;
   onClick?: (id: string) => void;
+  hiddenNuts?: boolean;
+  // revealedColors prop removed
 };
 
 // === Side-view bolt dimensions — tip at TOP, head at BOTTOM ===
@@ -71,6 +73,8 @@ export default function BoltView({
   invalid = false,
   showDebug = false,
   onClick,
+  hiddenNuts = false,
+  // revealedColors prop removed
 }: Props) {
   const palette = getPalette(paletteId);
   const capacity = bolt.capacity;
@@ -214,15 +218,19 @@ export default function BoltView({
             })}
 
             {/* ── Filled nuts (index 0 = bottommost slot near head) ── */}
-            {bolt.nuts.map((colorId, slotIdx) => {
+            {bolt.nuts.map((nut, slotIdx) => {
+              const colorId = (nut as any).color as string;
               const colorIndex = parseInt(colorId.replace(/^c/, ''), 10) || 0;
               const color = palette.colors[colorIndex % palette.colors.length];
+              const isTop = slotIdx === bolt.nuts.length - 1;
+              const isRevealed = Boolean((nut as any).revealed);
+              const shouldHide = Boolean(hiddenNuts && !isTop && !isRevealed);
               const y = nutTop(slotIdx, effectiveCapacity);
 
               const gradId = `nutgrad-${bolt.id}-${slotIdx}`;
 
               return (
-                <g key={`${bolt.id}-${slotIdx}-${colorId}`} data-nut-index={slotIdx} data-nut-id={colorId}>
+                <g key={`${bolt.id}-${slotIdx}-${(nut as any).id}`} data-nut-index={slotIdx} data-nut-id={colorId} data-nut-instance={(nut as any).id}>
                   <defs>
                     <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
                       <stop offset="0%" stopColor={lighten(color, 0.18)} stopOpacity="1" />
@@ -237,21 +245,24 @@ export default function BoltView({
                     width={NUT_W}
                     height={NUT_H}
                     rx={NUT_H / 2}
-                    fill={`url(#${gradId})`}
-                    stroke="var(--nut-stroke)"
+                    fill={shouldHide ? '#bdbdbd' : `url(#${gradId})`}
+                    stroke={shouldHide ? 'rgba(0,0,0,0.12)' : 'var(--nut-stroke)'}
                     strokeWidth={0.8}
-                    filter={`url(#${dsFilterId})`}
+                    filter={shouldHide ? undefined : `url(#${dsFilterId})`}
+                    data-hidden={shouldHide ? 'true' : undefined}
                   />
                   {/* top sheen as smaller rounded rect */}
-                  <rect
-                    x={NUT_X + 8}
-                    y={y + 4}
-                    width={NUT_W - 16}
-                    height={Math.max(4, Math.round(NUT_H * 0.18))}
-                    rx={2}
-                    fill="var(--sheen-color)"
-                    opacity={0.9}
-                  />
+                  {!shouldHide && (
+                    <rect
+                      x={NUT_X + 8}
+                      y={y + 4}
+                      width={NUT_W - 16}
+                      height={Math.max(4, Math.round(NUT_H * 0.18))}
+                      rx={2}
+                      fill="var(--sheen-color)"
+                      opacity={0.9}
+                    />
+                  )}
                 </g>
               );
             })}

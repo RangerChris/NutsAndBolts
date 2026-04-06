@@ -45,9 +45,10 @@ export default function GameShell(): ReactElement {
     const initialLevel = progress.difficulties?.[difficulty]?.currentLevel ?? 1;
     const [currentLevel, setCurrentLevelState] = useState<number>(initialLevel);
     const [showDebug, setShowDebug] = useState<boolean>(false);
+    const [forceHidden, setForceHidden] = useState<boolean>(false);
 
     useEffect(() => {
-        const { state: s } = createLevel({ difficulty, level: currentLevel, seed });
+        const { state: s } = createLevel({ difficulty, level: currentLevel, seed, hiddenNuts: forceHidden ? true : null });
         // ensure seed is persisted for this difficulty so reloads will recreate same level
         try {
             const { setSeedForDifficulty } = require('../lib/persistence');
@@ -56,7 +57,7 @@ export default function GameShell(): ReactElement {
             // ignore in non-browser/tests
         }
         setState(s);
-    }, [seed, difficulty, currentLevel]);
+    }, [seed, difficulty, currentLevel, forceHidden]);
 
     const [selected, setSelected] = useState<string | null>(null);
     const [invalidTarget, setInvalidTarget] = useState<string | null>(null);
@@ -84,7 +85,11 @@ export default function GameShell(): ReactElement {
         for (const b of bolts) {
             if (!b.nuts || b.nuts.length === 0) continue;
             const first = b.nuts[0];
-            const uniform = b.nuts.every((n) => n === first);
+            const firstColor = typeof first === 'string' ? first : (first as any).color;
+            const uniform = b.nuts.every((n) => {
+                const col = typeof n === 'string' ? n : (n as any).color;
+                return col === firstColor;
+            });
             if (uniform) sorted += b.nuts.length;
         }
         return Math.round((sorted / total) * 100);
@@ -122,7 +127,7 @@ export default function GameShell(): ReactElement {
 
     const handleRestart = () => {
         // Recreate the level exactly as when first loaded using the same seed
-        const { state: s } = createLevel({ difficulty, level: currentLevel, seed });
+        const { state: s } = createLevel({ difficulty, level: currentLevel, seed, hiddenNuts: forceHidden ? true : null });
         setState(s);
         setSelected(null);
         setInvalidTarget(null);
@@ -261,6 +266,8 @@ export default function GameShell(): ReactElement {
                     paletteId={paletteId}
                     showDebug={showDebug}
                     onShowDebugChange={setShowDebug}
+                    forceHidden={forceHidden}
+                    onForceHiddenChange={(v) => setForceHidden(v)}
                     onPaletteChange={(id) => {
                         setPalette(id);
                         setPaletteId(id);

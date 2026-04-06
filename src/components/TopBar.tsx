@@ -9,12 +9,15 @@ type Props = {
     paletteId: PaletteId;
     showDebug?: boolean;
     onShowDebugChange?: (show: boolean) => void;
+    // Force hiddenNuts for debugging (when enabled, generator will use this)
+    forceHidden?: boolean;
+    onForceHiddenChange?: (v: boolean) => void;
     onPaletteChange: (id: PaletteId) => void;
     onDifficultyChange?: (d: string) => void;
     onSeedChange?: (seed: string) => void;
 };
 
-export default function TopBar({ level, difficulty, seed, paletteId, showDebug = false, onShowDebugChange, onPaletteChange, onDifficultyChange, onSeedChange }: Props) {
+export default function TopBar({ level, difficulty, seed, paletteId, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onPaletteChange, onDifficultyChange, onSeedChange }: Props) {
     const [editingSeed, setEditingSeed] = useState(false);
     const [seedValue, setSeedValue] = useState(seed || '');
     const [open, setOpen] = useState(false);
@@ -47,6 +50,16 @@ export default function TopBar({ level, difficulty, seed, paletteId, showDebug =
                     />
                     <span>Show debug</span>
                 </label>
+                {showDebug && (
+                    <label className="topbar-debug">
+                        <input
+                            type="checkbox"
+                            checked={Boolean(forceHidden)}
+                            onChange={(e) => onForceHiddenChange?.(e.target.checked)}
+                        />
+                        <span>Force Hidden Nuts</span>
+                    </label>
+                )}
                 <div className="topbar-seed">
                     <strong>Seed</strong>:{' '}
                     {!editingSeed ? (
