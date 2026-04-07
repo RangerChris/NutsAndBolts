@@ -743,3 +743,86 @@ body {
     border-radius: 6px;
     pointer-events: auto;
 }
+
+/* Responsive rendering: web defaults + mobile overrides */
+.game-shell-root {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.bolt-svg {
+    width: 120px;
+    height: auto;
+    display: block;
+}
+
+@media (max-width: 900px) {
+    .game-shell-root {
+        padding: 12px;
+    }
+
+    .board-container {
+        max-height: calc(100dvh - 280px);
+    }
+
+    .board-row {
+        gap: 8px;
+        padding: 6px;
+    }
+
+    .bolt-svg {
+        width: 96px;
+    }
+
+    .sorted-progress {
+        width: min(560px, 96%);
+    }
+
+    .bottom-bar {
+        gap: 8px;
+        padding: 10px 6px;
+    }
+
+    .control-btn {
+        min-width: 82px;
+        padding: 9px 12px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 520px) {
+    .game-shell-root {
+        padding: 10px;
+    }
+
+    .game-info-left {
+        margin-left: 0;
+    }
+
+    .board-container {
+        max-height: calc(100dvh - 300px);
+    }
+
+    .board-row {
+        gap: 6px;
+        padding: 4px;
+    }
+
+    .bolt-svg {
+        width: 84px;
+    }
+
+    .sorted-progress-wrapper {
+        margin: 8px 0 4px 0;
+    }
+
+    .progress-label {
+        font-size: 12px;
+    }
+
+    .control-btn {
+        min-width: 72px;
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+}

@@ -19,13 +19,21 @@ describe('engine helpers', () => {
     expect(ok.ok).toBe(true);
   });
 
-  it('rejects placement by capacity', () => {
+  it('rejects placement when target is full', () => {
     const src: Bolt = { id: 's', capacity: 4, nuts: ['red', 'red', 'red'] };
-    const tgt: Bolt = { id: 't', capacity: 3, nuts: ['blue'] };
+    const tgt: Bolt = { id: 't', capacity: 3, nuts: ['blue', 'blue', 'blue'] };
     const top = pickTopGroup(src);
     const ok = canPlaceGroup(src, tgt, top.count);
     expect(ok.ok).toBe(false);
     expect(ok.reason).toBe('capacity');
+  });
+
+  it('allows placement when target has partial free room', () => {
+    const src: Bolt = { id: 's', capacity: 4, nuts: ['red', 'red', 'red'] };
+    const tgt: Bolt = { id: 't', capacity: 4, nuts: [] };
+    const top = pickTopGroup(src);
+    const ok = canPlaceGroup(src, tgt, top.count);
+    expect(ok.ok).toBe(true);
   });
 
   it('performs a legal move and returns a Move', () => {
@@ -36,6 +44,16 @@ describe('engine helpers', () => {
     expect(move?.count).toBe(2);
     expect(src.nuts.length).toBe(0);
     expect(tgt.nuts.length).toBe(2);
+  });
+
+  it('performs a partial move when target has limited room', () => {
+    const src: Bolt = { id: 's', capacity: 4, nuts: ['red', 'red', 'red'] };
+    const tgt: Bolt = { id: 't', capacity: 4, nuts: ['red', 'red', 'red'] };
+    const move = performMove(src, tgt);
+    expect(move).not.toBeNull();
+    expect(move?.count).toBe(1);
+    expect(src.nuts.length).toBe(2);
+    expect(tgt.nuts.length).toBe(4);
   });
 
   it('does not perform illegal move (color mismatch)', () => {
@@ -62,6 +80,25 @@ describe('engine helpers', () => {
     expect(res.success).toBe(true);
     expect(state.bolts[0].nuts.length).toBe(0);
     expect(state.bolts[1].nuts.length).toBe(2);
+    expect(state.moveHistory.length).toBe(1);
+  });
+
+  it('executeMoveOnState moves only available count when room is limited', () => {
+    const state: GameState = {
+      bolts: [
+        { id: 'a', capacity: 4, nuts: ['red', 'red', 'red'] },
+        { id: 'b', capacity: 4, nuts: ['red', 'red', 'red'] },
+      ],
+      extraBoltUsed: false,
+      level: 1,
+      difficulty: 'easy',
+      moveHistory: [],
+    };
+    const res = executeMoveOnState(state, 'a', 'b');
+    expect(res.success).toBe(true);
+    expect(res.move?.count).toBe(1);
+    expect(state.bolts[0].nuts.length).toBe(2);
+    expect(state.bolts[1].nuts.length).toBe(4);
     expect(state.moveHistory.length).toBe(1);
   });
 

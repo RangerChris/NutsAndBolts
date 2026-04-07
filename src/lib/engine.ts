@@ -22,7 +22,7 @@ export function canPlaceGroup(
 ): { ok: boolean; reason?: string } {
   if (groupCount <= 0) return { ok: false, reason: 'empty-group' };
   const free = target.capacity - target.nuts.length;
-  if (free < groupCount) return { ok: false, reason: 'capacity' };
+  if (free <= 0) return { ok: false, reason: 'capacity' };
   if (target.nuts.length === 0) return { ok: true };
   const targetTop = typeof target.nuts[target.nuts.length - 1] === 'string' ? (target.nuts[target.nuts.length - 1] as any) : (target.nuts[target.nuts.length - 1] as any).color;
   const sourceTop = typeof source.nuts[source.nuts.length - 1] === 'string' ? (source.nuts[source.nuts.length - 1] as any) : (source.nuts[source.nuts.length - 1] as any).color;
@@ -30,13 +30,23 @@ export function canPlaceGroup(
   return { ok: false, reason: 'color-mismatch' };
 }
 
-export function performMove(source: Bolt, target: Bolt): Move | null {
+export function getMovableTopCount(
+  source: Bolt,
+  target: Bolt
+): { color?: string; count: number; reason?: string } {
   const { color, count } = pickTopGroup(source);
-  if (!color || count === 0) return null;
+  if (!color || count <= 0) return { count: 0, reason: 'empty-source' };
   const can = canPlaceGroup(source, target, count);
-  if (!can.ok) return null;
+  if (!can.ok) return { color, count: 0, reason: can.reason };
+  const free = target.capacity - target.nuts.length;
+  return { color, count: Math.min(count, free) };
+}
+
+export function performMove(source: Bolt, target: Bolt): Move | null {
+  const movable = getMovableTopCount(source, target);
+  if (!movable.color || movable.count === 0) return null;
   // remove from source
-  const moved = source.nuts.splice(source.nuts.length - count, count) as any[];
+  const moved = source.nuts.splice(source.nuts.length - movable.count, movable.count) as any[];
   // append to target
   // ensure moved items are Nut objects and mark revealed
   for (let i = 0; i < moved.length; i++) {
@@ -51,8 +61,8 @@ export function performMove(source: Bolt, target: Bolt): Move | null {
   const move: Move = {
     fromBoltId: source.id,
     toBoltId: target.id,
-    color,
-    count,
+    color: movable.color,
+    count: movable.count,
     timestamp: Date.now(),
   };
   return move;
@@ -78,10 +88,8 @@ export function executeMoveOnState(state: GameState, fromId: string, toId: strin
   const src = findBolt(state, fromId);
   const tgt = findBolt(state, toId);
   if (!src || !tgt) return { success: false, reason: 'bolt-not-found' };
-  const { color, count } = pickTopGroup(src);
-  if (!color || count === 0) return { success: false, reason: 'empty-source' };
-  const can = canPlaceGroup(src, tgt, count);
-  if (!can.ok) return { success: false, reason: can.reason };
+  const movable = getMovableTopCount(src, tgt);
+  if (movable.count === 0) return { success: false, reason: movable.reason };
   // capture source length before move to detect if a hidden nut becomes exposed
   const srcLenBefore = src.nuts.length;
   const move = performMove(src, tgt);
@@ -197,15 +205,13 @@ export function computeOptimalMoves(startState: GameState, maxDepth = 20): numbe
         if (i === j) continue;
         const src = state.bolts[i];
         const tgt = state.bolts[j];
-        const { color, count } = pickTopGroup(src);
-        if (!color || count === 0) continue;
-        const can = canPlaceGroup(src, tgt, count);
-        if (!can.ok) continue;
+        const movable = getMovableTopCount(src, tgt);
+        if (movable.count === 0) continue;
         // apply move on a clone
         const ns = cloneState(state);
         const ssrc = ns.bolts[i];
         const stgt = ns.bolts[j];
-        const moved = ssrc.nuts.splice(ssrc.nuts.length - count, count);
+        const moved = ssrc.nuts.splice(ssrc.nuts.length - movable.count, movable.count);
         stgt.nuts.push(...moved);
         const c = canon(ns);
         if (visited.has(c)) continue;

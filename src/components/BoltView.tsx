@@ -121,7 +121,7 @@ export default function BoltView({
       }}
       data-bolt={bolt.id}
     >
-      <svg width={W} height={svgH} viewBox={`0 0 ${W} ${svgH}`} aria-hidden="true">
+      <svg className="bolt-svg" width={W} height={svgH} viewBox={`0 0 ${W} ${svgH}`} aria-hidden="true">
         <g transform={`scale(${scale})`}>
           <defs>
             {/* Drop shadow for nuts/head */}

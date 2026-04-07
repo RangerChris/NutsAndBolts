@@ -6,8 +6,7 @@ import {
     undoLastMove,
     isWin,
     executeMoveOnState,
-    pickTopGroup,
-    canPlaceGroup,
+    getMovableTopCount,
     computeStars,
 } from '../lib/engine';
 import Board, { AnimMove } from '../components/Board';
@@ -155,10 +154,13 @@ export default function GameShell(): ReactElement {
         }
         // attempt move
         const srcBolt = state.bolts.find((x) => x.id === selected);
-        if (!srcBolt) return;
-        const { color, count } = pickTopGroup(srcBolt);
-        if (!color || count === 0) {
+        const tgtBolt = state.bolts.find((x) => x.id === id);
+        if (!srcBolt || !tgtBolt) return;
+        const { count } = getMovableTopCount(srcBolt, tgtBolt);
+        if (count === 0) {
             setSelected(null);
+            setInvalidTarget(id);
+            setTimeout(() => setInvalidTarget(null), 420);
             return;
         }
 
@@ -169,7 +171,6 @@ export default function GameShell(): ReactElement {
             width: number;
             height: number;
             color: string;
-            colorLabel?: string;
         }> = [];
         for (let i = 0; i < count; i++) {
             const idx = srcBolt.nuts.length - count + i;
@@ -178,17 +179,10 @@ export default function GameShell(): ReactElement {
                 const r = sel.getBoundingClientRect();
                 // derive color from svg polygon fill if possible
                 let color = '#999999';
-                let colorLabel: string | undefined = undefined;
                 try {
                     // First child rect of the nut <g> is the body with the palette color
                     const nutRect = sel.querySelector('rect');
                     if (nutRect) color = (nutRect as SVGElement).getAttribute('fill') || color;
-                    // data-nut-id is on the nut group (and may also exist on descendants)
-                    colorLabel = sel.getAttribute('data-nut-id') || undefined;
-                    if (!colorLabel) {
-                        const labelEl = sel.querySelector('[data-nut-id]');
-                        if (labelEl) colorLabel = (labelEl as Element).getAttribute('data-nut-id') || undefined;
-                    }
                 } catch {
                     // ignore
                 }
@@ -198,7 +192,6 @@ export default function GameShell(): ReactElement {
                     width: r.width,
                     height: r.height,
                     color,
-                    colorLabel,
                 });
             }
         }
@@ -218,12 +211,10 @@ export default function GameShell(): ReactElement {
 
     const findHint = () => {
         for (const src of state.bolts) {
-            const { color, count } = pickTopGroup(src);
-            if (!color || count === 0) continue;
             for (const tgt of state.bolts) {
                 if (tgt.id === src.id) continue;
-                const can = canPlaceGroup(src, tgt, count);
-                if (can.ok) return { from: src.id, to: tgt.id };
+                const movable = getMovableTopCount(src, tgt);
+                if (movable.count > 0) return { from: src.id, to: tgt.id };
             }
         }
         return null;
