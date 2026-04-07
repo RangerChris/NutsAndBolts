@@ -27,7 +27,6 @@ describe('progression scaling', () => {
     const curr = getCurrentLevel('easy');
     const res = advanceLevel('easy');
     expect(res.currentLevel).toBe(curr + 1);
-    // set explicitly
     setCurrentLevel('easy', 5);
     expect(getCurrentLevel('easy')).toBe(5);
   });

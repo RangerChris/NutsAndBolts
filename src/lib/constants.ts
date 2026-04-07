@@ -2,7 +2,7 @@ import type { Difficulty } from './types';
 
 export const STORAGE_KEY = 'nuts-and-bolts:progress';
 
-export const MAX_BOLTS = 10; // includes temporary extra bolt
+export const MAX_BOLTS = 10;
 
 export const DEFAULT_PALETTE_ID = 0;
 

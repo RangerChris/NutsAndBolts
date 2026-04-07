@@ -6,7 +6,7 @@ describe('engine hidden-nut reveal telemetry', () => {
   it('emits nutRevealed when hiddenNuts enabled and an underlying nut is exposed', () => {
     const state = normalizeState({
       bolts: [
-        { id: 'b0', capacity: 4, nuts: ['c0', 'c1'] }, // two nuts: top=c1
+        { id: 'b0', capacity: 4, nuts: ['c0', 'c1'] },
         { id: 'b1', capacity: 4, nuts: [] },
       ],
       extraBoltUsed: false,
@@ -17,16 +17,15 @@ describe('engine hidden-nut reveal telemetry', () => {
       moveHistory: [],
     });
 
-    const events: any[] = [];
+    const events: unknown[] = [];
     const off = onBalancerEvent((ev) => events.push(ev));
 
-    // Move the top group (count=1) from b0 to b1 — this should expose c0 on b0
     const res = executeMoveOnState(state, 'b0', 'b1');
     expect(res.success).toBe(true);
 
     off();
 
-    const found = events.some((e) => (e.payload as any).event === 'nutRevealed');
+    const found = events.some((e) => (e as { payload?: { event?: string } }).payload?.event === 'nutRevealed');
     expect(found).toBe(true);
   });
 });

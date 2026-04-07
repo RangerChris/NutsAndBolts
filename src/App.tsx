@@ -10,10 +10,9 @@ export default function App(): ReactElement {
 
     useEffect(() => {
         const { unsubscribe } = initPersistence();
-        // keep progress if needed — for now we just mark loaded
         setProgressLoaded(true);
 
-        // Listen for level completion events and persist progress
+
         const unsubEvent = onBalancerEvent((ev) => {
             try {
                 if (ev.payload && ev.payload.event === 'levelComplete') {
@@ -22,11 +21,10 @@ export default function App(): ReactElement {
                         typeof ev.payload.level === 'number'
                             ? ev.payload.level
                             : parseInt(ev.payload.level, 10) || 1;
-                    // advance to next level
                     setCurrentLevel(diff, level + 1);
                 }
             } catch {
-                // ignore
+
             }
         });
 

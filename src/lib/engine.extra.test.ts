@@ -56,7 +56,6 @@ describe('extra bolt and undo', () => {
 
   it('detects win state correctly', () => {
     const winState = makeState();
-    // fill bolts with uniform colors
     winState.bolts = [
       { id: 'a', capacity: 3, nuts: ['x', 'x', 'x'] },
       { id: 'b', capacity: 3, nuts: [] },

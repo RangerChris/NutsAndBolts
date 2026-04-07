@@ -22,14 +22,10 @@ export function emitBalancerEvent(source: BalancerEvent['source'], payload: Reco
     try {
       l(ev);
     } catch (e) {
-      // swallow listener errors to avoid breaking generator
-       
       console.error('balancer listener error', e);
     }
   }
 }
-
-// Helper to format a CSV line for simple exports
 export function toCsvLine(ev: BalancerEvent, keys: string[]) {
   return keys.map((k) => JSON.stringify(ev.payload[k] ?? '')).join(',');
 }

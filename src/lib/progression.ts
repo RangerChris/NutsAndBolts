@@ -9,10 +9,6 @@ type LevelParams = {
   shuffleMoves: number;
 };
 
-// Simple progression rules:
-// - Bolts increase slowly every 3 levels up to difficulty max
-// - Stack height increases slowly every 5 levels within configured range
-// - Shuffle moves scale linearly with level (capped)
 export function getLevelParams(difficulty: Difficulty, level: number): LevelParams {
   const cfg = DIFFICULTY_CONFIG[difficulty];
   const boltsGrowEvery = 3;
@@ -25,13 +21,11 @@ export function getLevelParams(difficulty: Difficulty, level: number): LevelPara
   const maxHeight = cfg.stackHeightRange[1];
   const stackHeight = Math.min(maxHeight, cfg.stackHeightRange[0] + extraHeight);
 
-  const levelCap = progressionConfig.levelCap; // cap scaling effect
+  const levelCap = progressionConfig.levelCap;
   const rawT = Math.min(level - 1, levelCap) / levelCap;
-  // apply gentle easing to slow growth at high levels (tunable)
   const easedT = Math.pow(rawT, progressionConfig.easingExponent);
   const shuffleMin = cfg.shuffleRange[0];
   const shuffleMax = cfg.shuffleRange[1];
-  // difficulty multiplier to slightly reduce extreme growth
   const difficultyMultiplier: Record<Difficulty, number> = progressionConfig.difficultyMultiplier as Record<Difficulty, number>;
   const base = shuffleMin + easedT * (shuffleMax - shuffleMin);
   const shuffleMoves = Math.round(Math.min(shuffleMax, base * difficultyMultiplier[difficulty]));
@@ -39,7 +33,6 @@ export function getLevelParams(difficulty: Difficulty, level: number): LevelPara
   return { numBolts, stackHeight, shuffleMoves };
 }
 
-// Progression state helpers (uses persistence)
 export function getCurrentLevel(difficulty: Difficulty): number {
   const p = loadProgress();
   return p.difficulties?.[difficulty]?.currentLevel ?? 1;

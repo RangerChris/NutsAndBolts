@@ -12,7 +12,7 @@ import {
 import Board, { AnimMove } from '../components/Board';
 import BottomBar from '../components/BottomBar';
 import TopBar from '../components/TopBar';
-import starUrl from '../assets/icons/star.svg'; // Keep star asset
+import starUrl from '../assets/icons/star.svg';
 import {
     loadProgress,
     setPaletteId,
@@ -28,13 +28,10 @@ export default function GameShell(): ReactElement {
     const progress = loadProgress();
     const [paletteId, setPalette] = useState<number>(progress.settings?.paletteId ?? 0);
     const [seed, setSeed] = useState<string>(() => {
-        // prefer persisted seed for the selected difficulty so reloads restore the same level
         try {
             const s = require('../lib/persistence').getSeedForDifficulty(persistedDifficulty as string);
             if (s) return s;
-        } catch {
-            // ignore
-        }
+        } catch { }
         return `seed-${Date.now()}`;
     });
     const persistedDifficulty = getSelectedDifficulty();
@@ -48,21 +45,16 @@ export default function GameShell(): ReactElement {
 
     useEffect(() => {
         const { state: s } = createLevel({ difficulty, level: currentLevel, seed, hiddenNuts: forceHidden ? true : null });
-        // ensure seed is persisted for this difficulty so reloads will recreate same level
         try {
             const { setSeedForDifficulty } = require('../lib/persistence');
             setSeedForDifficulty(difficulty, seed);
-        } catch {
-            // ignore in non-browser/tests
-        }
+        } catch { }
         setState(s);
     }, [seed, difficulty, currentLevel, forceHidden]);
 
     const [selected, setSelected] = useState<string | null>(null);
     const [invalidTarget, setInvalidTarget] = useState<string | null>(null);
-    // Prevent accidental immediate double-taps on the same bolt
     const lastClickRef = useRef<{ id: string | null; time: number }>({ id: null, time: 0 });
-    // Animation state for FLIP clone animations — keep hooks unconditional
     const [animMove, setAnimMove] = useState<AnimMove | null>(null);
     const [showComplete, setShowComplete] = useState(false);
 
@@ -84,9 +76,10 @@ export default function GameShell(): ReactElement {
         for (const b of bolts) {
             if (!b.nuts || b.nuts.length === 0) continue;
             const first = b.nuts[0];
-            const firstColor = typeof first === 'string' ? first : (first as any).color;
+            const getNutColor = (n: unknown) => (typeof n === 'string' ? n : (n as { color?: string } | undefined)?.color);
+            const firstColor = getNutColor(first);
             const uniform = b.nuts.every((n) => {
-                const col = typeof n === 'string' ? n : (n as any).color;
+                const col = getNutColor(n);
                 return col === firstColor;
             });
             if (uniform) sorted += b.nuts.length;
@@ -94,7 +87,6 @@ export default function GameShell(): ReactElement {
         return Math.round((sorted / total) * 100);
     };
 
-    // compute pct for render and announce changes
     const pct = state ? computeSortedPercent(state) : 0;
     const prevPctRef = useRef<number>(pct);
     const [bump, setBump] = useState(false);
@@ -113,7 +105,6 @@ export default function GameShell(): ReactElement {
         const res = addExtraBolt(state);
         if (res.success) setState({ ...state });
         else {
-            // show invalid feedback on target
             setInvalidTarget('extra');
             setTimeout(() => setInvalidTarget(null), 420);
         }
@@ -125,7 +116,6 @@ export default function GameShell(): ReactElement {
     };
 
     const handleRestart = () => {
-        // Recreate the level exactly as when first loaded using the same seed
         const { state: s } = createLevel({ difficulty, level: currentLevel, seed, hiddenNuts: forceHidden ? true : null });
         setState(s);
         setSelected(null);
@@ -136,14 +126,14 @@ export default function GameShell(): ReactElement {
 
     const handleBoltClick = (id: string) => {
         const now = Date.now();
-        const THROTTLE_MS = 120; // small window to prevent accidental double taps
+        const THROTTLE_MS = 120;
         if (lastClickRef.current.id === id && now - lastClickRef.current.time < THROTTLE_MS) {
             return;
         }
         lastClickRef.current = { id, time: now };
 
         if (!selected) {
-            // select source if it has nuts
+
             const b = state.bolts.find((x) => x.id === id);
             if (b && b.nuts.length > 0) setSelected(id);
             return;
@@ -152,7 +142,7 @@ export default function GameShell(): ReactElement {
             setSelected(null);
             return;
         }
-        // attempt move
+
         const srcBolt = state.bolts.find((x) => x.id === selected);
         const tgtBolt = state.bolts.find((x) => x.id === id);
         if (!srcBolt || !tgtBolt) return;
@@ -164,7 +154,7 @@ export default function GameShell(): ReactElement {
             return;
         }
 
-        // capture pre-move rects for the top `count` nuts
+
         const preRects: Array<{
             left: number;
             top: number;
@@ -177,14 +167,11 @@ export default function GameShell(): ReactElement {
             const sel = document.querySelector(`[data-bolt="${selected}"] [data-nut-index="${idx}"]`);
             if (sel instanceof Element) {
                 const r = sel.getBoundingClientRect();
-                // derive color from svg polygon fill if possible
                 let color = '#999999';
                 try {
-                    // First child rect of the nut <g> is the body with the palette color
                     const nutRect = sel.querySelector('rect');
                     if (nutRect) color = (nutRect as SVGElement).getAttribute('fill') || color;
                 } catch {
-                    // ignore
                 }
                 preRects.push({
                     left: r.left,
@@ -200,10 +187,8 @@ export default function GameShell(): ReactElement {
         setSelected(null);
         if (res.success) {
             setState({ ...state });
-            // trigger animation in Board using captured rects and the move
             setAnimMove({ move: res.move, preRects });
         } else {
-            // show invalid feedback on target
             setInvalidTarget(id);
             setTimeout(() => setInvalidTarget(null), 420);
         }
@@ -223,26 +208,21 @@ export default function GameShell(): ReactElement {
     const handleHint = () => {
         const h = findHint();
         if (!h) return;
-        // brief visual cue: select source then clear after short timeout
         setSelected(h.from);
         setTimeout(() => setSelected(null), 800);
     };
 
     const handleContinue = () => {
-        // advance to next level using currentLevel state
         const nextLevel = (currentLevel || 1) + 1;
-        // persist current level progress
         setCurrentLevel(difficulty, nextLevel);
         setCurrentLevelState(nextLevel);
-        // generate a fresh seed for the next level — effect will create the level
         const newSeed = `seed-${Date.now()}`;
         setSeed(newSeed);
-        // persist the new seed for this difficulty so reload will not recreate the old level
         try {
             const { setSeedForDifficulty } = require('../lib/persistence');
             setSeedForDifficulty(difficulty, newSeed);
         } catch {
-            // ignore
+
         }
         setShowComplete(false);
     };
@@ -269,17 +249,16 @@ export default function GameShell(): ReactElement {
                             const { setSeedForDifficulty } = require('../lib/persistence');
                             setSeedForDifficulty(difficulty, s);
                         } catch {
-                            // ignore
+
                         }
                     }}
                     onDifficultyChange={(d) => {
                         const newDiff = d as GameState['difficulty'];
                         setDifficulty(newDiff);
                         setSelectedDifficulty(newDiff);
-                        // switch to stored level for the new difficulty (or 1)
                         const lvl = loadProgress().difficulties?.[newDiff]?.currentLevel ?? 1;
                         setCurrentLevelState(lvl);
-                        // load persisted seed for the new difficulty, or create+persist one
+
                         try {
                             const { getSeedForDifficulty, setSeedForDifficulty } = require('../lib/persistence');
                             const ps = getSeedForDifficulty(newDiff);
@@ -332,7 +311,6 @@ export default function GameShell(): ReactElement {
                     onUndo={handleUndo}
                     onHint={handleHint}
                     onRestart={handleRestart}
-                    // Disable the Extra button when an extra bolt is already present
                     extraDisabled={state.bolts.some((b) => String(b.id).startsWith('extra')) || state.bolts.length >= 12}
                     undoDisabled={!state.moveHistory || state.moveHistory.length === 0}
                     hintDisabled={!!findHint() === false}

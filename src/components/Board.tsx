@@ -26,10 +26,8 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
         const { move, preRects } = animMove;
         const clones: HTMLElement[] = [];
 
-        // For each moved nut, find its target DOM node and animate a clone
         for (let i = 0; i < preRects.length; i++) {
             const pr = preRects[i];
-            // target index after move: take last N nuts
             const tgtBolt = state.bolts.find((b) => b.id === move.toBoltId);
             if (!tgtBolt) continue;
             const targetIndex = tgtBolt.nuts.length - preRects.length + i;
@@ -38,7 +36,6 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
             if (!targetEl) continue;
             const targetRect = targetEl.getBoundingClientRect();
 
-            // create clone
             const clone = document.createElement('div');
             clone.style.position = 'fixed';
             clone.style.left = `${pr.left}px`;
@@ -48,8 +45,7 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
             clone.style.zIndex = '9999';
             clone.style.pointerEvents = 'none';
             clone.style.transition = 'transform 360ms ease, opacity 260ms ease';
-            // Side-view nut clone (66×20 viewBox matches BoltView NUT_W×NUT_H)
-            // Build SVG via DOM APIs to avoid HTML injection
+
             const SVG_NS = 'http://www.w3.org/2000/svg';
             const svg = document.createElementNS(SVG_NS, 'svg');
             svg.setAttribute('width', String(pr.width));
@@ -98,38 +94,36 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
             document.body.appendChild(clone);
             clones.push(clone);
 
-            // compute delta
             const dx = targetRect.left - pr.left;
             const dy = targetRect.top - pr.top;
 
-            // trigger animation
             requestAnimationFrame(() => {
                 clone.style.transform = `translate(${dx}px, ${dy}px)`;
                 clone.style.opacity = '1';
             });
 
-            // cleanup after transition
             const onEnd = () => {
                 clone.removeEventListener('transitionend', onEnd);
                 clone.remove();
                 const idx = clones.indexOf(clone);
                 if (idx >= 0) clones.splice(idx, 1);
-                if (clones.length === 0) {
-                    onAnimDone?.();
-                }
+                if (clones.length === 0) onAnimDone?.();
             };
             clone.addEventListener('transitionend', onEnd);
         }
-        // safety: clear clones after timeout
+
         const t = setTimeout(() => {
             clones.forEach((c) => c.remove());
+            clones.length = 0;
             onAnimDone?.();
         }, 800);
-        return () => clearTimeout(t);
+        return () => {
+            clearTimeout(t);
+            clones.forEach((c) => c.remove());
+            clones.length = 0;
+        };
     }, [animMove, state, onAnimDone]);
 
-    // Render bolts in a wrapping flex container so as many bolts as fit are
-    // shown per row and the remaining bolts wrap to the next line.
     return (
         <div className="board-container" ref={containerRef}>
             <div className="board-row">

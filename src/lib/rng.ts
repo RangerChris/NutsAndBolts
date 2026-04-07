@@ -1,4 +1,3 @@
-// Small seeded RNG: xmur3 + mulberry32
 export function xmur3(str: string) {
   let h = 1779033703 ^ str.length;
   for (let i = 0; i < str.length; i++) {

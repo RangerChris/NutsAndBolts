@@ -11,13 +11,11 @@ describe('level generator', () => {
   });
 
   it('generated board has no over-capacity bolts and is not trivially solved', () => {
-    // The generator uses the live shuffled state directly instead of replaying
-    // filtered moves on a solved board, so nuts.length must never exceed capacity.
     const { state } = createLevel({ difficulty: 'easy', level: 1, seed: 'reverse-test' });
     for (const bolt of state.bolts) {
       expect(bolt.nuts.length).toBeLessThanOrEqual(bolt.capacity);
     }
-    // At least one bolt must be mixed (level should not be trivially solved at start).
+    
     const hasMixed = state.bolts.some(
       (b) => b.nuts.length > 1 && !b.nuts.every((n) => n === b.nuts[0])
     );

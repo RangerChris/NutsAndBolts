@@ -1,9 +1,7 @@
 import { STORAGE_KEY } from './constants';
 
-// Fallback storage for non-browser envs (tests)
 let storageImpl: Storage;
 try {
-  // detect if global localStorage is usable
   if (typeof localStorage !== 'undefined') {
     try {
       localStorage.setItem('__nb_test', '1');
@@ -41,7 +39,6 @@ try {
   } as unknown as Storage;
 }
 
-// Test helpers (exported for tests)
 export function _setRaw(key: string, value: string) {
   storageImpl.setItem(key, value);
 }
@@ -86,12 +83,12 @@ export function loadProgress(): PersistedProgress {
 export function migrateProgress(obj: unknown): PersistedProgress {
   if (!obj || typeof obj !== 'object') return DEFAULT_PROGRESS;
   const o = obj as Record<string, unknown>;
-  // If already has a version and matches our shape, accept it
+  
   if (typeof o.version === 'number' && o.difficulties && o.settings) {
     return o as PersistedProgress;
   }
 
-  // Migration: older schema might have 'levels' keyed by difficulty
+  
   if (o.levels && typeof o.levels === 'object') {
     const difficulties: Record<string, { currentLevel: number; maxReached: number }> = {};
     const levels = o.levels as Record<string, unknown>;
@@ -104,13 +101,12 @@ export function migrateProgress(obj: unknown): PersistedProgress {
     return { version: 1, difficulties, settings: (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings };
   }
 
-  // Fallback: try to salvage partial fields
+  
   const difficulties = (o.difficulties as PersistedProgress['difficulties']) || DEFAULT_PROGRESS.difficulties;
   const settings = (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings;
   return { version: 1, difficulties, settings };
 }
 
-// Initialize persistence lifecycle hooks. Returns current progress and an unsubscribe function.
 export function initPersistence() {
   const progress = loadProgress();
   let unsub = () => {};
@@ -120,9 +116,7 @@ export function initPersistence() {
       window.addEventListener('visibilitychange', onVisibility);
       unsub = () => window.removeEventListener('visibilitychange', onVisibility);
     }
-  } catch {
-    // ignore in non-browser environments
-  }
+  } catch {}
   return { progress, unsubscribe: unsub };
 }
 

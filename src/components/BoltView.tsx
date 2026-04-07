@@ -10,24 +10,23 @@ type Props = {
   showDebug?: boolean;
   onClick?: (id: string) => void;
   hiddenNuts?: boolean;
-  // revealedColors prop removed
+
 };
 
-// === Side-view bolt dimensions — tip at TOP, head at BOTTOM ===
-const W = 120; // SVG width
-const CX = W / 2; // center x = 60
-const HEAD_W = 64; // bolt head width (keep original)
-const HEAD_H = 32; // bolt head height
-const HEAD_X = (W - HEAD_W) / 2; // center head
-const SHAFT_W = 28; // shaft (screw) width — increased
-const SHAFT_X = CX - SHAFT_W / 2; // shaft x derived from CX
-const SLOT_H = 34; // height per nut slot
-const NUT_H = 26; // nut hex height
-const NUT_W = 72; // nut hex width
-const NUT_X = (W - NUT_W) / 2; // centered under wider bolt
-const NUT_Y_PAD = (SLOT_H - NUT_H) / 2; // vertical padding in slot = 3
-const THREAD_H = 22; // pointed tip + thread section at top
-const TOP_PAD = 8; // extra space above the tip so top nut isn't clipped
+const W = 120;
+const CX = W / 2;
+const HEAD_W = 64;
+const HEAD_H = 32;
+const HEAD_X = (W - HEAD_W) / 2;
+const SHAFT_W = 28;
+const SHAFT_X = CX - SHAFT_W / 2;
+const SLOT_H = 34;
+const NUT_H = 26;
+const NUT_W = 72;
+const NUT_X = (W - NUT_W) / 2;
+const NUT_Y_PAD = (SLOT_H - NUT_H) / 2;
+const THREAD_H = 22;
+const TOP_PAD = 8;
 
 function clamp(v: number, a = 0, b = 255) {
   return Math.max(a, Math.min(b, Math.round(v)));
@@ -51,10 +50,7 @@ function darken(hex: string, amt = 0.1) {
   return rgbToHex(clamp(r - 255 * amt), clamp(g - 255 * amt), clamp(b - 255 * amt));
 }
 
-// Layout (y increases downward):
-//  [0 .. THREAD_H]               = tip point + thread marks
-//  [THREAD_H .. THREAD_H+cap*SLOT_H] = nut slots (slot cap-1 near tip, slot 0 near head)
-//  [THREAD_H+cap*SLOT_H .. svgH]     = bolt head
+
 
 /** y-position (top edge) of slot i. slot 0 = bottommost (nearest head). */
 function slotTop(slotIdx: number, capacity: number): number {
@@ -74,24 +70,19 @@ export default function BoltView({
   showDebug = false,
   onClick,
   hiddenNuts = false,
-  // revealedColors prop removed
 }: Props) {
   const palette = getPalette(paletteId);
   const capacity = bolt.capacity;
-  // Safety net: if the bolt state is somehow over-capacity, use the actual
-  // nut count so all nuts have a valid slot position and none are clipped.
+
   const effectiveCapacity = Math.max(capacity, bolt.nuts.length);
   const headY = THREAD_H + effectiveCapacity * SLOT_H; // y where head begins (relative to drawing origin)
   const svgH = headY + HEAD_H + TOP_PAD; // add extra top padding to overall svg height
-  // Ensure the bolt is always visible by scaling it down if it would exceed
-  // the available display height. Use the viewport height (when available)
-  // so tall bolts scale to fit smaller screens rather than being clipped.
+
   const DEFAULT_MAX = 320; // fallback
   let MAX_DISPLAY_HEIGHT = DEFAULT_MAX;
   if (typeof window !== 'undefined' && typeof window.innerHeight === 'number') {
-    // available vertical space (leave room for topbar/controls)
     const avail = window.innerHeight - 160;
-    // clamp into a reasonable range; allow smaller viewports to use a smaller max
+
     if (avail > 0) {
       MAX_DISPLAY_HEIGHT = Math.min(avail, 900);
     } else {
@@ -104,7 +95,7 @@ export default function BoltView({
   const dsFilterId = `ds-${bolt.id}`;
   const platformGradId = `plat-${bolt.id}`;
 
-  // readableTextColor removed — not used
+
 
   return (
     <div
@@ -124,23 +115,19 @@ export default function BoltView({
       <svg className="bolt-svg" width={W} height={svgH} viewBox={`0 0 ${W} ${svgH}`} aria-hidden="true">
         <g transform={`scale(${scale})`}>
           <defs>
-            {/* Drop shadow for nuts/head */}
             <filter id={dsFilterId} x="-50%" y="-50%" width="200%" height="200%">
               <feDropShadow dx="0" dy="6" stdDeviation="10" floodColor="var(--amb-shadow-color)" floodOpacity="0.9" />
             </filter>
-            {/* Bolt head gradient (top-lit) */}
             <linearGradient id={headGradId} x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%" stopColor="var(--head-grad-light)" />
               <stop offset="100%" stopColor="var(--head-grad-dark)" />
             </linearGradient>
-            {/* Shaft gradient (side-lit — lighter in center) */}
             <linearGradient id={shaftGradId} x1="0" x2="1" y1="0" y2="0">
               <stop offset="0%" stopColor="var(--shaft-dark)" />
               <stop offset="35%" stopColor="var(--shaft-mid)" />
               <stop offset="65%" stopColor="var(--shaft-mid)" />
               <stop offset="100%" stopColor="var(--shaft-dark)" />
             </linearGradient>
-            {/* Thread pattern — diagonal stripes */}
             <pattern
               id={`thread-${bolt.id}`}
               patternUnits="userSpaceOnUse"
@@ -154,7 +141,6 @@ export default function BoltView({
           </defs>
 
           <g transform={`translate(0, ${TOP_PAD})`}>
-            {/* ambient elliptical shadow under the bolt */}
             <defs>
               <radialGradient id={`amb-${bolt.id}`} cx="50%" cy="50%" r="50%">
                 <stop offset="0%" stopColor="var(--amb-shadow-color)" stopOpacity="0.8" />
@@ -163,9 +149,8 @@ export default function BoltView({
             </defs>
             <ellipse cx={CX} cy={svgH - 8} rx={HEAD_W * 0.9} ry={12} fill={`url(#amb-${bolt.id})`} />
 
-            {/* ── Shaft (full height from tip down to top of head) ── */}
             <rect x={SHAFT_X} y={0} width={SHAFT_W} height={headY} fill={`url(#${shaftGradId})`} />
-            {/* overlay subtle thread lines using the pattern */}
+
             <rect
               x={SHAFT_X}
               y={0}
@@ -175,13 +160,13 @@ export default function BoltView({
               opacity={0.35}
             />
 
-            {/* ── Bolt tip (pointing up) ── */}
+
             <polygon
               points={`${CX},0 ${SHAFT_X},4 ${SHAFT_X + SHAFT_W},4`}
               fill={`url(#${shaftGradId})`}
             />
 
-            {/* ── Thread marks (diagonal cuts just below the tip) ── */}
+
             {Array.from({ length: 6 }).map((_, i) => (
               <line
                 key={`t${i}`}
@@ -194,13 +179,10 @@ export default function BoltView({
               />
             ))}
 
-            {/* ── Empty slot ghost outlines ── */}
+
             {Array.from({ length: effectiveCapacity }).map((_, slotIdx) => {
               if (slotIdx < bolt.nuts.length) return null;
               const y = nutTop(slotIdx, effectiveCapacity);
-              // hex points (flat-top hexagon)
-
-              // draw a pill (rounded rect) for ghost slot
               return (
                 <rect
                   key={`ghost-${slotIdx}`}
@@ -217,20 +199,20 @@ export default function BoltView({
               );
             })}
 
-            {/* ── Filled nuts (index 0 = bottommost slot near head) ── */}
+
             {bolt.nuts.map((nut, slotIdx) => {
-              const colorId = (nut as any).color as string;
+              const colorId = nut.color as string;
               const colorIndex = parseInt(colorId.replace(/^c/, ''), 10) || 0;
               const color = palette.colors[colorIndex % palette.colors.length];
               const isTop = slotIdx === bolt.nuts.length - 1;
-              const isRevealed = Boolean((nut as any).revealed);
+              const isRevealed = Boolean(nut.revealed);
               const shouldHide = Boolean(hiddenNuts && !isTop && !isRevealed);
               const y = nutTop(slotIdx, effectiveCapacity);
 
               const gradId = `nutgrad-${bolt.id}-${slotIdx}`;
 
               return (
-                <g key={`${bolt.id}-${slotIdx}-${(nut as any).id}`} data-nut-index={slotIdx} data-nut-id={colorId} data-nut-instance={(nut as any).id}>
+                <g key={`${bolt.id}-${slotIdx}-${nut.id}`} data-nut-index={slotIdx} data-nut-id={colorId} data-nut-instance={nut.id}>
                   <defs>
                     <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
                       <stop offset="0%" stopColor={lighten(color, 0.18)} stopOpacity="1" />
@@ -238,7 +220,6 @@ export default function BoltView({
                       <stop offset="100%" stopColor={darken(color, 0.18)} stopOpacity="1" />
                     </linearGradient>
                   </defs>
-                  {/* Nut pill (rounded rect) with gradient + stroke + subtle inner highlight */}
                   <rect
                     x={NUT_X}
                     y={y}
@@ -251,7 +232,6 @@ export default function BoltView({
                     filter={shouldHide ? undefined : `url(#${dsFilterId})`}
                     data-hidden={shouldHide ? 'true' : undefined}
                   />
-                  {/* top sheen as smaller rounded rect */}
                   {!shouldHide && (
                     <rect
                       x={NUT_X + 8}
@@ -267,8 +247,7 @@ export default function BoltView({
               );
             })}
 
-            {/* ── Bolt head at bottom (drawn last so it renders over shaft) ── */}
-            {/* Top chamfer — shaft widens into the head */}
+
             <line
               x1={HEAD_X}
               y1={headY + 2}
@@ -295,7 +274,7 @@ export default function BoltView({
               stroke="var(--head-grad-dark)"
               strokeWidth="1"
             />
-            {/* Hex face lines */}
+
             <line
               x1={HEAD_X + 13}
               y1={headY + 2}
@@ -312,7 +291,7 @@ export default function BoltView({
               stroke="rgba(0,0,0,0.10)"
               strokeWidth="0.8"
             />
-            {/* Top-edge highlight on head */}
+
             <rect
               x={HEAD_X + 3}
               y={headY + 4}
@@ -321,7 +300,7 @@ export default function BoltView({
               rx="1"
               fill="var(--sheen-color)"
             />
-            {/* rounded platform/base under the head */}
+
             <defs>
               <linearGradient id={platformGradId} x1="0" x2="0" y1="0" y2="1">
                 <stop offset="0%" stopColor="var(--surface-container-low)" />
@@ -349,7 +328,7 @@ export default function BoltView({
         </g>
       </svg>
 
-      {/* Debug labels shown below the bolt: stack index only (bottom->top) */}
+
       {showDebug && (
         <div className="debug-labels" aria-hidden="true">
           {bolt.nuts.map((_, i) => {

@@ -4,7 +4,6 @@ import { describe, it, expect } from 'vitest'
 import GameShell from './GameShell'
 
 if (typeof document === 'undefined') {
-    // Register a skipped suite so Vitest doesn't fail the file
     describe.skip('GameShell UI (skipped - no DOM available)', () => {
         it('skipped', () => { })
     })
@@ -14,10 +13,8 @@ if (typeof document === 'undefined') {
             render(<GameShell />)
             const extraBtn = await screen.findByText(/Extra Bolt/i)
             expect(extraBtn).toBeInTheDocument()
-            // initial state: should be enabled
             expect(extraBtn).not.toBeDisabled()
             fireEvent.click(extraBtn)
-            // after click, button should be disabled
             expect(extraBtn).toBeDisabled()
         })
 
@@ -25,7 +22,6 @@ if (typeof document === 'undefined') {
             render(<GameShell />)
             const undoBtn = await screen.findByText(/Undo/i)
             expect(undoBtn).toBeInTheDocument()
-            // initially no moves, so disabled
             expect(undoBtn).toBeDisabled()
         })
     })

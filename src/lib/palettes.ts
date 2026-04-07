@@ -10,26 +10,22 @@ export const PALETTES: Palette[] = [
   {
     id: 0,
     name: 'Vibrant',
-    // high-contrast, highly separable hues (10 distinct identifiers)
     colors: ['#E41A1C', '#377EB8', '#4DAF4A', '#984EA3', '#FF7F00', '#A65628', '#F781BF', '#66C2A5', '#D9C100', '#2B3A67'],
   },
   {
     id: 1,
     name: 'Pastel',
-    // softer, but still visually separated pastel tones
     colors: ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BFFCC6', '#B3D9FF', '#E2B8FF', '#FDE2FF', '#DFF8E1', '#FFF3B0', '#CDEFFF'],
   },
   {
     id: 2,
     name: 'Jewel',
-    // deep, jewel-like tones with good separation
-    colors: ['#0B486B', '#1B9AAA', '#FFD166', '#EF476F', '#118AB2', '#2A6F97', '#9B2F7A', '#6A994E', '#4B2E83', '#00A6A6'],
+    colors: ['#2E0854', '#5E239D', '#A020F0', '#7A4FE3', '#3B0B3A'],
   },
   {
     id: 3,
     name: 'Colorblind',
-    // Okabe–Ito + extras for colorblind-safe separation
-    colors: ['#E69F00', '#56B4E9', '#009E73', '#F0E442', '#0072B2', '#D55E00', '#CC79A7', '#88CCEE', '#999999', '#000000'],
+    colors: ['#000000', '#E69F00', '#56B4E9', '#009E73', '#F0E442', '#0072B2', '#D55E00', '#CC79A7'],
   },
   {
     id: 4,

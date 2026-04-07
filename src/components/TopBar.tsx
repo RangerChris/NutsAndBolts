@@ -9,7 +9,6 @@ type Props = {
     paletteId: PaletteId;
     showDebug?: boolean;
     onShowDebugChange?: (show: boolean) => void;
-    // Force hiddenNuts for debugging (when enabled, generator will use this)
     forceHidden?: boolean;
     onForceHiddenChange?: (v: boolean) => void;
     onPaletteChange: (id: PaletteId) => void;
