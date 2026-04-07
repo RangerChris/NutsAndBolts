@@ -825,4 +825,38 @@ body {
         padding: 8px 10px;
         font-size: 13px;
     }
+
+    /* Compact header on mobile */
+    .game-shell-header {
+        margin-bottom: 6px;
+    }
+
+    .topbar-root {
+        gap: 6px;
+        padding: 2px 0;
+    }
+
+    .topbar-left {
+        gap: 6px;
+        font-size: 13px;
+    }
+
+    .topbar-controls {
+        gap: 6px;
+    }
+
+    /* Hide debug and seed on mobile */
+    .topbar-debug {
+        display: none;
+    }
+
+    .topbar-seed {
+        display: none;
+    }
+
+    /* Compact footer on mobile */
+    .bottom-bar {
+        padding: 8px 4px;
+        gap: 6px;
+    }
 }
