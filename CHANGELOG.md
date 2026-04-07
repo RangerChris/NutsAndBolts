@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.6](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.5...v0.1.6) (2026-04-07)
+
+
+### Bug Fixes
+
+* enhance seed input handling in playthrough tests ([9a8be1d](https://github.com/RangerChris/NutsAndBolts/commit/9a8be1de0bf19984784ac096c9a8e2ca004a905d))
+
 ### [0.1.5](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.4...v0.1.5) (2026-04-07)
 
 ### [0.1.4](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.3...v0.1.4) (2026-04-07)
