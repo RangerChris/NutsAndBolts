@@ -4,7 +4,7 @@ import BoltView from './BoltView';
 
 export type AnimMove = {
     move: { toBoltId: string };
-    preRects: Array<{ left: number; top: number; width: number; height: number; color: string; colorLabel?: string }>;
+    preRects: Array<{ left: number; top: number; width: number; height: number; color: string }>;
 };
 
 type Props = {
@@ -49,7 +49,6 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
             clone.style.pointerEvents = 'none';
             clone.style.transition = 'transform 360ms ease, opacity 260ms ease';
             // Side-view nut clone (66×20 viewBox matches BoltView NUT_W×NUT_H)
-            // include data-nut-id text so clones mirror BoltView labels
             // Build SVG via DOM APIs to avoid HTML injection
             const SVG_NS = 'http://www.w3.org/2000/svg';
             const svg = document.createElementNS(SVG_NS, 'svg');
@@ -94,19 +93,6 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
             shine.setAttribute('rx', '1');
             shine.setAttribute('fill', 'rgba(255,255,255,0.28)');
             svg.appendChild(shine);
-
-            const cid = pr.colorLabel || '';
-            if (cid) {
-                const text = document.createElementNS(SVG_NS, 'text');
-                text.setAttribute('x', '33');
-                text.setAttribute('y', '14');
-                text.setAttribute('text-anchor', 'middle');
-                text.setAttribute('font-size', '8');
-                text.setAttribute('fill', 'var(--text)');
-                text.setAttribute('data-nut-id', cid);
-                text.textContent = cid;
-                svg.appendChild(text);
-            }
 
             clone.appendChild(svg);
             document.body.appendChild(clone);
