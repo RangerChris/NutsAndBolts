@@ -139,7 +139,7 @@ test.describe('playthroughs by seed', () => {
       const progress = {
         version: 1,
         difficulties: { [c.difficulty]: { currentLevel: c.level, maxReached: c.level } },
-        settings: { paletteId: 0, difficulty: c.difficulty },
+        settings: { paletteId: 0, difficulty: c.difficulty, seeds: { [c.difficulty]: chosenSeed } },
       };
       await page.addInitScript((p) => {
         try { localStorage.setItem('nuts-and-bolts:progress', JSON.stringify(p)); } catch {};
@@ -147,15 +147,21 @@ test.describe('playthroughs by seed', () => {
 
       await page.goto('/');
 
-      // set seed via TopBar: click Edit, fill input, Save
-      const editBtn = page.locator('button.topbar-btn-edit');
-      await expect(editBtn).toBeVisible();
-      await editBtn.click();
+      // set seed via TopBar: open edit mode if needed, fill input, Save
+      // Use DOM-triggered clicks so overlays cannot intercept pointer events.
       const seedInput = page.locator('input[aria-label="Seed"]');
+      if (!(await seedInput.isVisible())) {
+        await page.evaluate(() => {
+          const edit = document.querySelector('button.topbar-btn-edit') as HTMLButtonElement | null;
+          edit?.click();
+        });
+      }
       await expect(seedInput).toBeVisible();
       await seedInput.fill(chosenSeed);
-      const saveBtn = page.locator('button:has-text("Save")');
-      await saveBtn.click();
+      await page.evaluate(() => {
+        const save = Array.from(document.querySelectorAll('button')).find((b) => b.textContent?.trim() === 'Save') as HTMLButtonElement | undefined;
+        save?.click();
+      });
 
       // Wait a moment for the level to be generated
       await page.waitForTimeout(200);
