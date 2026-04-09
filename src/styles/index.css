@@ -172,6 +172,7 @@ body {
     padding: 12px 8px;
     display: flex;
     justify-content: center;
+    align-items: center;
     gap: 12px;
     border-radius: var(--radius-lg);
     -webkit-backdrop-filter: blur(8px);
@@ -616,32 +617,58 @@ body {
     min-height: 100dvh;
     max-height: 100dvh;
     box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    row-gap: 10px;
 }
 
 .game-shell-header {
-    margin-bottom: 12px;
-}
-
-.game-info-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 12px;
-}
-
-.game-info-left {
-    margin-left: 12px;
+    margin-bottom: 0;
 }
 
 .game-actions {
-    margin-top: 12px;
+    margin-top: 0;
 }
 
 .board-stage {
-    flex: 1 1 auto;
     min-height: 0;
+    overflow: hidden;
     display: flex;
+}
+
+.sorted-progress-wrapper {
+    z-index: 1;
+}
+
+.game-actions {
+    z-index: 2;
+}
+
+.bottom-bar-version {
+    margin-left: auto;
+    font-size: 12px;
+    color: rgba(228, 226, 229, 0.72);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.bottom-bar-inner {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+/* Footer (app-wide) */
+.app-footer {
+    display: none;
+}
+
+.app-footer .container {
+    display: none;
+}
+
+.board-stage {
+    min-height: 0;
 }
 
 /* Sorted progress bar between board and bottom bar */
@@ -744,27 +771,6 @@ body {
     margin: 0;
 }
 
-/* Footer (app-wide) */
-.app-footer {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 8px;
-    display: flex;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 1000;
-}
-
-.app-footer .container {
-    font-size: 12px;
-    color: rgba(228, 226, 229, 0.65);
-    background: transparent;
-    padding: 4px 8px;
-    border-radius: 6px;
-    pointer-events: auto;
-}
-
 /* Responsive rendering: web defaults + mobile overrides */
 .game-shell-root {
     max-width: 1280px;
@@ -811,10 +817,7 @@ body {
 @media (max-width: 520px) {
     .game-shell-root {
         padding: 10px;
-    }
-
-    .game-info-left {
-        margin-left: 0;
+        row-gap: 8px;
     }
 
     .board-row {
@@ -872,6 +875,13 @@ body {
     .bottom-bar {
         padding: 8px 4px;
         gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    .bottom-bar-version {
+        width: 100%;
+        margin-left: 0;
+        text-align: center;
     }
 }
 

@@ -264,12 +264,6 @@ export default function GameShell(): ReactElement {
                 />
             </div>
 
-            <div className="game-info-row">
-                <div className="game-info-left">
-                    {isWin(state) ? <span>🎉 Solved</span> : <span>In play</span>}
-                </div>
-            </div>
-
             <div className="board-stage">
                 <Board
                     state={state}
@@ -300,6 +294,7 @@ export default function GameShell(): ReactElement {
                     onRestart={handleRestart}
                     undoDisabled={!state.moveHistory || state.moveHistory.length === 0}
                     hintDisabled={!!findHint() === false}
+                    version={typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0'}
                 />
             </div>
             {showComplete && (

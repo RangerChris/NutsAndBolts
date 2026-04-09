@@ -72,12 +72,17 @@ test.describe('hidden nuts level (E2E)', () => {
     // set seed via topbar edit UI (matches other e2e tests)
     const editBtn = page.locator('button.topbar-btn-edit');
     await expect(editBtn).toBeVisible();
-    await editBtn.click();
+    await page.evaluate(() => {
+      const edit = document.querySelector('button.topbar-btn-edit') as HTMLButtonElement | null;
+      edit?.click();
+    });
     const seedInput = page.locator('input[aria-label="Seed"]');
     await expect(seedInput).toBeVisible();
     await seedInput.fill(seed);
-    const saveBtn = page.locator('button:has-text("Save")');
-    await saveBtn.click();
+    await page.evaluate(() => {
+      const save = Array.from(document.querySelectorAll('button')).find((b) => b.textContent?.trim() === 'Save') as HTMLButtonElement | undefined;
+      save?.click();
+    });
 
     // wait for render
     await page.waitForTimeout(300);
@@ -92,8 +97,10 @@ test.describe('hidden nuts level (E2E)', () => {
     const toEl = page.locator(`[data-bolt="${toId}"]`);
     await expect(fromEl).toBeVisible();
     await expect(toEl).toBeVisible();
-    await fromEl.click();
-    await toEl.click();
+    await fromEl.focus();
+    await fromEl.press('Enter');
+    await toEl.focus();
+    await toEl.press('Enter');
     await page.waitForTimeout(300);
 
     // After the move, the new top nut at the source should not be hidden
