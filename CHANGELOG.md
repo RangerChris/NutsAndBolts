@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.10](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.9...v0.1.10) (2026-04-09)
+
+
+### Features
+
+* enhance game state management and UI layout ([12e1820](https://github.com/RangerChris/NutsAndBolts/commit/12e18205e2aef0d13e46272e82bfa6ca06546c87))
+
 ### [0.1.9](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.8...v0.1.9) (2026-04-09)
 
 ### [0.1.8](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.7...v0.1.8) (2026-04-07)
