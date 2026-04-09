@@ -575,9 +575,11 @@ body {
 
 /* Board layout utilities */
 .board-container {
+    flex: 1 1 auto;
     overflow-x: auto;
     overflow-y: auto;
-    max-height: calc(100vh - 220px);
+    min-height: 0;
+    height: 100%;
 }
 
 .board-row {
@@ -607,6 +609,11 @@ body {
 
 .game-shell-root {
     padding: 16px;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
 .game-shell-header {
@@ -625,6 +632,12 @@ body {
 
 .game-actions {
     margin-top: 12px;
+}
+
+.board-stage {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
 }
 
 /* Sorted progress bar between board and bottom bar */
@@ -752,6 +765,7 @@ body {
 .game-shell-root {
     max-width: 1280px;
     margin: 0 auto;
+    width: 100%;
 }
 
 .bolt-svg {
@@ -763,10 +777,6 @@ body {
 @media (max-width: 900px) {
     .game-shell-root {
         padding: 12px;
-    }
-
-    .board-container {
-        max-height: calc(100dvh - 280px);
     }
 
     .board-row {
@@ -801,10 +811,6 @@ body {
 
     .game-info-left {
         margin-left: 0;
-    }
-
-    .board-container {
-        max-height: calc(100dvh - 300px);
     }
 
     .board-row {

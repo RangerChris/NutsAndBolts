@@ -1,6 +1,6 @@
 import type { Bolt, GameState, Move, Nut } from './types';
 import { MAX_BOLTS } from './constants';
-import { pickTopGroup, getMovableTopCount, performMove, markRevealedIfNeeded } from './engine.core';
+import { getMovableTopCount, performMove, markRevealedIfNeeded } from './engine.core';
 import { emitBalancerEvent } from './balancer';
 
 const nutColor = (n?: Nut | string | unknown) => (typeof n === 'string' ? n : (n as Nut | undefined)?.color);

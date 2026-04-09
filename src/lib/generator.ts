@@ -147,7 +147,12 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
   } catch {}
 
   try {
-    const optimal = computeOptimalMoves(normalized, Math.max(12, shuffleMoves));
+    const optimalInput = normalizeState({
+      ...normalized,
+      bolts: normalized.bolts.filter((b) => b.id !== EXTRA_BOLT_ID),
+      extraBoltUsed: false,
+    });
+    const optimal = computeOptimalMoves(optimalInput, Math.max(12, shuffleMoves));
     normalized.optimalMoves = optimal;
   } catch {
     normalized.optimalMoves = null;

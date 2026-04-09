@@ -18,6 +18,8 @@ import {
     getSelectedDifficulty,
     setSelectedDifficulty,
     setCurrentLevel,
+    getSeedForDifficulty,
+    setSeedForDifficulty,
 } from '../lib/persistence';
 
 import type { ReactElement } from 'react';
@@ -25,15 +27,15 @@ import type { ReactElement } from 'react';
 export default function GameShell(): ReactElement {
     const [state, setState] = useState<GameState | null>(null);
     const progress = loadProgress();
+    const persistedDifficulty = getSelectedDifficulty();
     const [paletteId, setPalette] = useState<number>(progress.settings?.paletteId ?? 0);
     const [seed, setSeed] = useState<string>(() => {
         try {
-            const s = require('../lib/persistence').getSeedForDifficulty(persistedDifficulty as string);
+            const s = getSeedForDifficulty(persistedDifficulty as string);
             if (s) return s;
         } catch { }
         return `seed-${Date.now()}`;
     });
-    const persistedDifficulty = getSelectedDifficulty();
     const [difficulty, setDifficulty] = useState<GameState['difficulty']>(
         persistedDifficulty as GameState['difficulty']
     );
@@ -45,7 +47,6 @@ export default function GameShell(): ReactElement {
     useEffect(() => {
         const { state: s } = createLevel({ difficulty, level: currentLevel, seed, hiddenNuts: forceHidden ? true : null });
         try {
-            const { setSeedForDifficulty } = require('../lib/persistence');
             setSeedForDifficulty(difficulty, seed);
         } catch { }
         setState(s);
@@ -209,7 +210,6 @@ export default function GameShell(): ReactElement {
         const newSeed = `seed-${Date.now()}`;
         setSeed(newSeed);
         try {
-            const { setSeedForDifficulty } = require('../lib/persistence');
             setSeedForDifficulty(difficulty, newSeed);
         } catch {
 
@@ -236,7 +236,6 @@ export default function GameShell(): ReactElement {
                     onSeedChange={(s) => {
                         setSeed(s);
                         try {
-                            const { setSeedForDifficulty } = require('../lib/persistence');
                             setSeedForDifficulty(difficulty, s);
                         } catch {
 
@@ -250,7 +249,6 @@ export default function GameShell(): ReactElement {
                         setCurrentLevelState(lvl);
 
                         try {
-                            const { getSeedForDifficulty, setSeedForDifficulty } = require('../lib/persistence');
                             const ps = getSeedForDifficulty(newDiff);
                             if (ps) setSeed(ps);
                             else {
@@ -272,7 +270,7 @@ export default function GameShell(): ReactElement {
                 </div>
             </div>
 
-            <div>
+            <div className="board-stage">
                 <Board
                     state={state}
                     paletteId={paletteId}
