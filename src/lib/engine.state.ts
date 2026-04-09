@@ -155,17 +155,6 @@ export function undoLastMove(state: GameState): { success: boolean; reason?: str
   return { success: true };
 }
 
-export function addExtraBolt(state: GameState, boltId?: string, capacity?: number): { success: boolean; reason?: string } {
-  if (state.extraBoltUsed) return { success: false, reason: 'already-used' };
-  if (state.bolts.some((b) => String(b.id).startsWith('extra'))) return { success: false, reason: 'already-used' };
-  if (state.bolts.length >= MAX_BOLTS) return { success: false, reason: 'max-bolts' };
-  const id = boltId || `extra-${Date.now()}`;
-  const cap = capacity ?? (state.bolts[0]?.capacity ?? 4);
-  state.bolts.push({ id, capacity: cap, nuts: [] });
-  state.extraBoltUsed = true;
-  return { success: true };
-}
-
 export function isWin(state: GameState): boolean {
   const seenColors = new Set<string>();
   for (const b of state.bolts) {

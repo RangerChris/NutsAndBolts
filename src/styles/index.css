@@ -581,12 +581,16 @@ body {
 }
 
 .board-row {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(var(--board-columns, 1), max-content);
+    grid-template-rows: repeat(3, min-content);
+    grid-auto-flow: row;
     gap: 12px;
     padding: 8px;
-    align-items: flex-start;
+    align-items: start;
     justify-content: center;
+    width: max-content;
+    margin: 0 auto;
 }
 
 .board-item {
@@ -771,7 +775,7 @@ body {
     }
 
     .bolt-svg {
-        width: 96px;
+        width: 82px;
     }
 
     .sorted-progress {
@@ -809,7 +813,7 @@ body {
     }
 
     .bolt-svg {
-        width: 84px;
+        width: 68px;
     }
 
     .sorted-progress-wrapper {
@@ -858,5 +862,16 @@ body {
     .bottom-bar {
         padding: 8px 4px;
         gap: 6px;
+    }
+}
+
+@media (max-width: 400px) {
+    .bolt-svg {
+        width: 60px;
+    }
+
+    .board-row {
+        gap: 4px;
+        padding: 2px;
     }
 }

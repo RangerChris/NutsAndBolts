@@ -26,7 +26,7 @@ test('difficulty control changes value and screenshot saved', async ({ page }) =
   expect(stat.size).toBeGreaterThan(0);
 });
 
-test('palette picker opens and changes palette, Extra Bolt adds a bolt and disables button', async ({ page }) => {
+test('palette picker opens and changes palette, with no extra bolt button', async ({ page }) => {
   await page.goto('/');
 
   // Palette picker: open the palette dropdown
@@ -53,20 +53,6 @@ test('palette picker opens and changes palette, Extra Bolt adds a bolt and disab
     await expect(paletteToggle).toContainText(picked);
   }
 
-  // Extra Bolt flow: count bolts, click Extra Bolt, assert bolts increment and button disabled
   const extraBtn = page.locator('button:has-text("Extra Bolt")');
-  await expect(extraBtn).toBeVisible();
-  const before = await page.locator('[data-bolt]').count();
-  await extraBtn.click();
-  // After clicking, extra button should be disabled
-  await expect(extraBtn).toBeDisabled();
-  // bolts count increases by 1 (or remains if blocked by max, but prefer to assert +1)
-  const after = await page.locator('[data-bolt]').count();
-  expect(after).toBeGreaterThanOrEqual(before);
-  if (after === before) {
-    // if unchanged, at least ensure extra button is disabled
-    await expect(extraBtn).toBeDisabled();
-  } else {
-    expect(after).toBe(before + 1);
-  }
+  await expect(extraBtn).toHaveCount(0);
 });

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { createLevel } from '../../src/lib/generator';
-import { performMove, isWin, addExtraBolt } from '../../src/lib/engine';
+import { performMove, isWin } from '../../src/lib/engine';
 
 type Move = { fromBoltId: string; toBoltId: string };
 
@@ -62,36 +62,6 @@ function findSolutionPath(startState: any, maxDepth = 40): Move[] | null {
       }
     }
 
-    // consider adding an extra bolt as an action (use placeholder id '__EXTRA__')
-    try {
-      const canAdd = !state.extraBoltUsed && state.bolts.length < 12; // conservative max
-      if (canAdd) {
-        const ns = cloneState(state);
-        // create a deterministic placeholder id for the extra bolt in solver
-        const EXTRA_PLACEHOLDER = '__EXTRA__';
-        addExtraBolt(ns, EXTRA_PLACEHOLDER, ns.bolts[0]?.capacity ?? 4);
-        const c = canon(ns);
-        if (!visited.has(c)) {
-          parent.set(c, { prev: canon(state), move: { fromBoltId: '__ADD__', toBoltId: EXTRA_PLACEHOLDER } });
-          if (isWin(ns)) {
-            const path: Move[] = [];
-            let cur = c;
-            while (cur) {
-              const p = parent.get(cur);
-              if (!p) break;
-              if (p.move) path.unshift(p.move);
-              cur = p.prev as string;
-              if (!cur) break;
-            }
-            return path;
-          }
-          visited.add(c);
-          queue.push({ state: ns, depth: depth + 1 });
-        }
-      }
-    } catch {
-      // ignore any errors from addExtraBolt in solver
-    }
   }
   return null;
 }
@@ -166,33 +136,10 @@ test.describe('playthroughs by seed', () => {
       // Wait a moment for the level to be generated
       await page.waitForTimeout(200);
 
-      // Play moves by clicking bolts for each move pair. Support 'add extra bolt' placeholder moves.
-      const EXTRA_MARKER = '__EXTRA__';
-      const ADD_MARKER = '__ADD__';
-      const extraMapping: Record<string, string> = {};
+      // Play moves by clicking bolts for each move pair.
       for (const mv of path) {
-        if (mv.fromBoltId === ADD_MARKER) {
-          // add extra bolt in UI: click Extra Bolt button and map placeholder to real id
-          const extraBtn = page.locator('button:has-text("Extra Bolt")');
-          await expect(extraBtn).toBeVisible();
-          const beforeCount = await page.locator('[data-bolt]').count();
-          await extraBtn.click();
-          // wait for DOM update
-          await page.waitForTimeout(200);
-          const afterCount = await page.locator('[data-bolt]').count();
-          if (afterCount <= beforeCount) {
-            // fallback: find any new bolt by comparing lists (simple fallback)
-          }
-          const newEl = page.locator('[data-bolt]').nth(afterCount - 1);
-          const newId = await newEl.getAttribute('data-bolt');
-          if (newId) extraMapping[EXTRA_MARKER] = newId;
-          continue;
-        }
-
-        const fromId = mv.fromBoltId === EXTRA_MARKER ? extraMapping[EXTRA_MARKER] : mv.fromBoltId;
-        const toId = mv.toBoltId === EXTRA_MARKER ? extraMapping[EXTRA_MARKER] : mv.toBoltId;
-        const from = page.locator(`[data-bolt="${fromId}"]`);
-        const to = page.locator(`[data-bolt="${toId}"]`);
+        const from = page.locator(`[data-bolt="${mv.fromBoltId}"]`);
+        const to = page.locator(`[data-bolt="${mv.toBoltId}"]`);
         await expect(from).toBeVisible();
         await expect(to).toBeVisible();
         await from.click();

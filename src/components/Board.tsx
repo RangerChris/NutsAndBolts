@@ -20,6 +20,8 @@ type Props = {
 
 export default function Board({ state, paletteId, showDebug = false, selectedBoltId, invalidBoltId, onBoltClick, animMove, onAnimDone }: Props) {
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const boardColumns = Math.max(1, Math.ceil(state.bolts.length / 3));
+    const boardRowStyle = { '--board-columns': boardColumns } as React.CSSProperties & Record<'--board-columns', number>;
 
     useEffect(() => {
         if (!animMove || !containerRef.current) return;
@@ -126,7 +128,7 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
 
     return (
         <div className="board-container" ref={containerRef}>
-            <div className="board-row">
+            <div className="board-row" style={boardRowStyle}>
                 {state.bolts.map((b) => (
                     <div key={b.id} className="board-item">
                         <BoltView

@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import GameShell from './GameShell'
 
@@ -9,13 +9,9 @@ if (typeof document === 'undefined') {
     })
 } else {
     describe('GameShell UI', () => {
-        it('renders and allows extra bolt then prevents second use', async () => {
+        it('renders with no extra bolt control button', async () => {
             render(<GameShell />)
-            const extraBtn = await screen.findByText(/Extra Bolt/i)
-            expect(extraBtn).toBeInTheDocument()
-            expect(extraBtn).not.toBeDisabled()
-            fireEvent.click(extraBtn)
-            expect(extraBtn).toBeDisabled()
+            expect(screen.queryByText(/Extra Bolt/i)).not.toBeInTheDocument()
         })
 
         it('undo button is disabled when no history and exists', async () => {

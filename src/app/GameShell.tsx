@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import type { GameState } from '../lib/types';
 import { createLevel } from '../lib/generator';
 import {
-    addExtraBolt,
     undoLastMove,
     isWin,
     executeMoveOnState,
@@ -100,15 +99,6 @@ export default function GameShell(): ReactElement {
     }, [pct]);
 
     if (!state) return <div className="game-loading">Loading...</div>;
-
-    const handleExtra = () => {
-        const res = addExtraBolt(state);
-        if (res.success) setState({ ...state });
-        else {
-            setInvalidTarget('extra');
-            setTimeout(() => setInvalidTarget(null), 420);
-        }
-    };
 
     const handleUndo = () => {
         const res = undoLastMove(state);
@@ -307,11 +297,9 @@ export default function GameShell(): ReactElement {
 
             <div className="game-actions">
                 <BottomBar
-                    onExtra={handleExtra}
                     onUndo={handleUndo}
                     onHint={handleHint}
                     onRestart={handleRestart}
-                    extraDisabled={state.bolts.some((b) => String(b.id).startsWith('extra')) || state.bolts.length >= 12}
                     undoDisabled={!state.moveHistory || state.moveHistory.length === 0}
                     hintDisabled={!!findHint() === false}
                 />

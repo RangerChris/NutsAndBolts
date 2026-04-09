@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickTopGroup, canPlaceGroup, performMove, executeMoveOnState, undoLastMove, addExtraBolt, isWin, validateState } from './engine';
+import { pickTopGroup, canPlaceGroup, performMove, executeMoveOnState, undoLastMove, isWin, validateState } from './engine';
 import type { Bolt } from './types';
 import type { GameState } from './types';
 
@@ -119,24 +119,6 @@ describe('engine helpers', () => {
     expect(undoRes.success).toBe(true);
     expect(state.bolts[0].nuts.length).toBe(2);
     expect(state.bolts[1].nuts.length).toBe(0);
-  });
-
-  it('addExtraBolt adds a temporary bolt once', () => {
-    const state: GameState = {
-      bolts: [
-        { id: 'a', capacity: 4, nuts: [] },
-      ],
-      extraBoltUsed: false,
-      level: 1,
-      difficulty: 'easy',
-      moveHistory: [],
-    };
-    const r1 = addExtraBolt(state, 'xtra', 3);
-    expect(r1.success).toBe(true);
-    expect(state.extraBoltUsed).toBe(true);
-    expect(state.bolts.length).toBe(2);
-    const r2 = addExtraBolt(state);
-    expect(r2.success).toBe(false);
   });
 
   it('isWin detects solved state', () => {

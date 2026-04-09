@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { addExtraBolt, undoLastMove, executeMoveOnState, isWin } from './engine';
+import { undoLastMove, executeMoveOnState, isWin } from './engine';
 import type { GameState } from './types';
 
 function makeState(): GameState {
@@ -16,22 +16,11 @@ function makeState(): GameState {
   } as unknown as GameState;
 }
 
-describe('extra bolt and undo', () => {
+describe('undo and win helpers', () => {
   let state: GameState;
 
   beforeEach(() => {
     state = makeState();
-  });
-
-  it('allows a single extra bolt and prevents second use', () => {
-    const r1 = addExtraBolt(state, 'extra1', 3);
-    expect(r1.success).toBe(true);
-    expect(state.extraBoltUsed).toBe(true);
-    expect(state.bolts.find((b) => b.id === 'extra1')).toBeDefined();
-
-    const r2 = addExtraBolt(state, 'extra2', 3);
-    expect(r2.success).toBe(false);
-    expect(r2.reason).toBe('already-used');
   });
 
   it('executes a move and can undo it, restoring state', () => {

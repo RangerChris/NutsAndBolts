@@ -78,13 +78,14 @@ export default function BoltView({
   const headY = THREAD_H + effectiveCapacity * SLOT_H; // y where head begins (relative to drawing origin)
   const svgH = headY + HEAD_H + TOP_PAD; // add extra top padding to overall svg height
 
-  const DEFAULT_MAX = 320; // fallback
+  const viewportWidth = typeof window !== 'undefined' && typeof window.innerWidth === 'number' ? window.innerWidth : 1200;
+  const DEFAULT_MAX = viewportWidth <= 520 ? 240 : viewportWidth <= 900 ? 280 : 320;
   let MAX_DISPLAY_HEIGHT = DEFAULT_MAX;
   if (typeof window !== 'undefined' && typeof window.innerHeight === 'number') {
     const avail = window.innerHeight - 160;
 
     if (avail > 0) {
-      MAX_DISPLAY_HEIGHT = Math.min(avail, 900);
+      MAX_DISPLAY_HEIGHT = Math.min(avail, DEFAULT_MAX);
     } else {
       MAX_DISPLAY_HEIGHT = DEFAULT_MAX;
     }

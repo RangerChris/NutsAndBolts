@@ -30,6 +30,7 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
   const shuffleMoves = randomInt(rng, cfg.shuffleRange[0], cfg.shuffleRange[1]);
 
   const bolts = createSolvedBoard(numBolts, stackHeight);
+  const EXTRA_BOLT_ID = 'extra-0';
   const TEMP_EXTRA_ID = '__temp_extra';
   bolts.push({ id: TEMP_EXTRA_ID, capacity: stackHeight, nuts: [] });
   const moveHistory: Move[] = [];
@@ -68,6 +69,7 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
     }
   }
   const boltsToReturn = bolts.filter((b) => b.id !== TEMP_EXTRA_ID);
+  boltsToReturn.push({ id: EXTRA_BOLT_ID, capacity: stackHeight, nuts: [] });
   const filteredMoves: Move[] = [];
   const hiddenNutsEnabled = typeof opts.hiddenNuts === 'boolean' ? opts.hiddenNuts : rng() < 0.25;
 
@@ -83,7 +85,7 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
 
   const state: GameState = {
     bolts: boltsToReturn || bolts,
-    extraBoltUsed: false,
+    extraBoltUsed: true,
     level: opts.level || 1,
     difficulty: opts.difficulty,
     seed,
