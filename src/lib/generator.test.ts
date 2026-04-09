@@ -20,5 +20,6 @@ describe('level generator', () => {
       (b) => b.nuts.length > 1 && !b.nuts.every((n) => n === b.nuts[0])
     );
     expect(hasMixed).toBe(true);
+    expect(typeof state.optimalMoves === 'number' || state.optimalMoves === null).toBe(true);
   });
 });

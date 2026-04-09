@@ -2,7 +2,7 @@ import { seededRandom, randomInt } from './rng';
 import type { GameState, Bolt, Move } from './types';
 import { DIFFICULTY_CONFIG } from './constants';
 import { getLevelParams } from './progression';
-import { pickTopGroup, normalizeState, checkStateInvariants, computeOptimalMoves } from './engine';
+import { pickTopGroup, normalizeState, checkStateInvariants, computeSolutionPath } from './engine';
 import { emitBalancerEvent } from './balancer';
 import type { Nut } from './types';
 
@@ -47,7 +47,7 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
     const moveCount = Math.max(1, Math.min(count, Math.floor(rng() * count) + 1));
     const targets = bolts.filter((b) => b.id !== src.id && b.nuts.length + moveCount <= b.capacity);
     if (targets.length === 0) continue;
-    const mixedCandidates = targets.filter((b) => b.nuts.length > 0 && b.nuts[b.nuts.length - 1] !== color);
+    const mixedCandidates = targets.filter((b) => b.nuts.length > 0 && b.nuts[b.nuts.length - 1].color !== color);
     const candidates = (mixedCandidates.length > 0 ? mixedCandidates : targets).filter((t) => !(lastMove && lastMove.from === t.id && lastMove.to === src.id));
     const pickFrom = candidates.length > 0 ? candidates : mixedCandidates.length > 0 ? mixedCandidates : targets;
     const tgt = pickFrom[Math.floor(rng() * pickFrom.length)];
@@ -101,7 +101,10 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
       for (let j = 0; j < boltsToReturn.length; j++) {
         if (i === j) continue;
         const tgt = boltsToReturn[j];
-        if (tgt.nuts.length < tgt.capacity && tgt.nuts[tgt.nuts.length - 1] !== src.nuts[src.nuts.length - 1]) {
+        if (
+          tgt.nuts.length < tgt.capacity &&
+          (tgt.nuts.length === 0 || tgt.nuts[tgt.nuts.length - 1].color !== src.nuts[src.nuts.length - 1].color)
+        ) {
           const moved = src.nuts.splice(src.nuts.length - 1, 1);
           if (moved.length > 0) {
             tgt.nuts.push(moved[0]);
@@ -147,13 +150,21 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
   } catch {}
 
   try {
-    const optimalInput = normalizeState({
-      ...normalized,
-      bolts: normalized.bolts.filter((b) => b.id !== EXTRA_BOLT_ID),
-      extraBoltUsed: false,
+    const solution = computeSolutionPath(normalized, {
+      maxDepth: Math.max(80, shuffleMoves * 3),
+      maxStates: 250000,
     });
-    const optimal = computeOptimalMoves(optimalInput, Math.max(12, shuffleMoves));
-    normalized.optimalMoves = optimal;
+    normalized.optimalMoves = solution ? solution.length : null;
+
+    if (!solution) {
+      const retryMatch = /-retry-(\d+)$/.exec(seed);
+      const retryCount = retryMatch ? Number(retryMatch[1]) : 0;
+      if (retryCount < 5) {
+        const baseSeed = seed.replace(/-retry-\d+$/, '');
+        const retrySeed = `${baseSeed}-retry-${retryCount + 1}`;
+        return createLevel({ ...opts, seed: retrySeed });
+      }
+    }
   } catch {
     normalized.optimalMoves = null;
   }

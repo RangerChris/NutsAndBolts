@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pickTopGroup, canPlaceGroup, performMove, executeMoveOnState, undoLastMove, isWin, validateState } from './engine';
+import { pickTopGroup, canPlaceGroup, performMove, executeMoveOnState, undoLastMove, isWin, validateState, computeSolutionPath } from './engine';
 import type { Bolt } from './types';
 import type { GameState } from './types';
 
@@ -163,5 +163,24 @@ describe('engine helpers', () => {
     const v = validateState(state);
     expect(v.ok).toBe(false);
     expect(v.reason).toBe('bolt-over-capacity');
+  });
+
+  it('computeSolutionPath returns a valid first solving move', () => {
+    const state: GameState = {
+      bolts: [
+        { id: 'a', capacity: 2, nuts: ['red', 'blue'] },
+        { id: 'b', capacity: 2, nuts: ['red'] },
+        { id: 'c', capacity: 2, nuts: [] },
+      ],
+      extraBoltUsed: true,
+      level: 1,
+      difficulty: 'easy',
+      moveHistory: [],
+    };
+
+    const path = computeSolutionPath(state, { maxDepth: 20, maxStates: 10000 });
+    expect(path).not.toBeNull();
+    expect(path?.length).toBeGreaterThan(0);
+    expect(path?.[0]).toMatchObject({ fromBoltId: 'a', toBoltId: 'c', color: 'blue', count: 1 });
   });
 });

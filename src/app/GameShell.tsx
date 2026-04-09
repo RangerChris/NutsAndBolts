@@ -7,6 +7,7 @@ import {
     executeMoveOnState,
     getMovableTopCount,
     computeStars,
+    computeSolutionPath,
 } from '../lib/engine';
 import Board, { AnimMove } from '../components/Board';
 import BottomBar from '../components/BottomBar';
@@ -186,6 +187,11 @@ export default function GameShell(): ReactElement {
     };
 
     const findHint = () => {
+        const solution = computeSolutionPath(state, { maxDepth: 140, maxStates: 250000 });
+        if (solution && solution.length > 0) {
+            return { from: solution[0].fromBoltId, to: solution[0].toBoltId };
+        }
+
         for (const src of state.bolts) {
             for (const tgt of state.bolts) {
                 if (tgt.id === src.id) continue;

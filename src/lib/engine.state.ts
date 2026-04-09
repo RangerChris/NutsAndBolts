@@ -75,46 +75,135 @@ export function executeMoveOnState(state: GameState, fromId: string, toId: strin
 }
 
 export function computeOptimalMoves(startState: GameState, maxDepth = 20): number | null {
-  const canon = (s: GameState) => s.bolts.map((b) => b.nuts.map((n) => nutColor(n) || '').join(',')).join('|');
-  const cloneState = (s: GameState): GameState => ({
-    bolts: s.bolts.map((b) => ({
-      id: b.id,
-      capacity: b.capacity,
-      nuts: b.nuts.map((n, i) => (typeof n === 'string' ? { id: `${b.id}-n${i}`, color: n, revealed: false } : ({ ...(n as Nut) } as Nut))),
-    } as Bolt)),
-    extraBoltUsed: Boolean(s.extraBoltUsed),
-    level: s.level,
-    difficulty: s.difficulty,
-    seed: s.seed,
-    moveHistory: [],
-  } as GameState);
-  const startCanon = canon(startState);
-  if (isWin(startState)) return 0;
-  const queue: Array<{ state: GameState; depth: number }> = [{ state: cloneState(startState), depth: 0 }];
+  const path = computeSolutionPath(startState, { maxDepth });
+  return path ? path.length : null;
+}
+
+type SolverBolt = {
+  id: string;
+  capacity: number;
+  nuts: string[];
+};
+
+type SolverStep = {
+  fromBoltId: string;
+  toBoltId: string;
+  color: string;
+  count: number;
+};
+
+type SolverOptions = {
+  maxDepth?: number;
+  maxStates?: number;
+};
+
+function toSolverBolts(state: GameState): SolverBolt[] {
+  return state.bolts.map((b) => ({
+    id: b.id,
+    capacity: b.capacity,
+    nuts: b.nuts.map((n) => nutColor(n) || ''),
+  }));
+}
+
+function canonSolverBolts(bolts: SolverBolt[]): string {
+  return bolts.map((b) => b.nuts.join(',')).join('|');
+}
+
+function isWinSolverBolts(bolts: SolverBolt[]): boolean {
+  const seenColors = new Set<string>();
+  for (const b of bolts) {
+    if (b.nuts.length === 0) continue;
+    const first = b.nuts[0];
+    if (!b.nuts.every((n) => n === first)) return false;
+    if (seenColors.has(first)) return false;
+    seenColors.add(first);
+  }
+  return true;
+}
+
+function cloneSolverBolts(bolts: SolverBolt[]): SolverBolt[] {
+  return bolts.map((b) => ({ id: b.id, capacity: b.capacity, nuts: b.nuts.slice() }));
+}
+
+function getTopGroupForSolver(source: SolverBolt): { color?: string; count: number } {
+  if (source.nuts.length === 0) return { color: undefined, count: 0 };
+  const topColor = source.nuts[source.nuts.length - 1];
+  let count = 1;
+  for (let i = source.nuts.length - 2; i >= 0; i--) {
+    if (source.nuts[i] === topColor) count++;
+    else break;
+  }
+  return { color: topColor, count };
+}
+
+function getMovableCountForSolver(source: SolverBolt, target: SolverBolt): { color?: string; count: number } {
+  const { color, count } = getTopGroupForSolver(source);
+  if (!color || count <= 0) return { color, count: 0 };
+  const free = target.capacity - target.nuts.length;
+  if (free <= 0) return { color, count: 0 };
+  if (target.nuts.length > 0 && target.nuts[target.nuts.length - 1] !== color) return { color, count: 0 };
+  return { color, count: Math.min(count, free) };
+}
+
+export function computeSolutionPath(startState: GameState, options?: SolverOptions): SolverStep[] | null {
+  const maxDepth = options?.maxDepth ?? 120;
+  const maxStates = options?.maxStates ?? 250000;
+  const startBolts = toSolverBolts(startState);
+  const startCanon = canonSolverBolts(startBolts);
+  if (isWinSolverBolts(startBolts)) return [];
+
+  const queue: Array<{ bolts: SolverBolt[]; depth: number; canon: string }> = [
+    { bolts: startBolts, depth: 0, canon: startCanon },
+  ];
   const visited = new Set<string>([startCanon]);
-  while (queue.length > 0) {
-    const { state, depth } = queue.shift() as { state: GameState; depth: number };
+  const parent = new Map<string, { prev: string | null; move: SolverStep | null }>();
+  parent.set(startCanon, { prev: null, move: null });
+
+  for (let qIndex = 0; qIndex < queue.length; qIndex++) {
+    const { bolts, depth, canon } = queue[qIndex];
     if (depth >= maxDepth) continue;
-    for (let i = 0; i < state.bolts.length; i++) {
-      for (let j = 0; j < state.bolts.length; j++) {
+
+    for (let i = 0; i < bolts.length; i++) {
+      for (let j = 0; j < bolts.length; j++) {
         if (i === j) continue;
-        const src = state.bolts[i];
-        const tgt = state.bolts[j];
-        const movable = getMovableTopCount(src, tgt);
-        if (movable.count === 0) continue;
-        const ns = cloneState(state);
-        const ssrc = ns.bolts[i];
-        const stgt = ns.bolts[j];
-        const moved = ssrc.nuts.splice(ssrc.nuts.length - movable.count, movable.count);
-        stgt.nuts.push(...moved);
-        const c = canon(ns);
-        if (visited.has(c)) continue;
-        if (isWin(ns)) return depth + 1;
-        visited.add(c);
-        queue.push({ state: ns, depth: depth + 1 });
+        const source = bolts[i];
+        const target = bolts[j];
+        const movable = getMovableCountForSolver(source, target);
+        if (!movable.color || movable.count === 0) continue;
+
+        const nextBolts = cloneSolverBolts(bolts);
+        const moved = nextBolts[i].nuts.splice(nextBolts[i].nuts.length - movable.count, movable.count);
+        nextBolts[j].nuts.push(...moved);
+        const nextCanon = canonSolverBolts(nextBolts);
+        if (visited.has(nextCanon)) continue;
+
+        const move: SolverStep = {
+          fromBoltId: source.id,
+          toBoltId: target.id,
+          color: movable.color,
+          count: movable.count,
+        };
+        parent.set(nextCanon, { prev: canon, move });
+
+        if (isWinSolverBolts(nextBolts)) {
+          const path: SolverStep[] = [];
+          let cur: string | null = nextCanon;
+          while (cur) {
+            const p = parent.get(cur);
+            if (!p) break;
+            if (p.move) path.unshift(p.move);
+            cur = p.prev;
+          }
+          return path;
+        }
+
+        visited.add(nextCanon);
+        if (visited.size >= maxStates) return null;
+        queue.push({ bolts: nextBolts, depth: depth + 1, canon: nextCanon });
       }
     }
   }
+
   return null;
 }
 
