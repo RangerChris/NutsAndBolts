@@ -142,8 +142,10 @@ test.describe('playthroughs by seed', () => {
         const to = page.locator(`[data-bolt="${mv.toBoltId}"]`);
         await expect(from).toBeVisible();
         await expect(to).toBeVisible();
-        await from.click();
-        await to.click();
+        await from.focus();
+        await from.press('Enter');
+        await to.focus();
+        await to.press('Enter');
         // wait for animation/DOM update
         await page.waitForTimeout(200);
       }

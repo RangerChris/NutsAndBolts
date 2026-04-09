@@ -128,6 +128,7 @@ body {
     -webkit-user-select: none;
     user-select: none;
     transition: transform 120ms ease, box-shadow 120ms ease;
+    scroll-margin-block: 24px 96px;
 }
 
 .bolt-header {
@@ -580,6 +581,9 @@ body {
     overflow-y: auto;
     min-height: 0;
     height: 100%;
+    box-sizing: border-box;
+    padding-bottom: 12px;
+    scroll-padding-bottom: 12px;
 }
 
 .board-row {
