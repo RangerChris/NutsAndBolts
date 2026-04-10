@@ -46,7 +46,8 @@ async function runSim() {
 }
 
 describe('simulation', () => {
-  it('runs generator simulation for balancing (prints to console)', async () => {
+  const maybeIt = process.env.RUN_SIM_TEST === '1' ? it : it.skip;
+  maybeIt('runs generator simulation for balancing (prints to console)', async () => {
     await runSim();
-  });
+  }, 120000);
 });

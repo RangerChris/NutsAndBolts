@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import type { GameState } from '../lib/types';
 import { createLevel } from '../lib/generator';
 import {
@@ -47,6 +47,8 @@ export default function GameShell(): ReactElement {
 
     useEffect(() => {
         const { state: s } = createLevel({ difficulty, level: currentLevel, seed, hiddenNuts: forceHidden ? true : null });
+        const initialSolution = computeSolutionPath(s, { maxDepth: 140, maxStates: 250000 });
+        setLevelSolvable(Boolean(initialSolution && initialSolution.length > 0));
         try {
             setSeedForDifficulty(difficulty, seed);
         } catch { }
@@ -58,10 +60,11 @@ export default function GameShell(): ReactElement {
     const lastClickRef = useRef<{ id: string | null; time: number }>({ id: null, time: 0 });
     const [animMove, setAnimMove] = useState<AnimMove | null>(null);
     const [showComplete, setShowComplete] = useState(false);
+    const [levelSolvable, setLevelSolvable] = useState(true);
 
-    const handleAnimDone = () => {
+    const handleAnimDone = useCallback(() => {
         setAnimMove(null);
-    };
+    }, []);
 
     useEffect(() => {
         if (!state) return;
@@ -109,6 +112,8 @@ export default function GameShell(): ReactElement {
 
     const handleRestart = () => {
         const { state: s } = createLevel({ difficulty, level: currentLevel, seed, hiddenNuts: forceHidden ? true : null });
+        const initialSolution = computeSolutionPath(s, { maxDepth: 140, maxStates: 250000 });
+        setLevelSolvable(Boolean(initialSolution && initialSolution.length > 0));
         setState(s);
         setSelected(null);
         setInvalidTarget(null);
@@ -299,7 +304,7 @@ export default function GameShell(): ReactElement {
                     onHint={handleHint}
                     onRestart={handleRestart}
                     undoDisabled={!state.moveHistory || state.moveHistory.length === 0}
-                    hintDisabled={!!findHint() === false}
+                    hintDisabled={!levelSolvable}
                     version={typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0'}
                 />
             </div>
@@ -332,7 +337,7 @@ export default function GameShell(): ReactElement {
                                             <div className="label">Moves</div>
                                             <div className="value">
                                                 {s.moveCount}
-                                                {s.optimal ? ` (opt ${s.optimal})` : ''}
+                                                {s.optimal ? ` (max: ${s.optimal})` : ''}
                                             </div>
                                         </div>
                                         <div className="divider-vertical" />
