@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.14](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.13...v0.1.14) (2026-04-10)
+
+
+### Features
+
+* enhance GameShell logic to compute and display level solvability; update simulation test to conditionally run ([91d93e9](https://github.com/RangerChris/NutsAndBolts/commit/91d93e9e09d69662ab037bd65a5100b5746642bf))
+
 ### [0.1.13](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.12...v0.1.13) (2026-04-09)
 
 
