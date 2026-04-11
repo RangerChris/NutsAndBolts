@@ -18,9 +18,8 @@ test('home menu shows on load and selecting modes starts game', async ({ page })
   // Return to home via TopBar exit if present, otherwise reload
   await page.goto('/');
 
-  // Start Custom Seed mode and ensure TopBar seed edit is available
-  await page.locator('input[placeholder="seed string"]').fill('test-seed-1');
-  await page.locator('button:has-text("Custom Seed")').click();
+  // Open app in Custom Seed mode via URL (seed should be handled in TopBar)
+  await page.goto('/?mode=custom&difficulty=easy&seed=test-seed-1');
   // wait for TopBar edit to appear, then open edit and check input
   const editBtn = page.locator('button.topbar-btn-edit');
   await page.waitForSelector('button.topbar-btn-edit');

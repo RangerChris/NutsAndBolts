@@ -15,10 +15,11 @@ type Props = {
     forceHidden?: boolean;
     onForceHiddenChange?: (v: boolean) => void;
     onPaletteChange: (id: PaletteId) => void;
+    onDifficultyChange?: (d: string) => void;
     onSeedChange?: (seed: string) => void;
 };
 
-export default function TopBar({ level, difficulty, seed, playMode = 'journey', showSeed = true, paletteId, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onPaletteChange, onSeedChange }: Props) {
+export default function TopBar({ level, difficulty, seed, playMode = 'journey', showSeed = true, paletteId, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onPaletteChange, onDifficultyChange, onSeedChange }: Props) {
     const [editingSeed, setEditingSeed] = useState(false);
     const [seedValue, setSeedValue] = useState(seed || '');
     const [open, setOpen] = useState(false);
@@ -46,6 +47,15 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
                 )}
             </div>
             <div className="topbar-controls">
+                <label>
+                    Difficulty
+                    <select value={difficulty} onChange={(e) => onDifficultyChange?.(e.target.value)} style={{ marginLeft: 8 }}>
+                        <option value="easy">easy</option>
+                        <option value="medium">medium</option>
+                        <option value="hard">hard</option>
+                        <option value="extreme">extreme</option>
+                    </select>
+                </label>
                 {showSeed && (
                     <>
                         <label className="topbar-debug">

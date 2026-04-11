@@ -6,7 +6,24 @@ import JourneyScreen from './JourneyScreen';
 import type { Screen } from '../lib/types';
 
 export default function AppShell() {
-    const [screen, setScreen] = useState<Screen>({ type: 'home' });
+    const getInitialScreen = (): Screen => {
+        try {
+            const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+            if (params) {
+                const mode = params.get('mode');
+                if (mode === 'tutorial') return { type: 'tutorial' };
+                if (mode === 'custom') {
+                    const difficulty = (params.get('difficulty') as any) || 'easy';
+                    const seed = params.get('seed') || undefined;
+                    return { type: 'game', mode: 'custom', difficulty, seed };
+                }
+                if (mode === 'journey') return { type: 'difficulty-select', mode: 'journey' };
+            }
+        } catch { }
+        return { type: 'home' };
+    };
+
+    const [screen, setScreen] = useState<Screen>(getInitialScreen);
 
     return (
         <div className="app-shell-root">

@@ -9,6 +9,7 @@ type Props = {
 
 export default function HomeScreen({ onSelectMode }: Props) {
     const [difficulty, setDifficulty] = useState<Difficulty>('easy');
+
     const [openEndless, setOpenEndless] = useState(false);
 
     return (
@@ -52,10 +53,6 @@ export default function HomeScreen({ onSelectMode }: Props) {
             </div>
 
             <div className="home-controls">
-                {/* difficulty selector removed from home screen; kept for modals */}
-
-                {/* custom seed input removed */}
-
                 <button data-testid="help-tutorial" className="help-btn" onClick={() => onSelectMode('tutorial')}>Help / Tutorial</button>
             </div>
             {openEndless && (

@@ -67,26 +67,14 @@ test.describe('hidden nuts level (E2E)', () => {
       try { localStorage.setItem('nuts-and-bolts:progress', JSON.stringify(p)); } catch {};
     }, progress);
 
-    await page.goto('/');
 
-    // Enter Custom Seed mode so TopBar seed edit is available
-    await page.locator('button:has-text("Custom Seed")').click();
+    // Open app in Custom Seed mode with the discovered seed
+    await page.goto(`/?mode=custom&difficulty=easy&seed=${encodeURIComponent(seed)}`);
 
-    // wait for TopBar edit seed button to appear
+    // wait for TopBar edit seed button to appear and ensure seed applied
     const editBtn = page.locator('button.topbar-btn-edit');
     await page.waitForSelector('button.topbar-btn-edit');
     await expect(editBtn).toBeVisible();
-    await page.evaluate(() => {
-      const edit = document.querySelector('button.topbar-btn-edit') as HTMLButtonElement | null;
-      edit?.click();
-    });
-    const seedInput = page.locator('input[aria-label="Seed"]');
-    await expect(seedInput).toBeVisible();
-    await seedInput.fill(seed);
-    await page.evaluate(() => {
-      const save = Array.from(document.querySelectorAll('button')).find((b) => b.textContent?.trim() === 'Save') as HTMLButtonElement | undefined;
-      save?.click();
-    });
 
     // wait for render
     await page.waitForTimeout(300);

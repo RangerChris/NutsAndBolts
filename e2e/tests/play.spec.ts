@@ -115,10 +115,8 @@ test.describe('playthroughs by seed', () => {
         try { localStorage.setItem('nuts-and-bolts:progress', JSON.stringify(p)); } catch {};
       }, progress);
 
-      await page.goto('/');
-      // ensure Home difficulty matches desired test difficulty then enter Custom Seed mode
-      await page.selectOption('label:has-text("Difficulty") select', c.difficulty);
-      await page.locator('button:has-text("Custom Seed")').click();
+      // Open app directly in Custom Seed mode so TopBar seed edit is available
+      await page.goto(`/?mode=custom&difficulty=${encodeURIComponent(c.difficulty)}&seed=${encodeURIComponent(chosenSeed)}`);
       // wait for TopBar seed edit UI or board to render
       await page.waitForSelector('button.topbar-btn-edit');
 
