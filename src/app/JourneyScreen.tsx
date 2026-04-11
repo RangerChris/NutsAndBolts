@@ -46,14 +46,22 @@ export default function JourneyScreen({ onPlayLevel, onBack }: Props) {
                 </div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
-                {DIFFICULTIES.map((d) => (
-                    <div key={d} style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06))', padding: 12, borderRadius: 12 }}>
-                        <h3 style={{ textTransform: 'capitalize' }}>{d}</h3>
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
-                            {Array.from({ length: 10 }).map((_, i) => makeButton(d, i + 1))}
+                {DIFFICULTIES.map((d) => {
+                    const diffEntry = progress.difficulties?.[d] as any;
+                    const completedArr: number[] = diffEntry && Array.isArray(diffEntry.completed) ? diffEntry.completed : [];
+                    const completedCount = completedArr.length;
+                    return (
+                        <div key={d} style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06))', padding: 12, borderRadius: 12 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <h3 style={{ textTransform: 'capitalize', margin: 0 }}>{d}</h3>
+                                <div className="muted">Completed: {completedCount}</div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginTop: 8 }}>
+                                {Array.from({ length: 10 }).map((_, i) => makeButton(d, i + 1))}
+                            </div>
                         </div>
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </div>
     );

@@ -8,6 +8,7 @@ type Props = {
 export default function HomeScreen({ onSelectMode }: Props) {
     const [difficulty, setDifficulty] = useState<Difficulty>('easy');
     const [seed, setSeed] = useState('');
+    const [openEndless, setOpenEndless] = useState(false);
 
     return (
         <div className="home-screen">
@@ -37,7 +38,7 @@ export default function HomeScreen({ onSelectMode }: Props) {
                     </div>
                 </button>
 
-                <button onClick={() => onSelectMode('endless', { difficulty })} className="mode-card" aria-label="Endless Mode">
+                <button onClick={() => setOpenEndless(true)} className="mode-card" aria-label="Endless Mode">
                     <div className="mode-icon-placeholder" aria-hidden="true"></div>
                     <div className="mode-content">
                         <div className="mode-title">Endless</div>
@@ -64,6 +65,31 @@ export default function HomeScreen({ onSelectMode }: Props) {
 
                 <button data-testid="help-tutorial" className="help-btn" onClick={() => onSelectMode('tutorial')}>Help / Tutorial</button>
             </div>
+            {openEndless && (
+                <div className="complete-overlay" role="dialog" aria-modal="true">
+                    <div className="complete-modal">
+                        <h2 className="complete-title">Endless Mode</h2>
+                        <p className="complete-sub">Choose difficulty for Endless mode:</p>
+                        <div style={{ marginBottom: 12 }}>
+                            <label>
+                                Difficulty:
+                                <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)} style={{ marginLeft: 8 }}>
+                                    <option value="easy">easy</option>
+                                    <option value="medium">medium</option>
+                                    <option value="hard">hard</option>
+                                    <option value="extreme">extreme</option>
+                                </select>
+                            </label>
+                        </div>
+                        <div style={{ width: '100%' }}>
+                            <button className="primary-cta" onClick={() => { setOpenEndless(false); onSelectMode('endless', { difficulty }); }}>Play Endless</button>
+                            <div className="secondary-actions" style={{ justifyContent: 'center' }}>
+                                <button className="control-btn" onClick={() => setOpenEndless(false)} style={{ marginTop: 12 }}>Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

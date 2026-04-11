@@ -147,6 +147,18 @@ export function setLevelCompleted(difficulty: string, level: number) {
   return p;
 }
 
+export function addEndlessCompleted(difficulty: string) {
+  const p = loadProgress();
+  p.difficulties = p.difficulties || {};
+  const cur = (p.difficulties[difficulty] as any) || { currentLevel: 1, maxReached: 1, completed: [] };
+  cur.completed = cur.completed || [];
+  // push a unique numeric entry (timestamp) so repeated endless completions are tracked
+  cur.completed.push(Date.now());
+  p.difficulties[difficulty] = cur;
+  saveProgress(p);
+  return p;
+}
+
 export function setDailyCompleted(dateString: string) {
   const p = loadProgress();
   p.daily = p.daily || { lastCompleted: null };

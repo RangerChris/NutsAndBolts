@@ -22,6 +22,7 @@ import {
     getSeedForDifficulty,
     setSeedForDifficulty,
     setLevelCompleted,
+    addEndlessCompleted,
 } from '../lib/persistence';
 import { emitEvent } from '../lib/events';
 import { getDailySeed } from '../lib/daily';
@@ -252,6 +253,9 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
 
     const handleContinue = () => {
         if (playMode === 'endless') {
+            try {
+                addEndlessCompleted(difficulty);
+            } catch { }
             const newSeed = `seed-${Date.now()}`;
             setSeed(newSeed);
             setShowComplete(false);

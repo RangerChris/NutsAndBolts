@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { PALETTES } from '../lib/palettes';
 import type { PaletteId, PlayMode } from '../lib/types';
+import { loadProgress } from '../lib/persistence';
 
 type Props = {
     level: number;
@@ -28,10 +29,22 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
     return (
         <div className="topbar topbar-root">
             <div className="topbar-left">
-                {playMode !== 'daily' && (
+                {playMode === 'endless' ? (
                     <div>
-                        <strong>Level</strong>: {level}
+                        <strong>Endless</strong>: {(() => {
+                            try {
+                                const p = loadProgress();
+                                const arr = p.difficulties?.[difficulty]?.completed || [];
+                                return `Completed ${arr.length}`;
+                            } catch { return '' }
+                        })()}
                     </div>
+                ) : (
+                    playMode !== 'daily' && (
+                        <div>
+                            <strong>Level</strong>: {level}
+                        </div>
+                    )
                 )}
             </div>
             <div className="topbar-controls">
