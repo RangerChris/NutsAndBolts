@@ -95,7 +95,7 @@ export function migrateProgress(obj: unknown): PersistedProgress {
     // ensure each difficulty entry has completed array
     if (p.difficulties) {
       for (const k of Object.keys(p.difficulties)) {
-        const d = p.difficulties[k] as any;
+        const d = p.difficulties[k] as PersistedProgress['difficulties'][string];
         if (!('completed' in d)) d.completed = [];
       }
     }
@@ -104,7 +104,7 @@ export function migrateProgress(obj: unknown): PersistedProgress {
 
   
   if (o.levels && typeof o.levels === 'object') {
-    const difficulties: Record<string, { currentLevel: number; maxReached: number }> = {};
+    const difficulties: Record<string, { currentLevel: number; maxReached: number; completed?: number[] }> = {};
     const levels = o.levels as Record<string, unknown>;
     for (const k of Object.keys(levels)) {
       const v = levels[k] as Record<string, unknown>;
@@ -116,7 +116,8 @@ export function migrateProgress(obj: unknown): PersistedProgress {
     if (settings.tutorialCompleted === undefined) settings.tutorialCompleted = false;
     // ensure completed arrays exist
     for (const k of Object.keys(difficulties)) {
-      (difficulties as any)[k].completed = (difficulties as any)[k].completed || [];
+      const dd = difficulties[k];
+      dd.completed = dd.completed || [];
     }
     return { version: 2, difficulties, settings, daily: DEFAULT_PROGRESS.daily };
   }
@@ -128,7 +129,7 @@ export function migrateProgress(obj: unknown): PersistedProgress {
   const daily = (o.daily as PersistedProgress['daily']) || DEFAULT_PROGRESS.daily;
   // ensure completed arrays on each difficulty entry
   for (const k of Object.keys(difficulties)) {
-    const d = difficulties[k] as any;
+    const d = difficulties[k] as PersistedProgress['difficulties'][string];
     if (!('completed' in d)) d.completed = [];
   }
   return { version: 2, difficulties, settings, daily };
@@ -137,7 +138,7 @@ export function migrateProgress(obj: unknown): PersistedProgress {
 export function setLevelCompleted(difficulty: string, level: number) {
   const p = loadProgress();
   p.difficulties = p.difficulties || {};
-  const cur = (p.difficulties[difficulty] as any) || { currentLevel: 1, maxReached: 1, completed: [] };
+  const cur = (p.difficulties[difficulty] as PersistedProgress['difficulties'][string]) || { currentLevel: 1, maxReached: 1, completed: [] };
   cur.completed = cur.completed || [];
   if (!cur.completed.includes(level)) cur.completed.push(level);
   // ensure maxReached covers this level
@@ -150,7 +151,7 @@ export function setLevelCompleted(difficulty: string, level: number) {
 export function addEndlessCompleted(difficulty: string) {
   const p = loadProgress();
   p.difficulties = p.difficulties || {};
-  const cur = (p.difficulties[difficulty] as any) || { currentLevel: 1, maxReached: 1, completed: [] };
+  const cur = (p.difficulties[difficulty] as PersistedProgress['difficulties'][string]) || { currentLevel: 1, maxReached: 1, completed: [] };
   cur.completed = cur.completed || [];
   // push a unique numeric entry (timestamp) so repeated endless completions are tracked
   cur.completed.push(Date.now());

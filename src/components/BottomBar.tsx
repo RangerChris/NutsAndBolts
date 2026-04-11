@@ -7,10 +7,9 @@ type Props = {
     onBack?: () => void;
     undoDisabled?: boolean;
     hintDisabled?: boolean;
-    version?: string;
 };
 
-export default function BottomBar({ onUndo, onHint, onRestart, onBack, undoDisabled, hintDisabled, version }: Props) {
+export default function BottomBar({ onUndo, onHint, onRestart, onBack, undoDisabled, hintDisabled }: Props) {
     return (
         <div className="bottom-bar bottom-bar-inner" style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', alignItems: 'center' }}>
             <div className="centered-controls">

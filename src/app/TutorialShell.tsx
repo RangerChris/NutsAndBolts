@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import GameShell from './GameShell';
 import { setTutorialCompleted } from '../lib/persistence';
-import { onEvent, offEvent } from '../lib/events';
+import { onEvent } from '../lib/events';
 
 type Props = { onExit?: () => void };
 
@@ -44,10 +44,7 @@ export default function TutorialShell({ onExit }: Props) {
         };
     }, [onExit, pendingExitOnWin]);
 
-    const handleSkip = () => {
-        setTutorialCompleted(true);
-        onExit?.();
-    };
+
 
     const handleNext = () => {
         if (step >= steps.length - 1) {

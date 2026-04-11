@@ -17,7 +17,7 @@ export default function JourneyScreen({ onPlayLevel, onBack }: Props) {
     const progress = loadProgress();
 
     const makeButton = (d: Difficulty, level: number) => {
-        const diffEntry = progress.difficulties?.[d] as any;
+        const diffEntry = progress.difficulties?.[d] as unknown;
         const completed = diffEntry && Array.isArray(diffEntry.completed) ? diffEntry.completed.includes(level) : false;
         const star = completed ? '★' : '☆';
         const label = `${level}`;
@@ -47,7 +47,7 @@ export default function JourneyScreen({ onPlayLevel, onBack }: Props) {
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
                 {DIFFICULTIES.map((d) => {
-                    const diffEntry = progress.difficulties?.[d] as any;
+                    const diffEntry = progress.difficulties?.[d] as unknown;
                     const completedArr: number[] = diffEntry && Array.isArray(diffEntry.completed) ? diffEntry.completed : [];
                     const completedCount = completedArr.length;
                     return (

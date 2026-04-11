@@ -1,4 +1,4 @@
-type Handler = (payload?: any) => void;
+type Handler = (payload?: unknown) => void;
 
 const listeners: Record<string, Handler[]> = {};
 
@@ -13,7 +13,7 @@ export function offEvent(event: string, cb: Handler) {
   listeners[event] = listeners[event].filter((h) => h !== cb);
 }
 
-export function emitEvent(event: string, payload?: any) {
+export function emitEvent(event: string, payload?: unknown) {
   const handlers = listeners[event] || [];
   for (const h of handlers.slice()) {
     try { h(payload); } catch { }

@@ -9,7 +9,6 @@ type Props = {
 
 export default function HomeScreen({ onSelectMode }: Props) {
     const [difficulty, setDifficulty] = useState<Difficulty>('easy');
-    const [seed, setSeed] = useState('');
     const [openEndless, setOpenEndless] = useState(false);
 
     return (

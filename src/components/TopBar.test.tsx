@@ -16,13 +16,13 @@ if (typeof document === 'undefined') {
         });
 
         it('shows Level for journey mode', () => {
-            render(<TopBar level={3} difficulty="easy" playMode={'journey'} paletteId={0} onPaletteChange={() => { }} showSeed={false} /> as any);
+            render(<TopBar level={3} difficulty="easy" playMode={'journey'} paletteId={0} onPaletteChange={() => { }} showSeed={false} />);
             expect(screen.getByText(/Level/)).toBeTruthy();
             expect(screen.getByText(/3/)).toBeTruthy();
         });
 
         it('does not show level or endless label for daily mode', () => {
-            render(<TopBar level={1} difficulty="easy" playMode={'daily'} paletteId={0} onPaletteChange={() => { }} showSeed={false} /> as any);
+            render(<TopBar level={1} difficulty="easy" playMode={'daily'} paletteId={0} onPaletteChange={() => { }} showSeed={false} />);
             expect(screen.queryByText(/Level/)).toBeNull();
             expect(screen.queryByText(/Endless/)).toBeNull();
         });
@@ -31,7 +31,7 @@ if (typeof document === 'undefined') {
             // record two completed entries for easy
             setLevelCompleted('easy', 1);
             setLevelCompleted('easy', 2);
-            render(<TopBar level={1} difficulty="easy" playMode={'endless'} paletteId={0} onPaletteChange={() => { }} showSeed={false} /> as any);
+            render(<TopBar level={1} difficulty="easy" playMode={'endless'} paletteId={0} onPaletteChange={() => { }} showSeed={false} />);
             expect(screen.getByText(/Endless/)).toBeTruthy();
             expect(screen.getByText(/Completed 2/)).toBeTruthy();
         });

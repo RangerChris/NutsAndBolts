@@ -15,12 +15,10 @@ type Props = {
     forceHidden?: boolean;
     onForceHiddenChange?: (v: boolean) => void;
     onPaletteChange: (id: PaletteId) => void;
-    onDifficultyChange?: (d: string) => void;
     onSeedChange?: (seed: string) => void;
-    onBack?: () => void;
 };
 
-export default function TopBar({ level, difficulty, seed, playMode = 'journey', showSeed = true, paletteId, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onPaletteChange, onDifficultyChange, onSeedChange, onBack }: Props) {
+export default function TopBar({ level, difficulty, seed, playMode = 'journey', showSeed = true, paletteId, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onPaletteChange, onSeedChange }: Props) {
     const [editingSeed, setEditingSeed] = useState(false);
     const [seedValue, setSeedValue] = useState(seed || '');
     const [open, setOpen] = useState(false);
