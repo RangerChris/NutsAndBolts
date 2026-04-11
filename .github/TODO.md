@@ -260,7 +260,7 @@ Full spec: `.github/references/menu-system.md` · Tasks checklist: `.github/refe
 
 - [x] On win in Endless: generate new random seed, reload board
 - [ ] Level Complete modal shows "Next Puzzle" instead of "Continue"
-- [ ] No level counter in TopBar for Endless mode
+- [x] Level counter in TopBar for Endless mode
 
 ### 21) Integration and Regression
 

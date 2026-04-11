@@ -30,13 +30,7 @@ export default function HomeScreen({ onSelectMode }: Props) {
                     </div>
                 </button>
 
-                <button onClick={() => onSelectMode('custom', { difficulty, seed })} className="mode-card" aria-label="Custom Seed">
-                    <div className="mode-icon-placeholder" aria-hidden="true"></div>
-                    <div className="mode-content">
-                        <div className="mode-title">Custom Seed</div>
-                        <div className="mode-desc">Play any seed string to reproduce or share puzzles.</div>
-                    </div>
-                </button>
+                {/* Custom Seed option removed per request */}
 
                 <button onClick={() => setOpenEndless(true)} className="mode-card" aria-label="Endless Mode">
                     <div className="mode-icon-placeholder" aria-hidden="true"></div>
@@ -48,20 +42,9 @@ export default function HomeScreen({ onSelectMode }: Props) {
             </div>
 
             <div className="home-controls">
-                <label>
-                    Difficulty:
-                    <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
-                        <option value="easy">easy</option>
-                        <option value="medium">medium</option>
-                        <option value="hard">hard</option>
-                        <option value="extreme">extreme</option>
-                    </select>
-                </label>
+                {/* difficulty selector removed from home screen; kept for modals */}
 
-                <label>
-                    Custom seed:
-                    <input value={seed} onChange={(e) => setSeed(e.target.value)} placeholder="seed string" />
-                </label>
+                {/* custom seed input removed */}
 
                 <button data-testid="help-tutorial" className="help-btn" onClick={() => onSelectMode('tutorial')}>Help / Tutorial</button>
             </div>
