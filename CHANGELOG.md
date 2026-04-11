@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.17](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.16...v0.1.17) (2026-04-11)
+
+
+### Features
+
+* update color palettes with new names and color schemes for better visual distinction ([aafac01](https://github.com/RangerChris/NutsAndBolts/commit/aafac018790f4e6e20fa672ee405fff696a9faa0))
+
 ### [0.1.16](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.15...v0.1.16) (2026-04-11)
 
 
