@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { PALETTES } from '../lib/palettes';
-import type { PaletteId } from '../lib/types';
+import type { PaletteId, PlayMode } from '../lib/types';
+import { loadProgress } from '../lib/persistence';
 
 type Props = {
     level: number;
     difficulty: string;
     seed?: string;
+    playMode?: PlayMode;
+    showSeed?: boolean;
     paletteId: PaletteId;
     showDebug?: boolean;
     onShowDebugChange?: (show: boolean) => void;
@@ -16,7 +19,7 @@ type Props = {
     onSeedChange?: (seed: string) => void;
 };
 
-export default function TopBar({ level, difficulty, seed, paletteId, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onPaletteChange, onDifficultyChange, onSeedChange }: Props) {
+export default function TopBar({ level, difficulty, seed, playMode = 'journey', showSeed = true, paletteId, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onPaletteChange, onDifficultyChange, onSeedChange }: Props) {
     const [editingSeed, setEditingSeed] = useState(false);
     const [seedValue, setSeedValue] = useState(seed || '');
     const [open, setOpen] = useState(false);
@@ -25,54 +28,70 @@ export default function TopBar({ level, difficulty, seed, paletteId, showDebug =
     return (
         <div className="topbar topbar-root">
             <div className="topbar-left">
-                <div>
-                    <strong>Level</strong>: {level}
-                </div>
-                <div>
-                    <label className="topbar-difficulty">
-                        <strong>Difficulty</strong>:
-                        <select value={difficulty} onChange={(e) => onDifficultyChange?.(e.target.value)}>
-                            <option value="easy">easy</option>
-                            <option value="medium">medium</option>
-                            <option value="hard">hard</option>
-                            <option value="extreme">extreme</option>
-                        </select>
-                    </label>
-                </div>
+                {playMode === 'endless' ? (
+                    <div>
+                        <strong>Endless</strong>: {(() => {
+                            try {
+                                const p = loadProgress();
+                                const arr = p.difficulties?.[difficulty]?.completed || [];
+                                return `Completed ${arr.length}`;
+                            } catch { return '' }
+                        })()}
+                    </div>
+                ) : (
+                    playMode !== 'daily' && (
+                        <div>
+                            <strong>Level</strong>: {level}
+                        </div>
+                    )
+                )}
             </div>
             <div className="topbar-controls">
-                <label className="topbar-debug">
-                    <input
-                        type="checkbox"
-                        checked={showDebug}
-                        onChange={(e) => onShowDebugChange?.(e.target.checked)}
-                    />
-                    <span>Show debug</span>
+                <label>
+                    Difficulty
+                    <select value={difficulty} onChange={(e) => onDifficultyChange?.(e.target.value)} style={{ marginLeft: 8 }}>
+                        <option value="easy">easy</option>
+                        <option value="medium">medium</option>
+                        <option value="hard">hard</option>
+                        <option value="extreme">extreme</option>
+                    </select>
                 </label>
-                {showDebug && (
-                    <label className="topbar-debug">
-                        <input
-                            type="checkbox"
-                            checked={Boolean(forceHidden)}
-                            onChange={(e) => onForceHiddenChange?.(e.target.checked)}
-                        />
-                        <span>Force Hidden Nuts</span>
-                    </label>
+                {showSeed && (
+                    <>
+                        <label className="topbar-debug">
+                            <input
+                                type="checkbox"
+                                checked={showDebug}
+                                onChange={(e) => onShowDebugChange?.(e.target.checked)}
+                            />
+                            <span>Show debug</span>
+                        </label>
+                        {showDebug && (
+                            <label className="topbar-debug">
+                                <input
+                                    type="checkbox"
+                                    checked={Boolean(forceHidden)}
+                                    onChange={(e) => onForceHiddenChange?.(e.target.checked)}
+                                />
+                                <span>Force Hidden Nuts</span>
+                            </label>
+                        )}
+                        <div className="topbar-seed">
+                            <strong>Seed</strong>:{' '}
+                            {!editingSeed ? (
+                                <span>
+                                    {seedValue || '—'}{' '}
+                                    <button onClick={() => setEditingSeed(true)} className="topbar-btn-edit">Edit</button>
+                                </span>
+                            ) : (
+                                <span>
+                                    <input aria-label="Seed" value={seedValue} onChange={(e) => setSeedValue(e.target.value)} className="topbar-input-seed" />
+                                    <button onClick={() => { setEditingSeed(false); onSeedChange?.(seedValue); }}>Save</button>
+                                </span>
+                            )}
+                        </div>
+                    </>
                 )}
-                <div className="topbar-seed">
-                    <strong>Seed</strong>:{' '}
-                    {!editingSeed ? (
-                        <span>
-                            {seedValue || '—'}{' '}
-                            <button onClick={() => setEditingSeed(true)} className="topbar-btn-edit">Edit</button>
-                        </span>
-                    ) : (
-                        <span>
-                            <input aria-label="Seed" value={seedValue} onChange={(e) => setSeedValue(e.target.value)} className="topbar-input-seed" />
-                            <button onClick={() => { setEditingSeed(false); onSeedChange?.(seedValue); }}>Save</button>
-                        </span>
-                    )}
-                </div>
                 <div className="palette-root">
                     <button
                         aria-haspopup="true"

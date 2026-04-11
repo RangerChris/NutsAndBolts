@@ -12,6 +12,7 @@ Files:
 - `persistence.md` — localStorage schema and save/load behavior
 - `testing.md` — unit/integration/playtest guidance
 - `tasks.md` — actionable checklist for agent implementers
+- `menu-system.md` — **improved-game feature**: home screen hub, play modes (Journey/Daily/Custom/Endless/Tutorial), in-game UI changes (TopBar seed visibility, BottomBar centering)
 
 Read the relevant file before starting work; these documents are living and should be updated as design decisions change.
 

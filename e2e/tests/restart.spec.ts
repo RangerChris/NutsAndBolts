@@ -2,6 +2,9 @@ import { test, expect } from '@playwright/test';
 
 test('Restart button recreates the initial board state', async ({ page }) => {
   await page.goto('/');
+  await page.locator('button:has-text("Journey")').click();
+  // start first level
+  await page.locator('.journey-screen button.control-btn:has-text("1")').first().click();
 
   // wait for board to render
   await page.waitForSelector('[data-bolt]');

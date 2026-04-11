@@ -115,7 +115,10 @@ test.describe('playthroughs by seed', () => {
         try { localStorage.setItem('nuts-and-bolts:progress', JSON.stringify(p)); } catch {};
       }, progress);
 
-      await page.goto('/');
+      // Open app directly in Custom Seed mode so TopBar seed edit is available
+      await page.goto(`/?mode=custom&difficulty=${encodeURIComponent(c.difficulty)}&seed=${encodeURIComponent(chosenSeed)}`);
+      // wait for TopBar seed edit UI or board to render
+      await page.waitForSelector('button.topbar-btn-edit');
 
       // set seed via TopBar: open edit mode if needed, fill input, Save
       // Use DOM-triggered clicks so overlays cannot intercept pointer events.

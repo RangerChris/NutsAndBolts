@@ -19,13 +19,13 @@ npm run test
 
 ## Project overview
 
-Nuts and Bolts is a single-screen puzzle: move contiguous top groups of same-colored nuts between bolts to produce bolts containing only a single color. The app includes a seeded level generator (reproducible by seed), an undo history, and a single-use Extra Bolt action per level.
+Nuts and Bolts is a single-screen puzzle: move contiguous top groups of same-colored nuts between bolts to produce bolts containing only a single color. The app includes a seeded level generator (reproducible by seed) and an undo history.
 
 Controls
 
 - Click / tap a bolt to pick its top contiguous group.
 - Click / tap a target bolt to attempt the move (legal if empty or matching top color and target capacity allows).
-- Use the bottom action bar for `Undo` and `Extra Bolt` actions.
+- Use the bottom action bar for `Undo` actions.
 
 Quick commands
 

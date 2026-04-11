@@ -20,3 +20,8 @@ export const DIFFICULTY_CONFIG: Record<
   hard: { minBolts: 6, maxBolts: 8, stackHeightRange: [4, 6], shuffleRange: [50, 80] },
   extreme: { minBolts: 8, maxBolts: 9, stackHeightRange: [6, 10], shuffleRange: [120, 200] },
 };
+
+// improved-game feature constants
+export const DAILY_DIFFICULTY: Difficulty = 'medium';
+export const DAILY_SEED_VERSION = 'daily-v1';
+export const TUTORIAL_SEED = 'tutorial-v1';

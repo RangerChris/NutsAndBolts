@@ -49,14 +49,16 @@ export function _clearStorage() {
 
 export type PersistedProgress = {
   version: number;
-  difficulties: Record<string, { currentLevel: number; maxReached: number }>;
-  settings: { paletteId: number; difficulty?: string; seeds?: Record<string, string> };
+  difficulties: Record<string, { currentLevel: number; maxReached: number; completed?: number[] }>;
+  settings: { paletteId: number; difficulty?: string; seeds?: Record<string, string>; tutorialCompleted?: boolean };
+  daily?: { lastCompleted?: string | null };
 };
 
 export const DEFAULT_PROGRESS: PersistedProgress = {
-  version: 1,
-  difficulties: { easy: { currentLevel: 1, maxReached: 1 } },
-  settings: { paletteId: 0, difficulty: 'easy', seeds: {} },
+  version: 2,
+  difficulties: { easy: { currentLevel: 1, maxReached: 1, completed: [] } },
+  settings: { paletteId: 0, difficulty: 'easy', seeds: {}, tutorialCompleted: false },
+  daily: { lastCompleted: null },
 };
 
 export function saveProgress(payload: PersistedProgress) {
@@ -85,12 +87,24 @@ export function migrateProgress(obj: unknown): PersistedProgress {
   const o = obj as Record<string, unknown>;
   
   if (typeof o.version === 'number' && o.difficulties && o.settings) {
-    return o as PersistedProgress;
+    const p = o as PersistedProgress;
+    // ensure new fields
+    p.settings = p.settings || DEFAULT_PROGRESS.settings;
+    if (p.settings.tutorialCompleted === undefined) p.settings.tutorialCompleted = false;
+    if (!('daily' in p)) p.daily = DEFAULT_PROGRESS.daily;
+    // ensure each difficulty entry has completed array
+    if (p.difficulties) {
+      for (const k of Object.keys(p.difficulties)) {
+        const d = p.difficulties[k] as PersistedProgress['difficulties'][string];
+        if (!('completed' in d)) d.completed = [];
+      }
+    }
+    return p as PersistedProgress;
   }
 
   
   if (o.levels && typeof o.levels === 'object') {
-    const difficulties: Record<string, { currentLevel: number; maxReached: number }> = {};
+    const difficulties: Record<string, { currentLevel: number; maxReached: number; completed?: number[] }> = {};
     const levels = o.levels as Record<string, unknown>;
     for (const k of Object.keys(levels)) {
       const v = levels[k] as Record<string, unknown>;
@@ -98,13 +112,71 @@ export function migrateProgress(obj: unknown): PersistedProgress {
       const max = typeof v?.max === 'number' ? (v.max as number) : current;
       difficulties[k] = { currentLevel: current, maxReached: max };
     }
-    return { version: 1, difficulties, settings: (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings };
+    const settings = (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings;
+    if (settings.tutorialCompleted === undefined) settings.tutorialCompleted = false;
+    // ensure completed arrays exist
+    for (const k of Object.keys(difficulties)) {
+      const dd = difficulties[k];
+      dd.completed = dd.completed || [];
+    }
+    return { version: 2, difficulties, settings, daily: DEFAULT_PROGRESS.daily };
   }
 
   
   const difficulties = (o.difficulties as PersistedProgress['difficulties']) || DEFAULT_PROGRESS.difficulties;
   const settings = (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings;
-  return { version: 1, difficulties, settings };
+  if (settings.tutorialCompleted === undefined) settings.tutorialCompleted = false;
+  const daily = (o.daily as PersistedProgress['daily']) || DEFAULT_PROGRESS.daily;
+  // ensure completed arrays on each difficulty entry
+  for (const k of Object.keys(difficulties)) {
+    const d = difficulties[k] as PersistedProgress['difficulties'][string];
+    if (!('completed' in d)) d.completed = [];
+  }
+  return { version: 2, difficulties, settings, daily };
+}
+
+export function setLevelCompleted(difficulty: string, level: number) {
+  const p = loadProgress();
+  p.difficulties = p.difficulties || {};
+  const cur = (p.difficulties[difficulty] as PersistedProgress['difficulties'][string]) || { currentLevel: 1, maxReached: 1, completed: [] };
+  cur.completed = cur.completed || [];
+  if (!cur.completed.includes(level)) cur.completed.push(level);
+  // ensure maxReached covers this level
+  cur.maxReached = Math.max(cur.maxReached || 1, level);
+  p.difficulties[difficulty] = cur;
+  saveProgress(p);
+  return p;
+}
+
+export function addEndlessCompleted(difficulty: string) {
+  const p = loadProgress();
+  p.difficulties = p.difficulties || {};
+  const cur = (p.difficulties[difficulty] as PersistedProgress['difficulties'][string]) || { currentLevel: 1, maxReached: 1, completed: [] };
+  cur.completed = cur.completed || [];
+  // push a unique numeric entry (timestamp) so repeated endless completions are tracked
+  cur.completed.push(Date.now());
+  p.difficulties[difficulty] = cur;
+  saveProgress(p);
+  return p;
+}
+
+export function setDailyCompleted(dateString: string) {
+  const p = loadProgress();
+  p.daily = p.daily || { lastCompleted: null };
+  p.daily.lastCompleted = dateString;
+  saveProgress(p);
+}
+
+export function getDailyLastCompleted(): string | null {
+  const p = loadProgress();
+  return p.daily?.lastCompleted || null;
+}
+
+export function setTutorialCompleted(val: boolean) {
+  const p = loadProgress();
+  p.settings = p.settings || DEFAULT_PROGRESS.settings;
+  p.settings.tutorialCompleted = val;
+  saveProgress(p);
 }
 
 export function initPersistence() {

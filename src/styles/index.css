@@ -25,6 +25,7 @@
 
     /* Shadows & surfaces */
     --ambient-shadow-color: rgba(0, 0, 0, 0.28);
+
     --ambient-shadow-strong: rgba(0, 0, 0, 0.45);
     --ghost-stroke: rgba(228, 226, 229, 0.12);
     /* 12% ghost outline */
@@ -893,5 +894,124 @@ body {
     .board-row {
         gap: 4px;
         padding: 2px;
+    }
+}
+
+/* HomeScreen intro menu styles */
+.home-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 20px;
+    gap: 20px;
+    color: var(--text);
+}
+
+.home-screen h1 {
+    font-size: 44px;
+    margin: 0;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+}
+
+.mode-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(220px, 320px));
+    gap: 18px;
+    margin-top: 8px;
+}
+
+.mode-card {
+    background: linear-gradient(180deg, var(--surface-container-high), rgba(255, 255, 255, 0.02));
+    border-radius: 14px;
+    padding: 16px 18px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.mode-card:focus,
+.mode-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 42px rgba(0, 0, 0, 0.18);
+}
+
+.mode-icon-placeholder {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-container));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: 22px;
+}
+
+.mode-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.mode-title {
+    font-weight: 900;
+    font-size: 18px;
+    color: #ffffff;
+}
+
+.mode-desc {
+    font-size: 13px;
+    color: rgba(228, 226, 229, 0.74);
+    margin-top: 6px;
+    max-width: 360px;
+}
+
+.home-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 16px;
+}
+
+.help-btn {
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--primary-container);
+    color: var(--on-primary-container);
+    border: none;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 720px) {
+    .mode-grid {
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+}
+
+.centered-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+@media (max-width: 420px) {
+    .centered-controls {
+        gap: 8px;
+    }
+
+    .bottom-bar .control-btn {
+        padding: 8px 10px;
+        min-width: 64px;
+        font-size: 14px;
     }
 }
