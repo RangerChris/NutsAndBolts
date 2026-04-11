@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.18](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.17...v0.1.18) (2026-04-11)
+
+
+### Features
+
+* enhance gameplay features and UI updates for Daily and Endless modes ([8ecce79](https://github.com/RangerChris/NutsAndBolts/commit/8ecce79707f74087c195b29a211a650c94453c68))
+* enhance HomeScreen with improved accessibility and visual design for game modes ([a4637bf](https://github.com/RangerChris/NutsAndBolts/commit/a4637bf13defb2443fa6fddc44a1529a046c9af2))
+* implement Custom Seed mode and update TopBar for difficulty selection ([c54f2cd](https://github.com/RangerChris/NutsAndBolts/commit/c54f2cd7027c579b25720dce741b2521dd1e7d66))
+* implement improved game feature with new home screen menu and play modes ([b4bc545](https://github.com/RangerChris/NutsAndBolts/commit/b4bc54536c3ab6748540048afb26d836aa083f63))
+
 ### [0.1.17](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.16...v0.1.17) (2026-04-11)
 
 
