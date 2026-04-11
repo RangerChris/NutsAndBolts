@@ -25,7 +25,7 @@ export default function HomeScreen({ onSelectMode }: Props) {
                     <div className="mode-icon-placeholder" aria-hidden="true"></div>
                     <div className="mode-content">
                         <div className="mode-title">Daily</div>
-                        <div className="mode-desc">One shared seeded puzzle per UTC day — compete for best solutions.</div>
+                        <div className="mode-desc">One shared seeded puzzle per day — compete for best solutions.</div>
                     </div>
                 </button>
 

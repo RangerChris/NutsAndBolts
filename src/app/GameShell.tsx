@@ -42,6 +42,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     const persistedDifficulty = getSelectedDifficulty();
     const [paletteId, setPalette] = useState<number>(progress.settings?.paletteId ?? 0);
     const [seed, setSeed] = useState<string>(() => {
+        if (playMode === 'daily') return getDailySeed();
         try {
             if (initialSeed) return initialSeed;
             const s = getSeedForDifficulty(persistedDifficulty as string);
@@ -50,7 +51,9 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         return `seed-${Date.now()}`;
     });
     const [difficulty, setDifficulty] = useState<GameState['difficulty']>(
-        (initialDifficulty as GameState['difficulty']) || (persistedDifficulty as GameState['difficulty'])
+        playMode === 'daily'
+            ? 'hard'
+            : ((initialDifficulty as GameState['difficulty']) || (persistedDifficulty as GameState['difficulty']))
     );
     const initialLevel = progress.difficulties?.[difficulty]?.currentLevel ?? 1;
     const [currentLevel, setCurrentLevelState] = useState<number>(initialLevel);

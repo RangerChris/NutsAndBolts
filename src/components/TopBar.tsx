@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { PALETTES } from '../lib/palettes';
 import type { PaletteId, PlayMode } from '../lib/types';
-import { getDailySeed } from '../lib/daily';
 
 type Props = {
     level: number;
@@ -29,26 +28,11 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
     return (
         <div className="topbar topbar-root">
             <div className="topbar-left">
-                {playMode === 'daily' ? (
-                    <div>
-                        <strong>Daily</strong>: {getDailySeed().slice('daily-v1-'.length)}
-                    </div>
-                ) : (
+                {playMode !== 'daily' && (
                     <div>
                         <strong>Level</strong>: {level}
                     </div>
                 )}
-                <div>
-                    <label className="topbar-difficulty">
-                        <strong>Difficulty</strong>:
-                        <select value={difficulty} onChange={(e) => onDifficultyChange?.(e.target.value)}>
-                            <option value="easy">easy</option>
-                            <option value="medium">medium</option>
-                            <option value="hard">hard</option>
-                            <option value="extreme">extreme</option>
-                        </select>
-                    </label>
-                </div>
             </div>
             <div className="topbar-controls">
                 {showSeed && (
