@@ -62,7 +62,7 @@ export default function HomeScreen({ onSelectMode }: Props) {
                     <input value={seed} onChange={(e) => setSeed(e.target.value)} placeholder="seed string" />
                 </label>
 
-                <button className="help-btn" onClick={() => onSelectMode('tutorial')}>Help / Tutorial</button>
+                <button data-testid="help-tutorial" className="help-btn" onClick={() => onSelectMode('tutorial')}>Help / Tutorial</button>
             </div>
         </div>
     );

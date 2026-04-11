@@ -226,7 +226,7 @@ Full spec: `.github/references/menu-system.md` · Tasks checklist: `.github/refe
 - [x] Create `src/app/AppShell.tsx` owning `Screen` state
 - [x] Replace `GameShell` in `src/App.tsx` with `AppShell`
 - [x] Pass `playMode`, `difficulty`, `seed` props to `GameShell`
-  - [x] Add Back button for all non-tutorial game screens (rendered in BottomBar)
+- [x] Add Back button for all non-tutorial game screens (rendered in BottomBar)
 
 ### 16) TopBar Changes
 

@@ -7,6 +7,8 @@ type Props = { onExit?: () => void };
 
 export default function TutorialShell({ onExit }: Props) {
     const [step, setStep] = useState(0);
+    const [overlayVisible, setOverlayVisible] = useState(true);
+    const [pendingExitOnWin, setPendingExitOnWin] = useState(false);
     const steps = [
         'Welcome — Tap a bolt to pick up matching colored nuts.',
         'Pick — Tap the highlighted bolt to lift the group.',
@@ -17,16 +19,22 @@ export default function TutorialShell({ onExit }: Props) {
 
     useEffect(() => {
         // subscribe to engine events to auto-advance tutorial
-        const unsubPick = onEvent('pick', (p) => {
-            if (step === 0) setStep(1);
-            else if (step === 1) setStep(2);
+        const unsubPick = onEvent('pick', () => {
+            setStep((s) => Math.min(s + 1, steps.length - 1));
         });
-        const unsubMove = onEvent('move', (m) => {
-            if (step <= 2) setStep(3);
+        const unsubMove = onEvent('move', () => {
+            setStep((s) => Math.max(s, 3));
         });
         const unsubWin = onEvent('win', () => {
-            setTutorialCompleted(true);
-            onExit?.();
+            // if player finished the tutorial and is now winning the level, exit to home
+            if (pendingExitOnWin) {
+                setTutorialCompleted(true);
+                onExit?.();
+            } else {
+                // if win occurs unexpectedly, mark tutorial completed and exit immediately
+                setTutorialCompleted(true);
+                onExit?.();
+            }
         });
 
         return () => {
@@ -34,26 +42,42 @@ export default function TutorialShell({ onExit }: Props) {
             try { unsubMove(); } catch { }
             try { unsubWin(); } catch { }
         };
-    }, [step, onExit]);
+    }, [onExit, pendingExitOnWin]);
 
     const handleSkip = () => {
         setTutorialCompleted(true);
         onExit?.();
     };
 
+    const handleNext = () => {
+        if (step >= steps.length - 1) {
+            // finish tutorial: mark completed, close overlay, but allow player to play the level
+            setTutorialCompleted(true);
+            setPendingExitOnWin(true);
+            setOverlayVisible(false);
+            return;
+        }
+        setStep((s) => Math.min(s + 1, steps.length - 1));
+    };
+
+    const handleBack = () => setStep((s) => Math.max(0, s - 1));
+
     return (
-        <div className="tutorial-shell">
-            <GameShell playMode={'tutorial'} initialSeed={undefined} initialDifficulty={'easy'} onExit={onExit} />
-            <div className="tutorial-overlay" role="region" aria-live="polite">
-                <div className="tutorial-banner">
-                    <p>{steps[step]}</p>
-                    <div className="tutorial-actions">
-                        <button onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>Back</button>
-                        <button onClick={() => setStep(Math.min(steps.length - 1, step + 1))} disabled={step === steps.length - 1}>Next</button>
-                        <button onClick={handleSkip}>Skip tutorial</button>
+        <>
+            <GameShell playMode={'tutorial'} initialSeed={undefined} initialDifficulty={'medium'} onExit={onExit} />
+
+            {overlayVisible && (
+                <div className="complete-overlay tutorial-overlay" role="dialog" aria-modal="true" aria-label="Tutorial">
+                    <div className="complete-modal tutorial-modal">
+                        <p style={{ marginBottom: 12 }}>{steps[step]}</p>
+                        <div style={{ display: 'flex', gap: 12, width: '100%', justifyContent: 'center' }}>
+                            <button className="control-btn" onClick={handleBack} disabled={step === 0}>Back</button>
+                            <button className="control-btn" onClick={handleNext}>{step === steps.length - 1 ? 'Finish' : 'Next'}</button>
+                            <button className="control-btn" onClick={() => { setTutorialCompleted(true); setPendingExitOnWin(false); setOverlayVisible(false); onExit?.(); }}>Skip tutorial</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            )}
+        </>
     );
 }
