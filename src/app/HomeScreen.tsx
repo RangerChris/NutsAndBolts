@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import type { PlayMode, Difficulty } from '../lib/types';
+import { getDailySeed } from '../lib/daily';
+import { getDailyLastCompleted } from '../lib/persistence';
 
 type Props = {
     onSelectMode: (mode: PlayMode, opts?: { difficulty?: Difficulty; seed?: string }) => void;
@@ -27,6 +29,15 @@ export default function HomeScreen({ onSelectMode }: Props) {
                     <div className="mode-content">
                         <div className="mode-title">Daily</div>
                         <div className="mode-desc">One shared seeded puzzle per day — compete for best solutions.</div>
+                        {(() => {
+                            try {
+                                const today = getDailySeed().slice('daily-v1-'.length);
+                                if (getDailyLastCompleted() === today) {
+                                    return <div style={{ marginTop: 8 }}><span style={{ background: 'var(--primary)', color: '#3a1200', padding: '4px 8px', borderRadius: 12, fontWeight: 800 }}>Completed today</span></div>;
+                                }
+                            } catch { }
+                            return null;
+                        })()}
                     </div>
                 </button>
 

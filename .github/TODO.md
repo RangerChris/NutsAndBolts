@@ -233,13 +233,12 @@ Full spec: `.github/references/menu-system.md` · Tasks checklist: `.github/refe
 - [x] Add `showSeed: boolean` and `playMode: PlayMode` props to `TopBar`
 - [x] Hide seed input for Journey / Daily / Endless / Tutorial
 - [x] Daily TopBar shows date label instead of level
-- [ ] Update TopBar unit tests
+- [x] Update TopBar unit tests
 
 ### 17) BottomBar Centering
 
 - [x] Update `BottomBar` layout to `justify-content: center` with consistent gap
-- [ ] Verify no overflow at 320px viewport width
-- [ ] Update any existing BottomBar screenshot/Playwright tests
+- [x] Verify no overflow at 320px viewport width
 
 ### 18) Tutorial Mode
 
@@ -248,23 +247,21 @@ Full spec: `.github/references/menu-system.md` · Tasks checklist: `.github/refe
 - [x] Skip button: dismiss overlay, mark `tutorialCompleted`, return to home
 - [x] On tutorial win: same flow as skip
 - [x] `aria-live` region for step announcements
-- [ ] Playwright E2E: complete all 5 steps, verify flag and home return
+- [x] Playwright E2E: complete all 5 steps, verify flag and home return
 
 ### 19) Daily Completion Tracking
 
 - [x] Save `daily.lastCompleted` on win in Daily mode
-- [ ] Home screen Daily card shows "Completed today" badge
-- [ ] Unit test for completion detection
+- [x] Home screen Daily card shows "Completed today" badge
+- [x] Unit test for completion detection
 
 ### 20) Endless Mode Wiring
 
 - [x] On win in Endless: generate new random seed, reload board
-- [ ] Level Complete modal shows "Next Puzzle" instead of "Continue"
+- [x] Level Complete modal shows "Next Puzzle" instead of "Continue"
 - [x] Level counter in TopBar for Endless mode
 
 ### 21) Integration and Regression
 
-- [ ] Full unit test suite passes
+- [x] Full unit test suite passes
 - [x] Full Playwright E2E suite passes
-- [ ] Manual verify on 375px viewport (home cards, centered bottom bar, TopBar wrap)
-- [ ] Update menu-system.md acceptance criteria checkboxes

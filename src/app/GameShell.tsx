@@ -425,7 +425,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
 
                                     <div className="centered-row">
                                         <button className="control-btn" onClick={handleContinue}>
-                                            Next Level
+                                            {playMode === 'endless' ? 'Next Puzzle' : 'Next Level'}
                                         </button>
                                     </div>
                                 </>
