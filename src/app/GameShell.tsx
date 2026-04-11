@@ -21,6 +21,7 @@ import {
     setCurrentLevel,
     getSeedForDifficulty,
     setSeedForDifficulty,
+    setLevelCompleted,
 } from '../lib/persistence';
 import { emitEvent } from '../lib/events';
 import { getDailySeed } from '../lib/daily';
@@ -261,6 +262,15 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
                 const dateStr = ds.slice('daily-v1-'.length);
                 setDailyCompleted(dateStr);
             } catch { }
+            onExit?.();
+            return;
+        }
+
+        if (playMode === 'journey') {
+            try {
+                setLevelCompleted(difficulty, state.level);
+            } catch { }
+            // return to Journey selector
             onExit?.();
             return;
         }

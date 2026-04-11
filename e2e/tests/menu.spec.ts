@@ -6,8 +6,10 @@ test('home menu shows on load and selecting modes starts game', async ({ page })
   // Home screen should render
   await expect(page.locator('.home-screen h1')).toHaveText('Nuts & Bolts');
 
-  // Start Journey mode
+  // Start Journey mode and pick first level
   await page.locator('button:has-text("Journey")').click();
+  // click first level star in Journey screen
+  await page.locator('.journey-screen button.control-btn:has-text("1")').first().click();
   // Board should appear
   await page.waitForSelector('[data-bolt]');
   const count = await page.locator('[data-bolt]').count();
