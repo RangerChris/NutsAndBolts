@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.16](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.15...v0.1.16) (2026-04-11)
+
+
+### Features
+
+* implement singleton color check for hard and extreme levels; enhance createLevel logic to retry seed generation ([9a62f08](https://github.com/RangerChris/NutsAndBolts/commit/9a62f08e5a74f2a9f22283317a6a0c06a5e1bee6))
+
 ### [0.1.15](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.14...v0.1.15) (2026-04-11)
 
 ### [0.1.14](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.13...v0.1.14) (2026-04-10)
