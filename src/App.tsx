@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import GameShell from './app/GameShell';
+import AppShell from './app/AppShell';
 import { initPersistence, setCurrentLevel } from './lib/persistence';
 import { onBalancerEvent } from './lib/balancer';
 
@@ -37,7 +37,7 @@ export default function App(): ReactElement {
     return (
         <div className="app-root hardware-texture">
             <main className="app-main glass-effect metallic-brushed">
-                <GameShell />
+                <AppShell />
                 {!progressLoaded && <div>Loading progress...</div>}
             </main>
         </div>

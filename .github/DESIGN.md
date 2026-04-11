@@ -8,7 +8,7 @@ Core concepts
 
 - Bolts: stacks with fixed `capacity` containing ordered `nuts` (colors).
 - Move: transfers the contiguous top group of same-colored nuts from a source bolt to a target bolt when legal.
-- Extra Bolt: single-use per level adds a temporary bolt with configured capacity.
+-- Extra Bolt: (removed) The extra bolt mechanic was removed from the game design.
 - Seeded generator: constructs a solved state then performs deterministic reverse legal moves to produce solvable, non-trivial levels.
 
 Engine invariants
@@ -38,6 +38,22 @@ Palettes & Accessibility
 Debugging seeds
 
 - To reproduce a board, pass the `seed` to `createLevel` or use the seed displayed in the top bar of the running app.
+- In production play modes (all modes except Custom Seed) the seed and debug info are hidden from the in-game TopBar to reduce clutter.
+
+Menu system & Play modes (feature: improved-game)
+
+- A home screen hub replaces the in-game difficulty dropdown as the primary navigation entry point.
+- Four play modes are supported: Journey, Daily, Custom Seed, Endless.
+- Journey: existing progression per difficulty (Easy/Medium/Hard/Extreme), level counter per difficulty, full TopBar minus seed/debug.
+- Daily: one seeded board per UTC calendar day. Seed is deterministic: `"daily-" + UTC date string (YYYY-MM-DD)`. Same board for all players on the same calendar day. No undo/extra bolt display of seed — board is fixed and shared.
+- Custom Seed: player enters any seed string. Board reproduces exactly. Seed is shown in TopBar.
+- Endless: random boards at chosen difficulty, no persistent level counter, no seed shown.
+- Tutorial / Help mode: a guided walkthrough on a hand-authored fixed-seed easy level. Step-by-step overlay explains the purpose of the game, how to pick a group of nuts, how to place them, how to use the Extra Bolt, and what the win condition is. Accessible from the home menu and from an in-game help button.
+
+In-game UI changes (feature: improved-game)
+
+- TopBar: seed display and debug info are hidden for Journey, Daily, and Endless modes. Only Custom Seed mode shows the seed input.
+- BottomBar: Extra Bolt, Undo, and Hint buttons are horizontally centered (currently left-aligned). Layout uses flexbox justify-content: center with equal spacing.
 
 Where to find tests
 

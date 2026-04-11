@@ -4,6 +4,8 @@ import path from 'path';
 
 test('difficulty control changes value and screenshot saved', async ({ page }) => {
   await page.goto('/');
+  // enter the game from the Home menu
+  await page.locator('button:has-text("Journey")').click();
 
   const select = page.locator('label:has-text("Difficulty") select');
   await expect(select).toHaveValue(/easy|medium|hard|extreme/);
@@ -28,6 +30,8 @@ test('difficulty control changes value and screenshot saved', async ({ page }) =
 
 test('palette picker opens and changes palette, with no extra bolt button', async ({ page }) => {
   await page.goto('/');
+  // enter the game from the Home menu
+  await page.locator('button:has-text("Journey")').click();
 
   // Palette picker: open the palette dropdown
   const paletteToggle = page.locator('button[aria-haspopup="true"]');

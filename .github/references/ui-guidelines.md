@@ -7,7 +7,7 @@ Summary of current UI features
 - Top bar (`TopBar`): shows Level, Difficulty, Seed, and Palette controls. The top bar is responsive and uses wrapping (`flex-wrap`) so items move to the next row when width is constrained. Seed editing and palette selection are inline and will wrap below the level/difficulty when needed.
 - Main board (`Board`): bolts are laid out inline and wrap naturally to the next row using a wrapping flex container. FLIP-style animations are used when moving nuts (cloned nut elements animate from source to target).
 - Bolt rendering (`BoltView`): side-view bolt with nuts — SVG scaled down when bolt height would exceed a maximum display height. An 8px top padding ensures the top nut isn't clipped.
-- Bottom controls (`BottomBar`): `Extra Bolt`, `Undo`, `Hint` and status indicators; Extra Bolt is single-use per level and disabled appropriately.
+-- Bottom controls (`BottomBar`): `Undo`, `Hint` and status indicators.
 - Level Complete modal: shown when `isWin(state)` is true; Continue advances `currentLevel`, persists it, and generates a new seed.
 - The UI uses a FLIP-style clone animation for moving nuts (cloned nut elements animate from source to target). The clone animation implementation lives in `src/components/Board.tsx` and uses short fixed-position SVG clones to animate transforms; animations are cleaned up after `transitionend` or a safety timeout.
 

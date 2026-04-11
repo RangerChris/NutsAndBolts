@@ -116,6 +116,11 @@ test.describe('playthroughs by seed', () => {
       }, progress);
 
       await page.goto('/');
+      // ensure Home difficulty matches desired test difficulty then enter Custom Seed mode
+      await page.selectOption('label:has-text("Difficulty") select', c.difficulty);
+      await page.locator('button:has-text("Custom Seed")').click();
+      // wait for TopBar seed edit UI or board to render
+      await page.waitForSelector('button.topbar-btn-edit');
 
       // set seed via TopBar: open edit mode if needed, fill input, Save
       // Use DOM-triggered clicks so overlays cannot intercept pointer events.

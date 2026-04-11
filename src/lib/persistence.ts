@@ -50,13 +50,15 @@ export function _clearStorage() {
 export type PersistedProgress = {
   version: number;
   difficulties: Record<string, { currentLevel: number; maxReached: number }>;
-  settings: { paletteId: number; difficulty?: string; seeds?: Record<string, string> };
+  settings: { paletteId: number; difficulty?: string; seeds?: Record<string, string>; tutorialCompleted?: boolean };
+  daily?: { lastCompleted?: string | null };
 };
 
 export const DEFAULT_PROGRESS: PersistedProgress = {
-  version: 1,
+  version: 2,
   difficulties: { easy: { currentLevel: 1, maxReached: 1 } },
-  settings: { paletteId: 0, difficulty: 'easy', seeds: {} },
+  settings: { paletteId: 0, difficulty: 'easy', seeds: {}, tutorialCompleted: false },
+  daily: { lastCompleted: null },
 };
 
 export function saveProgress(payload: PersistedProgress) {
@@ -85,7 +87,12 @@ export function migrateProgress(obj: unknown): PersistedProgress {
   const o = obj as Record<string, unknown>;
   
   if (typeof o.version === 'number' && o.difficulties && o.settings) {
-    return o as PersistedProgress;
+    const p = o as PersistedProgress;
+    // ensure new fields
+    p.settings = p.settings || DEFAULT_PROGRESS.settings;
+    if (p.settings.tutorialCompleted === undefined) p.settings.tutorialCompleted = false;
+    if (!('daily' in p)) p.daily = DEFAULT_PROGRESS.daily;
+    return p as PersistedProgress;
   }
 
   
@@ -98,13 +105,36 @@ export function migrateProgress(obj: unknown): PersistedProgress {
       const max = typeof v?.max === 'number' ? (v.max as number) : current;
       difficulties[k] = { currentLevel: current, maxReached: max };
     }
-    return { version: 1, difficulties, settings: (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings };
+    const settings = (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings;
+    if (settings.tutorialCompleted === undefined) settings.tutorialCompleted = false;
+    return { version: 2, difficulties, settings, daily: DEFAULT_PROGRESS.daily };
   }
 
   
   const difficulties = (o.difficulties as PersistedProgress['difficulties']) || DEFAULT_PROGRESS.difficulties;
   const settings = (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings;
-  return { version: 1, difficulties, settings };
+  if (settings.tutorialCompleted === undefined) settings.tutorialCompleted = false;
+  const daily = (o.daily as PersistedProgress['daily']) || DEFAULT_PROGRESS.daily;
+  return { version: 2, difficulties, settings, daily };
+}
+
+export function setDailyCompleted(dateString: string) {
+  const p = loadProgress();
+  p.daily = p.daily || { lastCompleted: null };
+  p.daily.lastCompleted = dateString;
+  saveProgress(p);
+}
+
+export function getDailyLastCompleted(): string | null {
+  const p = loadProgress();
+  return p.daily?.lastCompleted || null;
+}
+
+export function setTutorialCompleted(val: boolean) {
+  const p = loadProgress();
+  p.settings = p.settings || DEFAULT_PROGRESS.settings;
+  p.settings.tutorialCompleted = val;
+  saveProgress(p);
 }
 
 export function initPersistence() {

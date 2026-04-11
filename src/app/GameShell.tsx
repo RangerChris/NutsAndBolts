@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import type { GameState } from '../lib/types';
+import type { GameState, PlayMode } from '../lib/types';
 import { createLevel } from '../lib/generator';
 import {
     undoLastMove,
@@ -22,23 +22,34 @@ import {
     getSeedForDifficulty,
     setSeedForDifficulty,
 } from '../lib/persistence';
+import { emitEvent } from '../lib/events';
+import { getDailySeed } from '../lib/daily';
+import { setDailyCompleted } from '../lib/persistence';
 
 import type { ReactElement } from 'react';
 
-export default function GameShell(): ReactElement {
+type Props = {
+    playMode?: PlayMode;
+    initialSeed?: string | undefined;
+    initialDifficulty?: GameState['difficulty'];
+    onExit?: () => void;
+};
+
+export default function GameShell({ playMode = 'journey', initialSeed, initialDifficulty, onExit }: Props): ReactElement {
     const [state, setState] = useState<GameState | null>(null);
     const progress = loadProgress();
     const persistedDifficulty = getSelectedDifficulty();
     const [paletteId, setPalette] = useState<number>(progress.settings?.paletteId ?? 0);
     const [seed, setSeed] = useState<string>(() => {
         try {
+            if (initialSeed) return initialSeed;
             const s = getSeedForDifficulty(persistedDifficulty as string);
             if (s) return s;
         } catch { }
         return `seed-${Date.now()}`;
     });
     const [difficulty, setDifficulty] = useState<GameState['difficulty']>(
-        persistedDifficulty as GameState['difficulty']
+        (initialDifficulty as GameState['difficulty']) || (persistedDifficulty as GameState['difficulty'])
     );
     const initialLevel = progress.difficulties?.[difficulty]?.currentLevel ?? 1;
     const [currentLevel, setCurrentLevelState] = useState<number>(initialLevel);
@@ -70,6 +81,9 @@ export default function GameShell(): ReactElement {
         if (!state) return;
         if (isWin(state)) setShowComplete(true);
         else setShowComplete(false);
+        if (isWin(state)) {
+            try { emitEvent('win', { level: state.level }); } catch { }
+        }
     }, [state]);
 
     const computeSortedPercent = (s: GameState) => {
@@ -132,7 +146,21 @@ export default function GameShell(): ReactElement {
         if (!selected) {
 
             const b = state.bolts.find((x) => x.id === id);
-            if (b && b.nuts.length > 0) setSelected(id);
+            if (b && b.nuts.length > 0) {
+                // emit pick event with color/count
+                try {
+                    const top = b.nuts[b.nuts.length - 1];
+                    const color = typeof top === 'string' ? top : top.color;
+                    let count = 1;
+                    for (let i = b.nuts.length - 2; i >= 0; i--) {
+                        const n = b.nuts[i];
+                        const c = typeof n === 'string' ? n : n.color;
+                        if (c === color) count++; else break;
+                    }
+                    emitEvent('pick', { boltId: id, color, count });
+                } catch { }
+                setSelected(id);
+            }
             return;
         }
         if (selected === id) {
@@ -185,11 +213,15 @@ export default function GameShell(): ReactElement {
         if (res.success) {
             setState({ ...state });
             setAnimMove({ move: res.move, preRects });
+            try { emitEvent('move', res.move); } catch { }
         } else {
             setInvalidTarget(id);
             setTimeout(() => setInvalidTarget(null), 420);
         }
     };
+
+    // Extra bolt feature removed — no-op placeholder kept for compatibility if referenced
+    // function handleAddExtraBolt() { }
 
     const findHint = () => {
         const solution = computeSolutionPath(state, { maxDepth: 140, maxStates: 250000 });
@@ -215,6 +247,24 @@ export default function GameShell(): ReactElement {
     };
 
     const handleContinue = () => {
+        if (playMode === 'endless') {
+            const newSeed = `seed-${Date.now()}`;
+            setSeed(newSeed);
+            setShowComplete(false);
+            return;
+        }
+
+        if (playMode === 'daily') {
+            try {
+                const ds = getDailySeed();
+                // ds like daily-v1-YYYY-MM-DD -> store date only
+                const dateStr = ds.slice('daily-v1-'.length);
+                setDailyCompleted(dateStr);
+            } catch { }
+            onExit?.();
+            return;
+        }
+
         const nextLevel = (currentLevel || 1) + 1;
         setCurrentLevel(difficulty, nextLevel);
         setCurrentLevelState(nextLevel);
@@ -222,9 +272,7 @@ export default function GameShell(): ReactElement {
         setSeed(newSeed);
         try {
             setSeedForDifficulty(difficulty, newSeed);
-        } catch {
-
-        }
+        } catch { }
         setShowComplete(false);
     };
 
@@ -235,6 +283,8 @@ export default function GameShell(): ReactElement {
                     level={state.level}
                     difficulty={difficulty}
                     seed={seed}
+                    playMode={playMode}
+                    showSeed={playMode === 'custom'}
                     paletteId={paletteId}
                     showDebug={showDebug}
                     onShowDebugChange={setShowDebug}

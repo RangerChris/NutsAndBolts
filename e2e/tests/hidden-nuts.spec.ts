@@ -69,8 +69,12 @@ test.describe('hidden nuts level (E2E)', () => {
 
     await page.goto('/');
 
-    // set seed via topbar edit UI (matches other e2e tests)
+    // Enter Custom Seed mode so TopBar seed edit is available
+    await page.locator('button:has-text("Custom Seed")').click();
+
+    // wait for TopBar edit seed button to appear
     const editBtn = page.locator('button.topbar-btn-edit');
+    await page.waitForSelector('button.topbar-btn-edit');
     await expect(editBtn).toBeVisible();
     await page.evaluate(() => {
       const edit = document.querySelector('button.topbar-btn-edit') as HTMLButtonElement | null;

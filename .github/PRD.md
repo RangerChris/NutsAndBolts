@@ -22,7 +22,7 @@ Casual single-player puzzle: group same-colored nuts onto bolts using taps and o
 - Board: 3–9 bolts (columns) plus one player-created extra bolt (max total 10); each bolt holds 3–10 nut slots. The number of distinct colors used in a level equals the number of bolts in that level (the extra/player-created bolt counts toward this total).
 - Nuts: Colored tokens (with shape/pattern overlays for colorblind support).
 - Move: Tap a source bolt → pick the contiguous group of same-colored nuts at the top → tap a target bolt → move allowed if target is empty OR target top nut color matches picked color. Invalid moves show blocked animation.
-- Extra Bolt: One temporary empty bolt per level (single use).
+Extra Bolt: (removed) The player-created extra bolt was removed from the design.
 - Win: All bolts contain nuts of only one color. Level increments on completion.
 
 ## Seeded Level Generation (guaranteed solvable)
@@ -59,14 +59,23 @@ Note: the number of distinct colors in a level matches the number of bolts for t
 
 ## UX / Mobile-First UI
 
-- Top bar: difficulty, level, seed display/input, palette selector.
+- Home screen: card-based mode selector. Player picks a play mode before entering a level.
+- Play modes (see feature: improved-game):
+  - **Journey** — progressive difficulty levels; per-difficulty level counter; seed hidden from TopBar.
+  - **Daily** — one shared board per UTC calendar day (seed = `"daily-v1-YYYY-MM-DD"`); date shown in TopBar; no level counter; completion tracked per day.
+  - **Custom Seed** — player enters any seed; seed shown in TopBar; no progress stored.
+  - **Endless** — random boards at chosen difficulty; no level counter; seed hidden.
+  - **Tutorial** — guided 5-step overlay on a fixed simple board; teaches core mechanics.
+- Top bar (in-game): difficulty, level (Journey only), date (Daily only), seed input (Custom Seed only), palette selector is on the Home screen.
 - Center: bolts horizontally (scroll/swipe if overflow).
-- Bottom: Extra Bolt (remaining = 1), Undo (optional), Hint (optional).
+- Bottom: Extra Bolt (remaining = 1), Undo, Hint — **centered** using flexbox.
 - Interactions: tap source → highlight contiguous group → tap target to move; smooth animations & haptics where available.
+- Back button in TopBar returns to Home screen from any play mode.
 
 ## Persistence
 
 - Key: `nuts-and-bolts:progress`. Save on level complete and on visibility change.
+- Schema v2 additions: `settings.tutorialCompleted: boolean`, `daily.lastCompleted: string | null`.
 
 ## Testing & Acceptance
 
@@ -87,6 +96,13 @@ Note: the number of distinct colors in a level matches the number of bolts for t
 - Add placeholder assets & sounds
 - Create README and run instructions
 - Playtest & tune difficulty
+- **[improved-game]** Home screen hub with 4 play mode cards + Tutorial
+- **[improved-game]** Daily seed formula (`getDailySeed`) + daily completion tracking
+- **[improved-game]** AppShell screen routing
+- **[improved-game]** TopBar: hide seed for Journey/Daily/Endless/Tutorial modes
+- **[improved-game]** BottomBar: center Extra Bolt / Undo / Hint buttons
+- **[improved-game]** Tutorial overlay (5 steps, skip, `tutorialCompleted` flag)
+- **[improved-game]** Persistence schema migration v1 → v2
 
 ## Reference Docs
 

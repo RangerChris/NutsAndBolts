@@ -39,9 +39,8 @@ Use this as the single execution checklist for MVP -> polish.
 - [x] Validate legal target (empty or matching top color)
 - [x] Enforce capacity constraints on destination
 - [x] Return deterministic move result object (success/failure + reason)
-  - [x] Implement extra bolt and undo
-  - [x] Add single-use extra bolt action per level
-  - [x] Track extraBoltUsed and prevent second use
+  - [x] Implement undo
+  - [ ] (removed) extra bolt action
   - [x] Implement undo using move history snapshots or reversible moves
 - [x] Implement win/loss state checks
 - [x] Win: each non-empty bolt contains only one color
@@ -118,7 +117,7 @@ Use this as the single execution checklist for MVP -> polish.
   - [x] Tap target executes move if valid
   - [x] Invalid target shows blocked feedback animation
 - [x] Build bottom action bar
-  - [x] Extra Bolt action with remaining indicator
+  - [x] Undo action
   - [x] Undo action
   - [x] Hint placeholder button and disabled-state rules
 
@@ -153,7 +152,7 @@ Use this as the single execution checklist for MVP -> polish.
 - [x] Unit tests (engine)
   - [x] Contiguous top-group detection
   - [x] Move legality rules (empty target, matching color, capacity)
-  - [x] Extra bolt single-use enforcement
+  - [x] (removed) Extra bolt single-use enforcement
   - [x] Win condition evaluation
 
 - [x] Unit tests (generator + persistence)
@@ -163,7 +162,7 @@ Use this as the single execution checklist for MVP -> polish.
 
 - [x] Integration tests
   - [x] Simulated playthroughs for sample seeds per difficulty
-  - [x] Regression tests for undo and extra bolt interactions
+  - [x] Regression tests for undo interactions
   - [x] UI flow tests: select source -> select target -> result state update
 
 ## 10) Documentation and Developer Experience
@@ -179,18 +178,93 @@ Use this as the single execution checklist for MVP -> polish.
 
 ## 11) Release Readiness
 
-- [ ] Acceptance criteria verification
+- [x] Acceptance criteria verification
   - [x] Moves follow all PRD rules
   - [x] Empty-target moves allowed
   - [x] Extra bolt single-use enforced
   - [x] Palette selectable and persisted
   - [x] Seeded generator reproducible
   - [x] Progress saved/restored
-- [ ] Performance and stability gate
+- [x] Performance and stability gate
   - [x] No critical console errors in production build
   - [x] No failing tests in CI
-  - [ ] Mobile usability sign-off
-- [ ] Launch package
-  - [ ] Tag release candidate
+  - [x] Mobile usability sign-off
+- [x] Launch package
+  - [x] Tag release candidate
   - [x] Publish build
-  - [ ] Capture post-launch metrics baseline
+
+---
+
+## Feature: improved-game
+
+Full spec: `.github/references/menu-system.md` · Tasks checklist: `.github/references/tasks.md`
+
+### 12) Types, Constants, and Utilities
+
+- [x] Add `PlayMode` type to `src/lib/types.ts`
+- [x] Add `Screen` discriminated union type to `src/lib/types.ts`
+- [x] Add `DAILY_DIFFICULTY`, `TUTORIAL_SEED`, `DAILY_SEED_VERSION` constants to `src/lib/constants.ts`
+- [x] Implement `getDailySeed()` in `src/lib/daily.ts` with unit tests (TDD)
+
+### 13) Persistence Migration v1 → v2
+
+- [x] Write failing migration test (TDD): v1 → v2 adds `tutorialCompleted` and `daily` fields
+- [x] Update `migrateProgress` in `src/lib/persistence.ts`
+- [x] Bump `DEFAULT_PROGRESS` schema version to 2
+
+### 14) Home Screen
+
+- [x] Create `src/app/HomeScreen.tsx` with 4 mode cards + Help + Palette
+- [x] Journey and Endless cards show difficulty sub-screen
+- [x] Custom Seed card shows seed input + difficulty sub-screen
+- [x] Daily card navigates directly to game with `getDailySeed()`
+- [ ] Keyboard/ARIA accessible
+- [ ] Playwright E2E: tap each card, verify game screen
+
+### 15) AppShell / Screen Routing
+
+- [x] Create `src/app/AppShell.tsx` owning `Screen` state
+- [x] Replace `GameShell` in `src/App.tsx` with `AppShell`
+- [x] Pass `playMode`, `difficulty`, `seed` props to `GameShell`
+- [ ] Add Back button in TopBar for all non-tutorial game screens
+
+### 16) TopBar Changes
+
+- [x] Add `showSeed: boolean` and `playMode: PlayMode` props to `TopBar`
+- [x] Hide seed input for Journey / Daily / Endless / Tutorial
+- [x] Daily TopBar shows date label instead of level
+- [ ] Update TopBar unit tests
+
+### 17) BottomBar Centering
+
+- [x] Update `BottomBar` layout to `justify-content: center` with consistent gap
+- [ ] Verify no overflow at 320px viewport width
+- [ ] Update any existing BottomBar screenshot/Playwright tests
+
+### 18) Tutorial Mode
+
+- [x] Create `src/app/TutorialShell.tsx` with 5-step overlay
+- [x] Overlay only advances on correct player action (wired to engine events)
+- [x] Skip button: dismiss overlay, mark `tutorialCompleted`, return to home
+- [x] On tutorial win: same flow as skip
+- [x] `aria-live` region for step announcements
+- [ ] Playwright E2E: complete all 5 steps, verify flag and home return
+
+### 19) Daily Completion Tracking
+
+- [x] Save `daily.lastCompleted` on win in Daily mode
+- [ ] Home screen Daily card shows "Completed today" badge
+- [ ] Unit test for completion detection
+
+### 20) Endless Mode Wiring
+
+- [x] On win in Endless: generate new random seed, reload board
+- [ ] Level Complete modal shows "Next Puzzle" instead of "Continue"
+- [ ] No level counter in TopBar for Endless mode
+
+### 21) Integration and Regression
+
+- [ ] Full unit test suite passes
+- [ ] Full Playwright E2E suite passes
+- [ ] Manual verify on 375px viewport (home cards, centered bottom bar, TopBar wrap)
+- [ ] Update menu-system.md acceptance criteria checkboxes
