@@ -353,6 +353,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
                     onUndo={handleUndo}
                     onHint={handleHint}
                     onRestart={handleRestart}
+                    onBack={onExit}
                     undoDisabled={!state.moveHistory || state.moveHistory.length === 0}
                     hintDisabled={!levelSolvable}
                     version={typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0'}

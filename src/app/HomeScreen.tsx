@@ -13,10 +13,37 @@ export default function HomeScreen({ onSelectMode }: Props) {
         <div className="home-screen">
             <h1>Nuts & Bolts</h1>
             <div className="mode-grid">
-                <button onClick={() => onSelectMode('journey', { difficulty })} className="mode-card">Journey</button>
-                <button onClick={() => onSelectMode('daily')} className="mode-card">Daily</button>
-                <button onClick={() => onSelectMode('custom', { difficulty, seed })} className="mode-card">Custom Seed</button>
-                <button onClick={() => onSelectMode('endless', { difficulty })} className="mode-card">Endless</button>
+                <button onClick={() => onSelectMode('journey', { difficulty })} className="mode-card" aria-label="Start Journey">
+                    <div className="mode-icon-placeholder" aria-hidden="true"></div>
+                    <div className="mode-content">
+                        <div className="mode-title">Journey</div>
+                        <div className="mode-desc">Progress through curated puzzles and unlock new levels.</div>
+                    </div>
+                </button>
+
+                <button onClick={() => onSelectMode('daily')} className="mode-card" aria-label="Play Daily">
+                    <div className="mode-icon-placeholder" aria-hidden="true"></div>
+                    <div className="mode-content">
+                        <div className="mode-title">Daily</div>
+                        <div className="mode-desc">One shared seeded puzzle per UTC day — compete for best solutions.</div>
+                    </div>
+                </button>
+
+                <button onClick={() => onSelectMode('custom', { difficulty, seed })} className="mode-card" aria-label="Custom Seed">
+                    <div className="mode-icon-placeholder" aria-hidden="true"></div>
+                    <div className="mode-content">
+                        <div className="mode-title">Custom Seed</div>
+                        <div className="mode-desc">Play any seed string to reproduce or share puzzles.</div>
+                    </div>
+                </button>
+
+                <button onClick={() => onSelectMode('endless', { difficulty })} className="mode-card" aria-label="Endless Mode">
+                    <div className="mode-icon-placeholder" aria-hidden="true"></div>
+                    <div className="mode-content">
+                        <div className="mode-title">Endless</div>
+                        <div className="mode-desc">Keep solving generated puzzles — a fresh challenge every win.</div>
+                    </div>
+                </button>
             </div>
 
             <div className="home-controls">

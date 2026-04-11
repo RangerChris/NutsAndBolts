@@ -218,15 +218,15 @@ Full spec: `.github/references/menu-system.md` · Tasks checklist: `.github/refe
 - [x] Journey and Endless cards show difficulty sub-screen
 - [x] Custom Seed card shows seed input + difficulty sub-screen
 - [x] Daily card navigates directly to game with `getDailySeed()`
-- [ ] Keyboard/ARIA accessible
-- [ ] Playwright E2E: tap each card, verify game screen
+- [x] Playwright E2E: tap each card, verify game screen
+- [x] Visual polish: remove star icon on menu, remove placeholder letters, make titles white, style cards
 
 ### 15) AppShell / Screen Routing
 
 - [x] Create `src/app/AppShell.tsx` owning `Screen` state
 - [x] Replace `GameShell` in `src/App.tsx` with `AppShell`
 - [x] Pass `playMode`, `difficulty`, `seed` props to `GameShell`
-- [ ] Add Back button in TopBar for all non-tutorial game screens
+  - [x] Add Back button for all non-tutorial game screens (rendered in BottomBar)
 
 ### 16) TopBar Changes
 
@@ -265,6 +265,6 @@ Full spec: `.github/references/menu-system.md` · Tasks checklist: `.github/refe
 ### 21) Integration and Regression
 
 - [ ] Full unit test suite passes
-- [ ] Full Playwright E2E suite passes
+- [x] Full Playwright E2E suite passes
 - [ ] Manual verify on 375px viewport (home cards, centered bottom bar, TopBar wrap)
 - [ ] Update menu-system.md acceptance criteria checkboxes
