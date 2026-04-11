@@ -1,4 +1,4 @@
-# Nuts and Bolts
+# Nuts and Bolts game
 
 A casual puzzle game where the player groups same-colored "nuts" onto "bolts".
 
