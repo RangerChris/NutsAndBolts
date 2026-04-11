@@ -8,6 +8,30 @@ import type { Nut } from './types';
 
 type CreateLevelOpts = { difficulty: GameState['difficulty']; level?: number; seed?: string | number; hiddenNuts?: boolean | null };
 
+function hasSingletonColorCount(bolts: Bolt[]): boolean {
+  const counts = new Map<string, number>();
+  for (const bolt of bolts) {
+    for (const nut of bolt.nuts) {
+      counts.set(nut.color, (counts.get(nut.color) ?? 0) + 1);
+    }
+  }
+  for (const count of counts.values()) {
+    if (count === 1) return true;
+  }
+  return false;
+}
+
+function retrySeed(seed: string): { baseSeed: string; retryCount: number; retrySeed: string } {
+  const retryMatch = /-retry-(\d+)$/.exec(seed);
+  const retryCount = retryMatch ? Number(retryMatch[1]) : 0;
+  const baseSeed = seed.replace(/-retry-\d+$/, '');
+  return {
+    baseSeed,
+    retryCount,
+    retrySeed: `${baseSeed}-retry-${retryCount + 1}`,
+  };
+}
+
 export function createSolvedBoard(numBolts: number, stackHeight: number): Bolt[] {
   const bolts: Bolt[] = [];
   for (let i = 0; i < numBolts; i++) {
@@ -133,6 +157,14 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
 
   state.moveHistory = filteredMoves;
   const normalized = normalizeState(state);
+
+  if ((opts.difficulty === 'hard' || opts.difficulty === 'extreme') && hasSingletonColorCount(normalized.bolts)) {
+    const next = retrySeed(seed);
+    if (next.retryCount < 5) {
+      return createLevel({ ...opts, seed: next.retrySeed });
+    }
+  }
+
   const invariants = checkStateInvariants(normalized);
 
   try {
@@ -157,12 +189,9 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
     normalized.optimalMoves = solution ? solution.length : null;
 
     if (!solution) {
-      const retryMatch = /-retry-(\d+)$/.exec(seed);
-      const retryCount = retryMatch ? Number(retryMatch[1]) : 0;
-      if (retryCount < 5) {
-        const baseSeed = seed.replace(/-retry-\d+$/, '');
-        const retrySeed = `${baseSeed}-retry-${retryCount + 1}`;
-        return createLevel({ ...opts, seed: retrySeed });
+      const next = retrySeed(seed);
+      if (next.retryCount < 5) {
+        return createLevel({ ...opts, seed: next.retrySeed });
       }
     }
   } catch {
