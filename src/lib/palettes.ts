@@ -9,53 +9,32 @@ export type Palette = {
 export const PALETTES: Palette[] = [
   {
     id: 0,
-    name: 'Vibrant',
-    colors: ['#E41A1C', '#377EB8', '#4DAF4A', '#984EA3', '#FF7F00', '#A65628', '#F781BF', '#66C2A5', '#D9C100', '#2B3A67'],
+    name: 'Clarity Bright',
+    colors: ['#FF4D6D', '#FF9F1C', '#FFD60A', '#8AC926', '#2EC4B6', '#00BBF9', '#4D96FF', '#9B5DE5', '#F15BB5', '#F9844A'],
   },
   {
     id: 1,
-    name: 'Pastel',
-    colors: ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BFFCC6', '#B3D9FF', '#E2B8FF', '#FDE2FF', '#DFF8E1', '#FFF3B0', '#CDEFFF'],
+    name: 'Neon',
+    // Neon palette: high-saturation, easily distinguishable bright hues
+    colors: ['#FF00FF', '#FF007F', '#FF4D00', '#FFDD00', '#7CFF00', '#00FF00', '#00FF9F', '#00FFFF', '#007BFF', '#8A00FF'],
   },
   {
     id: 2,
-    name: 'Jewel',
-    colors: ['#2E0854', '#5E239D', '#A020F0', '#7A4FE3', '#3B0B3A'],
+    name: 'Tropical Mix',
+    // Designed as 5 complementary pairs for clear separation:
+    // (Coral, Teal), (Orange, Blue), (Lime, Purple), (Pink, Mint), (Yellow, Indigo)
+    colors: ['#FF6B6B', '#2EC4B6', '#FF9F43', '#4D96FF', '#8AC926', '#9B5DE5', '#F15BB5', '#7AE7C7', '#FFD60A', '#6C63FF'],
   },
   {
     id: 3,
-    name: 'Colorblind',
-    colors: ['#000000', '#E69F00', '#56B4E9', '#009E73', '#F0E442', '#0072B2', '#D55E00', '#CC79A7'],
+    name: 'Bold Spectrum',
+    colors: ['#FF3B30', '#FF6D00', '#FFB703', '#70E000', '#00C853', '#00B8D4', '#00A6FB', '#4361EE', '#8338EC', '#FF2D92'],
   },
   {
     id: 4,
-    name: 'Warm Sunset',
-    colors: ['#FF6A88', '#FF8C66', '#FFB86B', '#FFD166', '#FFEDD5', '#E07A5F', '#F4A261', '#FFBC42', '#D65A31', '#FF9F1C'],
-  },
-  {
-    id: 5,
-    name: 'Ocean',
-    colors: ['#012A4A', '#013A63', '#01497C', '#2A6F97', '#38A3A5', '#57CC99', '#7EE8B8', '#B3E5FC', '#D6F5FF', '#EAF6FF'],
-  },
-  {
-    id: 6,
-    name: 'Earth',
-    colors: ['#4B2E2B', '#7C4A2A', '#B66E49', '#D99B6C', '#F0C987', '#C1D37F', '#7FB069', '#3B6E47', '#2E5143', '#162520'],
-  },
-  {
-    id: 7,
-    name: 'Retro',
-    colors: ['#D7263D', '#F46036', '#2E294E', '#1B998B', '#E2C044', '#7FDD4C', '#F6A9A9', '#FBE7C6', '#2B2D42', '#8D99AE'],
-  },
-  {
-    id: 8,
-    name: 'Cyberpunk',
-    colors: ['#00F5FF', '#FF00C8', '#7B2CFF', '#FF6B6B', '#00FFD5', '#FAFF00', '#01A3A4', '#FF4D4D', '#6A00FF', '#00B3FF'],
-  },
-  {
-    id: 9,
-    name: 'High Contrast',
-    colors: ['#000000', '#FFFFFF', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF', '#888888', '#444444'],
+    name: 'Sunrise Energy',
+    // Complementary warm/cool pairs for distinctness
+    colors: ['#FF5A5F', '#2EC4B6', '#FF9F3D', '#4D96FF', '#FFD60A', '#9B5DE5', '#FF70A6', '#7AE7C7', '#FF8C42', '#4361EE'],
   },
 ];
 
