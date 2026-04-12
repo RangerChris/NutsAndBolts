@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.19](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.18...v0.1.19) (2026-04-12)
+
+
+### Features
+
+* remove palette selection and difficulty controls from UI, adopting a single Bold Spectrum palette ([7f109b4](https://github.com/RangerChris/NutsAndBolts/commit/7f109b4384e6a1aaac11ded3eb49b648cf676915))
+
 ### [0.1.18](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.17...v0.1.18) (2026-04-11)
 
 
