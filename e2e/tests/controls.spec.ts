@@ -8,12 +8,9 @@ test('difficulty control changes value and screenshot saved', async ({ page }) =
   await page.locator('button:has-text("Journey")').click();
   await page.locator('.journey-screen button.control-btn:has-text("1")').first().click();
 
+  // in-game difficulty selector removed; assert it's not present
   const select = page.locator('label:has-text("Difficulty") select');
-  await expect(select).toHaveValue(/easy|medium|hard|extreme/);
-
-  // change difficulty to medium
-  await select.selectOption('medium');
-  await expect(select).toHaveValue('medium');
+  await expect(select).toHaveCount(0);
 
   // take screenshot for verification
   const outDir = path.join(process.cwd(), 'e2e', 'screenshots');

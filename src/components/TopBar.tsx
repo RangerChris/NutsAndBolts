@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { PALETTES } from '../lib/palettes';
-import type { PaletteId, PlayMode } from '../lib/types';
+import type { PlayMode } from '../lib/types';
 import { loadProgress } from '../lib/persistence';
 
 type Props = {
@@ -9,20 +8,17 @@ type Props = {
     seed?: string;
     playMode?: PlayMode;
     showSeed?: boolean;
-    paletteId: PaletteId;
     showDebug?: boolean;
     onShowDebugChange?: (show: boolean) => void;
     forceHidden?: boolean;
     onForceHiddenChange?: (v: boolean) => void;
-    onPaletteChange: (id: PaletteId) => void;
-    onDifficultyChange?: (d: string) => void;
+    // difficulty may not be changed in-game; selection occurs when starting a session
     onSeedChange?: (seed: string) => void;
 };
 
-export default function TopBar({ level, difficulty, seed, playMode = 'journey', showSeed = true, paletteId, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onPaletteChange, onDifficultyChange, onSeedChange }: Props) {
+export default function TopBar({ level, difficulty, seed, playMode = 'journey', showSeed = true, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onDifficultyChange, onSeedChange }: Props) {
     const [editingSeed, setEditingSeed] = useState(false);
     const [seedValue, setSeedValue] = useState(seed || '');
-    const [open, setOpen] = useState(false);
 
 
     return (
@@ -47,15 +43,7 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
                 )}
             </div>
             <div className="topbar-controls">
-                <label>
-                    Difficulty
-                    <select value={difficulty} onChange={(e) => onDifficultyChange?.(e.target.value)} style={{ marginLeft: 8 }}>
-                        <option value="easy">easy</option>
-                        <option value="medium">medium</option>
-                        <option value="hard">hard</option>
-                        <option value="extreme">extreme</option>
-                    </select>
-                </label>
+                {/* Difficulty selection removed from in-game TopBar. Choose difficulty when starting Journey/Endless from Home screen. */}
                 {showSeed && (
                     <>
                         <label className="topbar-debug">
@@ -92,42 +80,7 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
                         </div>
                     </>
                 )}
-                <div className="palette-root">
-                    <button
-                        aria-haspopup="true"
-                        onClick={() => setOpen((o) => !o)}
-                        className="palette-button"
-                    >
-                        <div className="palette-preview">
-                            {PALETTES.find((p) => p.id === paletteId)?.colors.slice(0, 5).map((c, i) => (
-                                <svg key={i} width={14} height={14} className="palette-swatch" aria-hidden>
-                                    <rect width="100%" height="100%" rx="3" fill={c} stroke="rgba(0,0,0,0.06)" />
-                                </svg>
-                            ))}
-                        </div>
-                        <span className="palette-name">{PALETTES.find((p) => p.id === paletteId)?.name}</span>
-                    </button>
-                    {open && (
-                        <div className="palette-popover">
-                            {PALETTES.map((p) => (
-                                <button
-                                    key={p.id}
-                                    onClick={() => { onPaletteChange(p.id); setOpen(false); }}
-                                    className="palette-list-button"
-                                >
-                                    <div className="palette-preview">
-                                        {p.colors.slice(0, 5).map((c, i) => (
-                                            <svg key={i} width={14} height={14} className="palette-swatch" aria-hidden>
-                                                <rect width="100%" height="100%" rx="3" fill={c} stroke="rgba(0,0,0,0.06)" />
-                                            </svg>
-                                        ))}
-                                    </div>
-                                    <span className="palette-name">{p.name}</span>
-                                </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                {/* Palette selection removed — single Bold Spectrum palette used */}
             </div>
         </div>
     );

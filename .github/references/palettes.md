@@ -1,15 +1,13 @@
-# Color palettes
+# Color palette
 
-Multiple selectable palettes are implemented in the app (the runtime exposes an array of palettes in `src/lib/palettes.ts`). The shipped set includes the original four accessibility-focused palettes plus several additional theme palettes (Vibrant, Pastel, Jewel, Colorblind, Warm Sunset, Ocean, Earth, Retro, Cyberpunk, High Contrast).
+The app uses a single canonical palette: **Bold Spectrum**. Palette selection has been removed from the UI and the runtime uses this palette for all levels.
 
-Key implementation notes (current)
+Palette (Bold Spectrum)
 
-- Palettes are represented as simple arrays of color hex strings and an `id`/`name` pair (`Palette[]` in `src/lib/palettes.ts`).
-- The UI exposes a palette dropdown in the top bar that shows a small swatch preview and persists the selected palette id via `src/lib/persistence.ts`.
-- For accessibility, the `Colorblind` palette is provided and the rendering supports pattern/shape overlays; the token rendering code (in `src/components/BoltView.tsx`) uses gradients and can be extended to add SVG patterns for non-color markers.
-- Palettes act as base color sets. When a level requires extra distinct identifiers the runtime prefers pattern overlays or small perceptual shifts rather than inventing arbitrary colors.
+- #E11D48, #FB721A, #F59E0B, #16A34A, #059669, #0EA5E9, #2563EB, #7C3AED, #DB2777, #B45309
 
-Suggested guidance for designers
+Notes
 
-- Prefer the provided palettes from `src/lib/palettes.ts` rather than adding new ad-hoc hex lists.
-- When adding a palette, include a short `name`, an `id`, and 8–10 colors that remain separable at small sizes; provide a pattern identifier if the palette relies on non-color markers for accessibility.
+- Palettes are represented as simple arrays of color hex strings in `src/lib/palettes.ts` and exposed via `PALETTES`.
+- The UI no longer exposes a palette dropdown; the `paletteId` persistence key remains for compatibility but is not used by the runtime to change colors.
+- For accessibility, the runtime still supports pattern/shape overlays and other non-color markers; designers should rely on pattern overlays when additional distinct identifiers are required.

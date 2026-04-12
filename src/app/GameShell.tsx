@@ -15,7 +15,6 @@ import TopBar from '../components/TopBar';
 import starUrl from '../assets/icons/star.svg';
 import {
     loadProgress,
-    setPaletteId,
     getSelectedDifficulty,
     setSelectedDifficulty,
     setCurrentLevel,
@@ -41,7 +40,8 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     const [state, setState] = useState<GameState | null>(null);
     const progress = loadProgress();
     const persistedDifficulty = getSelectedDifficulty();
-    const [paletteId, setPalette] = useState<number>(progress.settings?.paletteId ?? 0);
+    // Palette selection removed — use single canonical palette id 0
+    const paletteId = 0;
     const [seed, setSeed] = useState<string>(() => {
         if (playMode === 'daily') return getDailySeed();
         try {
@@ -147,69 +147,16 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
             return;
         }
         lastClickRef.current = { id, time: now };
-
         if (!selected) {
-
             const b = state.bolts.find((x) => x.id === id);
             if (b && b.nuts.length > 0) {
-                // emit pick event with color/count
                 try {
                     const top = b.nuts[b.nuts.length - 1];
-                    const color = typeof top === 'string' ? top : top.color;
-                    let count = 1;
-                    for (let i = b.nuts.length - 2; i >= 0; i--) {
-                        const n = b.nuts[i];
-                        const c = typeof n === 'string' ? n : n.color;
-                        if (c === color) count++; else break;
-                    }
-                    emitEvent('pick', { boltId: id, color, count });
+                    const color = typeof top === 'string' ? top : (top as any).color;
+                    emitEvent('pick', { color, count: b.nuts.length });
                 } catch { }
                 setSelected(id);
-            }
-            return;
-        }
-        if (selected === id) {
-            setSelected(null);
-            return;
-        }
-
-        const srcBolt = state.bolts.find((x) => x.id === selected);
-        const tgtBolt = state.bolts.find((x) => x.id === id);
-        if (!srcBolt || !tgtBolt) return;
-        const { count } = getMovableTopCount(srcBolt, tgtBolt);
-        if (count === 0) {
-            setSelected(null);
-            setInvalidTarget(id);
-            setTimeout(() => setInvalidTarget(null), 420);
-            return;
-        }
-
-
-        const preRects: Array<{
-            left: number;
-            top: number;
-            width: number;
-            height: number;
-            color: string;
-        }> = [];
-        for (let i = 0; i < count; i++) {
-            const idx = srcBolt.nuts.length - count + i;
-            const sel = document.querySelector(`[data-bolt="${selected}"] [data-nut-index="${idx}"]`);
-            if (sel instanceof Element) {
-                const r = sel.getBoundingClientRect();
-                let color = '#999999';
-                try {
-                    const nutRect = sel.querySelector('rect');
-                    if (nutRect) color = (nutRect as SVGElement).getAttribute('fill') || color;
-                } catch {
-                }
-                preRects.push({
-                    left: r.left,
-                    top: r.top,
-                    width: r.width,
-                    height: r.height,
-                    color,
-                });
+                return;
             }
         }
 
@@ -217,7 +164,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         setSelected(null);
         if (res.success) {
             setState({ ...state });
-            setAnimMove({ move: res.move, preRects });
+            setAnimMove({ move: res.move, preRects: [] });
             try { emitEvent('move', res.move); } catch { }
         } else {
             setInvalidTarget(id);
@@ -302,42 +249,15 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
                     seed={seed}
                     playMode={playMode}
                     showSeed={playMode === 'custom'}
-                    paletteId={paletteId}
                     showDebug={showDebug}
                     onShowDebugChange={setShowDebug}
                     forceHidden={forceHidden}
                     onForceHiddenChange={(v) => setForceHidden(v)}
-                    onPaletteChange={(id) => {
-                        setPalette(id);
-                        setPaletteId(id);
-                    }}
                     onSeedChange={(s) => {
                         setSeed(s);
                         try {
                             setSeedForDifficulty(difficulty, s);
-                        } catch {
-
-                        }
-                    }}
-                    onDifficultyChange={(d) => {
-                        const newDiff = d as GameState['difficulty'];
-                        setDifficulty(newDiff);
-                        setSelectedDifficulty(newDiff);
-                        const lvl = loadProgress().difficulties?.[newDiff]?.currentLevel ?? 1;
-                        setCurrentLevelState(lvl);
-
-                        try {
-                            const ps = getSeedForDifficulty(newDiff);
-                            if (ps) setSeed(ps);
-                            else {
-                                const gen = `seed-${Date.now()}`;
-                                setSeed(gen);
-                                setSeedForDifficulty(newDiff, gen);
-                            }
-                        } catch {
-                            const gen = `seed-${Date.now()}`;
-                            setSeed(gen);
-                        }
+                        } catch { }
                     }}
                 />
             </div>

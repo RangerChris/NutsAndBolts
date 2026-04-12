@@ -487,94 +487,9 @@ body {
     margin-right: 8px;
 }
 
-.palette-root {
-    position: relative;
-    z-index: 400;
-}
+/* Palette UI removed — styling retained elsewhere */
 
-.palette-button {
-    display: inline-flex;
-    gap: 8px;
-    align-items: center;
-    padding: 6px 8px;
-    border-radius: 8px;
-    background: var(--surface-container-high);
-    border: 1px solid var(--ghost-stroke);
-    color: var(--text);
-}
-
-.palette-preview {
-    display: flex;
-    gap: 4px;
-}
-
-.palette-swatch {
-    width: 14px;
-    height: 14px;
-    border-radius: 3px;
-    display: inline-block;
-    border: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.palette-name {
-    margin-left: 8px;
-}
-
-.palette-popover {
-    position: absolute;
-    right: 0;
-    margin-top: 8px;
-    background: var(--surface-container-high);
-    border: 1px solid var(--ghost-stroke);
-    border-radius: 8px;
-    padding: 8px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    color: var(--text);
-    z-index: 500;
-}
-
-.palette-list-button {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    padding: 6px 8px;
-    width: 100%;
-    background: transparent;
-    border: none;
-    text-align: left;
-    cursor: pointer;
-    color: var(--text);
-}
-
-/* Palette selector */
-.palette-selector {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.palette-select-btn {
-    padding: 6px;
-    border-radius: 6px;
-    background: var(--surface-container-high);
-    color: var(--text);
-    display: flex;
-    gap: 4px;
-    align-items: center;
-    border: 1px solid var(--ghost-stroke);
-}
-
-.palette-select-btn.selected {
-    border: 2px solid var(--primary-container);
-}
-
-.palette-swatch-lg {
-    display: inline-block;
-}
-
-.palette-name {
-    margin-left: 8px;
-}
+/* Palette selector removed — no selector styles */
 
 /* Board layout utilities */
 .board-container {
