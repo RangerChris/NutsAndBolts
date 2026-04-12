@@ -29,7 +29,7 @@ export default function JourneyScreen({ onPlayLevel, onBack }: Props) {
         };
         return (
             <button key={`${d}-${level}`} className="control-btn" aria-pressed={completed} onClick={onClick} style={{ minWidth: 56 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
                     <div style={{ fontSize: 14, fontWeight: 800 }}>{star}</div>
                     <div style={{ fontSize: 12 }}>{label}</div>
                 </div>
@@ -45,7 +45,7 @@ export default function JourneyScreen({ onPlayLevel, onBack }: Props) {
                     <button className="control-btn" onClick={() => onBack?.()}>Back</button>
                 </div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {DIFFICULTIES.map((d) => {
                     const diffEntry = progress.difficulties?.[d] as unknown;
                     const completedArr: number[] = diffEntry && Array.isArray(diffEntry.completed) ? diffEntry.completed : [];
@@ -56,7 +56,7 @@ export default function JourneyScreen({ onPlayLevel, onBack }: Props) {
                                 <h3 style={{ textTransform: 'capitalize', margin: 0 }}>{d}</h3>
                                 <div className="muted">Completed: {completedCount}</div>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8, marginTop: 8 }}>
+                            <div style={{ display: 'flex', flexDirection: 'row', gap: 8, marginTop: 8, flexWrap: 'wrap', alignItems: 'center' }}>
                                 {Array.from({ length: 10 }).map((_, i) => makeButton(d, i + 1))}
                             </div>
                         </div>
