@@ -80,6 +80,9 @@ export default function HomeScreen({ onSelectMode }: Props) {
                     </div>
                 </div>
             )}
+            <div className="home-version" style={{ marginTop: 16, textAlign: 'center', color: 'var(--muted)', fontSize: 12 }}>
+                Version: {typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0'}
+            </div>
         </div>
     );
 }
