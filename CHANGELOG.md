@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.21](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.20...v0.1.21) (2026-04-12)
+
+
+### Bug Fixes
+
+* add version display to HomeScreen component ([b53c6aa](https://github.com/RangerChris/NutsAndBolts/commit/b53c6aab075e7697307c65d6b1a2a1e4c47f13f6))
+
 ### [0.1.20](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.19...v0.1.20) (2026-04-12)
 
 ### [0.1.19](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.18...v0.1.19) (2026-04-12)
