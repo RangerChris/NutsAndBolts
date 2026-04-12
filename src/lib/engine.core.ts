@@ -64,23 +64,38 @@ export function performMove(source: Bolt, target: Bolt): Move | null {
 export function markRevealedIfNeeded(state: GameState, fromId: string, beforeLen: number, moveCount: number) {
   if (!state.hiddenNuts || beforeLen - moveCount <= 0) return;
   const revealedBolt = state.bolts.find((b: Bolt) => b.id === fromId);
-  let revealedNut =
-    revealedBolt && revealedBolt.nuts.length > 0 ? revealedBolt.nuts[revealedBolt.nuts.length - 1] : undefined;
-  const revealedColor = revealedNut ? nutColor(revealedNut) : undefined;
-  if (revealedNut && typeof revealedNut === 'string') {
-    const idx = revealedBolt!.nuts.length - 1;
-    revealedNut = { id: `${revealedBolt!.id}-n${idx}`, color: revealedNut, revealed: true } as Nut;
-    revealedBolt!.nuts[idx] = revealedNut;
-  } else if (revealedNut && typeof revealedNut !== 'string') {
-    revealedNut.revealed = true;
+  if (!revealedBolt || revealedBolt.nuts.length === 0) return;
+
+  const lastMove = state.moveHistory && state.moveHistory.length > 0 ? state.moveHistory[state.moveHistory.length - 1] : undefined;
+  const movedColor = lastMove ? lastMove.color : undefined;
+
+  // Reveal consecutive nuts starting from the new top, stopping when we encounter a nut
+  // whose color differs from the moved group's color.
+  for (let idx = revealedBolt.nuts.length - 1; idx >= 0; idx--) {
+    let n = revealedBolt.nuts[idx];
+    const c = nutColor(n);
+    if (!c) break;
+
+    // mark as Nut object with revealed flag if needed
+    if (typeof n === 'string') {
+      n = { id: `${revealedBolt.id}-n${idx}`, color: n, revealed: true } as Nut;
+      revealedBolt.nuts[idx] = n;
+    } else {
+      n.revealed = true;
+    }
+
+    emitBalancerEvent('game', {
+      event: 'nutRevealed',
+      level: state.level,
+      difficulty: state.difficulty,
+      seed: state.seed,
+      boltId: fromId,
+      revealedNutId: n ? n.id : undefined,
+      revealedColor: c,
+    });
+
+    if (movedColor && c !== movedColor) break;
+    // if movedColor is undefined, reveal only the immediate top (we already revealed it), then stop
+    if (!movedColor) break;
   }
-  emitBalancerEvent('game', {
-    event: 'nutRevealed',
-    level: state.level,
-    difficulty: state.difficulty,
-    seed: state.seed,
-    boltId: fromId,
-    revealedNutId: revealedNut ? revealedNut.id : undefined,
-    revealedColor,
-  });
 }

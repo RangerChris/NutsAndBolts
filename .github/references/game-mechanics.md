@@ -76,15 +76,6 @@ Edge cases & invariants
 - Single extra bolt: the engine must never allow more than one player extra bolt per level.
 - IDs: bolt and nut ids must be stable and unique within a level so replay/undo and animations can reliably reference DOM elements.
 
-Telemetry events (recommended)
-
-- `level_started` — include seed and difficulty
-- `move_attempted` — include src, tgt, moved count, and attempted color
-- `move_succeeded`
-- `move_failed` — include failure reason (capacity, color mismatch, etc.)
-- `extra_bolt_requested` — accepted/denied
-- `level_completed` — moves count, elapsed time
-
 Accessibility notes
 
 - All interactive controls (difficulty, seed input, palette picker, Extra Bolt, Undo, Hint) must be keyboard-focusable and expose appropriate ARIA attributes. The palette picker and Extra Bolt should support both keyboard and mouse interaction.
