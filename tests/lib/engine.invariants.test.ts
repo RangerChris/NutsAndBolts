@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeState, checkStateInvariants } from './engine';
-import type { GameState, Bolt } from './types';
+import { normalizeState, checkStateInvariants } from '../../src/lib/engine';
+import type { GameState, Bolt } from '../../src/lib/types';
 
 describe('engine invariants', () => {
   it('normalizeState fills defaults and preserves valid state', () => {

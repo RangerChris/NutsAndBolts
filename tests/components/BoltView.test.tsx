@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import GameShell from '../app/GameShell';
+import GameShell from '../../src/app/GameShell';
 
 if (typeof document === 'undefined') {
     describe.skip('Bolt keyboard interactions (skipped - no DOM)', () => {

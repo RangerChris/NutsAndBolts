@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeState, executeMoveOnState } from './engine';
-import { onBalancerEvent } from './balancer';
+import { normalizeState, executeMoveOnState } from '../../src/lib/engine';
+import { onBalancerEvent } from '../../src/lib/balancer';
 
 describe('engine hidden-nut reveal telemetry', () => {
   it('emits nutRevealed when hiddenNuts enabled and an underlying nut is exposed', () => {

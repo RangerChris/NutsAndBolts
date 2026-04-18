@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import BoltView from './BoltView';
+import BoltView from '../../src/components/BoltView';
 
 if (typeof document === 'undefined') {
     describe.skip('BoltView hidden nuts rendering (skipped - no DOM)', () => {

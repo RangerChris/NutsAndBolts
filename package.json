@@ -8,7 +8,7 @@
     "release": "standard-version",
     "build:release": "npm run release && vite build",
     "preview": "vite preview",
-    "test": "vitest --run src",
+    "test": "vitest --run",
     "test:e2e": "playwright test",
     "check:accessibility": "node scripts/check_palettes.cjs",
     "test:watch": "vitest --watch",
@@ -32,6 +32,7 @@
     "@vitest/coverage-v8": "^4.1.4",
     "eslint": "^10.2.0",
     "eslint-config-prettier": "^10.1.8",
+    "jsdom": "^29.0.2",
     "playwright": "^1.59.1",
     "prettier": "^3.8.2",
     "standard-version": "^9.5.0",
@@ -43,8 +44,8 @@
   "vitest": {
     "environment": "jsdom",
     "include": [
-      "src/**/*.test.*",
-      "src/**/*.spec.*"
+      "tests/**/*.test.*",
+      "tests/**/*.spec.*"
     ],
     "exclude": [
       "e2e/**"

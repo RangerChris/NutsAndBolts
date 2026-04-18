@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { pickTopGroup, canPlaceGroup, performMove, executeMoveOnState, undoLastMove, isWin, validateState, computeSolutionPath } from './engine';
-import type { Bolt } from './types';
-import type { GameState } from './types';
+import { pickTopGroup, canPlaceGroup, performMove, executeMoveOnState, undoLastMove, isWin, validateState, computeSolutionPath } from '../../src/lib/engine';
+import type { Bolt } from '../../src/lib/types';
+import type { GameState } from '../../src/lib/types';
 
 describe('engine helpers', () => {
   it('picks contiguous top group correctly', () => {

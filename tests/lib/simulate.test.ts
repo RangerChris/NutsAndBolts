@@ -1,7 +1,7 @@
 import { describe, it } from 'vitest';
-import { createLevel } from './generator';
-import { getLevelParams } from './progression';
-import { onBalancerEvent } from './balancer';
+import { createLevel } from '../../src/lib/generator';
+import { getLevelParams } from '../../src/lib/progression';
+import { onBalancerEvent } from '../../src/lib/balancer';
 
 async function runSim() {
   const difficulties = ['easy', 'medium', 'hard', 'extreme'] as const;

@@ -66,8 +66,8 @@ export default function TutorialShell({ onExit }: Props) {
             {overlayVisible && (
                 <div className="complete-overlay tutorial-overlay" role="dialog" aria-modal="true" aria-label="Tutorial">
                     <div className="complete-modal tutorial-modal">
-                        <p style={{ marginBottom: 12 }}>{steps[step]}</p>
-                        <div style={{ display: 'flex', gap: 12, width: '100%', justifyContent: 'center' }}>
+                        <p className="tutorial-step-text">{steps[step]}</p>
+                        <div className="tutorial-actions">
                             <button className="control-btn" onClick={handleBack} disabled={step === 0}>Back</button>
                             <button className="control-btn" onClick={handleNext}>{step === steps.length - 1 ? 'Finish' : 'Next'}</button>
                             <button className="control-btn" onClick={() => { setTutorialCompleted(true); setPendingExitOnWin(false); setOverlayVisible(false); onExit?.(); }}>Skip tutorial</button>

@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import Board, { type AnimMove } from './Board';
-import type { GameState } from '../lib/types';
+import Board, { type AnimMove } from '../../src/components/Board';
+import type { GameState } from '../../src/lib/types';
 
 if (typeof document === 'undefined') {
     describe.skip('Board animation labels (skipped - no DOM)', () => {

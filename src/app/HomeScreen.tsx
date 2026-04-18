@@ -49,7 +49,7 @@ export default function HomeScreen({ onSelectMode }: Props) {
                             try {
                                 const today = getDailySeed().slice('daily-v1-'.length);
                                 if (getDailyLastCompleted() === today) {
-                                    return <div style={{ marginTop: 8 }}><span style={{ background: 'var(--primary)', color: '#3a1200', padding: '4px 8px', borderRadius: 12, fontWeight: 800 }}>Completed today</span></div>;
+                                    return <div className="daily-completed-wrap"><span className="daily-completed-badge">Completed today</span></div>;
                                 }
                             } catch { }
                             return null;
@@ -90,10 +90,10 @@ export default function HomeScreen({ onSelectMode }: Props) {
                     <div className="complete-modal">
                         <h2 className="complete-title">Endless Mode</h2>
                         <p className="complete-sub">Choose difficulty for Endless mode:</p>
-                        <div style={{ marginBottom: 12 }}>
-                            <label>
+                        <div className="endless-difficulty-row">
+                            <label className="endless-difficulty-label">
                                 Difficulty:
-                                <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)} style={{ marginLeft: 8 }}>
+                                <select className="endless-difficulty-select" value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
                                     <option value="easy">easy</option>
                                     <option value="medium">medium</option>
                                     <option value="hard">hard</option>
@@ -101,16 +101,16 @@ export default function HomeScreen({ onSelectMode }: Props) {
                                 </select>
                             </label>
                         </div>
-                        <div style={{ width: '100%' }}>
+                        <div className="endless-actions-wrap">
                             <button className="primary-cta" onClick={() => { setOpenEndless(false); onSelectMode('endless', { difficulty }); }}>Play Endless</button>
-                            <div className="secondary-actions" style={{ justifyContent: 'center' }}>
-                                <button className="control-btn" onClick={() => setOpenEndless(false)} style={{ marginTop: 12 }}>Cancel</button>
+                            <div className="secondary-actions endless-secondary-actions">
+                                <button className="control-btn endless-cancel-btn" onClick={() => setOpenEndless(false)}>Cancel</button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
-            <div className="home-version" style={{ marginTop: 16, textAlign: 'center', color: 'var(--muted)', fontSize: 12 }}>
+            <div className="home-version">
                 Version: {typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0'}
             </div>
         </div>

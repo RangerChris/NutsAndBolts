@@ -505,9 +505,9 @@ body {
 
 .board-row {
     display: grid;
-    grid-template-columns: repeat(var(--board-columns, 1), max-content);
     grid-template-rows: repeat(3, min-content);
-    grid-auto-flow: row;
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
     gap: 12px;
     padding: 8px;
     align-items: start;
@@ -572,6 +572,13 @@ body {
     width: 100%;
     max-width: 980px;
     margin: 0 auto;
+}
+
+.bottom-bar-layout {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    align-items: center;
 }
 
 /* Footer (app-wide) */
@@ -899,6 +906,147 @@ body {
     color: rgba(228, 226, 229, 0.74);
     margin-top: 6px;
     max-width: 360px;
+}
+
+.daily-completed-wrap {
+    margin-top: 8px;
+}
+
+.daily-completed-badge {
+    background: var(--primary);
+    color: #3a1200;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 800;
+}
+
+.endless-difficulty-row {
+    margin-bottom: 12px;
+}
+
+.endless-difficulty-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 800;
+    font-size: 16px;
+}
+
+.endless-difficulty-select {
+    min-width: 160px;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, var(--surface-container-high), var(--surface-container));
+    color: var(--text);
+    font-size: 16px;
+    font-weight: 700;
+    font-family: var(--font-sans);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+}
+
+.endless-difficulty-select:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.endless-actions-wrap {
+    width: 100%;
+}
+
+.endless-secondary-actions {
+    justify-content: center;
+}
+
+.endless-cancel-btn {
+    margin-top: 12px;
+}
+
+.home-version {
+    margin-top: 16px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.journey-screen {
+    padding: 16px;
+}
+
+.journey-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.journey-title {
+    margin: 0;
+}
+
+.journey-difficulty-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.journey-difficulty-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.06));
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.journey-difficulty-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.journey-difficulty-title {
+    text-transform: capitalize;
+    margin: 0;
+}
+
+.journey-level-grid {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.journey-level-btn {
+    min-width: 56px;
+}
+
+.journey-level-btn-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.journey-level-btn-star {
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.journey-level-btn-label {
+    font-size: 12px;
+}
+
+.tutorial-step-text {
+    margin-bottom: 12px;
+}
+
+.tutorial-actions {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
 }
 
 @media (max-width: 720px) {

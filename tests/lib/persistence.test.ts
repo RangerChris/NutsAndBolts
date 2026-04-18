@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { saveProgress, loadProgress, DEFAULT_PROGRESS, _setRaw, _clearStorage, setCurrentLevel, setPaletteId, initPersistence } from './persistence';
+import { saveProgress, loadProgress, DEFAULT_PROGRESS, _setRaw, _clearStorage, setCurrentLevel, setPaletteId, initPersistence } from '../../src/lib/persistence';
 
 describe('persistence', () => {
   beforeEach(() => {

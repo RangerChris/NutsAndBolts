@@ -111,6 +111,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     };
 
     const pct = state ? computeSortedPercent(state) : 0;
+    const progressFillRef = useRef<HTMLDivElement | null>(null);
     const prevPctRef = useRef<number>(pct);
     const [bump, setBump] = useState(false);
     useEffect(() => {
@@ -120,6 +121,11 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
             return () => clearTimeout(t);
         }
         prevPctRef.current = pct;
+    }, [pct]);
+
+    useEffect(() => {
+        if (!progressFillRef.current) return;
+        progressFillRef.current.style.width = `${pct}%`;
     }, [pct]);
 
     if (!state) return <div className="game-loading">Loading...</div>;
@@ -160,11 +166,15 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
             }
         }
 
+        if (!selected) return;
+
         const res = executeMoveOnState(state, selected, id);
         setSelected(null);
         if (res.success) {
             setState({ ...state });
-            setAnimMove({ move: res.move, preRects: [] });
+            if (res.move) {
+                setAnimMove({ move: res.move, preRects: [] });
+            }
             try { emitEvent('move', res.move); } catch { }
         } else {
             setInvalidTarget(id);
@@ -278,7 +288,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
             <div className="sorted-progress-wrapper">
                 <div className="sorted-progress">
                     <div className="progress-bar" aria-hidden>
-                        <div className="progress-fill" style={{ width: `${pct}%` }} />
+                        <div ref={progressFillRef} className="progress-fill" />
                     </div>
                     <div className={`progress-label ${bump ? 'bump' : ''}`}>Sorted: {pct}%</div>
                     <div className="visually-hidden" aria-live="polite">Sorted {pct} percent</div>
@@ -293,7 +303,6 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
                     onBack={onExit}
                     undoDisabled={!state.moveHistory || state.moveHistory.length === 0}
                     hintDisabled={!levelSolvable}
-                    version={typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : '0.0.0'}
                 />
             </div>
             {showComplete && (

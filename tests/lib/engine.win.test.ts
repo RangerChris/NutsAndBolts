@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { onBalancerEvent } from './balancer';
-import { executeMoveOnState } from './engine';
-import type { GameState } from './types';
+import { onBalancerEvent } from '../../src/lib/balancer';
+import { executeMoveOnState } from '../../src/lib/engine';
+import type { GameState } from '../../src/lib/types';
 
 describe('level completion event', () => {
   it('emits levelComplete when move solves the level', () => {

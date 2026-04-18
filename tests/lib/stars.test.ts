@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { computeOptimalMoves, computeStars } from './engine';
-import type { GameState } from './types';
+import { computeOptimalMoves, computeStars } from '../../src/lib/engine';
+import type { GameState } from '../../src/lib/types';
 
 describe('stars and optimal moves', () => {
   it('computeOptimalMoves returns 0 for already solved', () => {

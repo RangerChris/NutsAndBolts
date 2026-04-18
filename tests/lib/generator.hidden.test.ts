@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createLevel } from './generator';
+import { createLevel } from '../../src/lib/generator';
 
 describe('createLevel hiddenNuts flag', () => {
   it('is reproducible for same seed', () => {

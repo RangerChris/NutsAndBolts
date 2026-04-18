@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { getLevelParams, getCurrentLevel, advanceLevel, setCurrentLevel } from './progression';
-import { _clearStorage } from './persistence';
-import { DIFFICULTY_CONFIG } from './constants';
+import { getLevelParams, getCurrentLevel, advanceLevel, setCurrentLevel } from '../../src/lib/progression';
+import { _clearStorage } from '../../src/lib/persistence';
+import { DIFFICULTY_CONFIG } from '../../src/lib/constants';
 
 describe('progression scaling', () => {
   beforeEach(() => {

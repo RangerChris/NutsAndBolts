@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createLevel } from './generator';
+import { createLevel } from '../../src/lib/generator';
 
 describe('level generator', () => {
   it('generates reproducible board for same seed', () => {

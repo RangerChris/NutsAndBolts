@@ -1,8 +1,12 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
-import { describe, it, expect, beforeEach } from 'vitest';
-import TopBar from './TopBar';
-import { _clearStorage, setLevelCompleted } from '../lib/persistence';
+import { render, screen, cleanup } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import TopBar from '../../src/components/TopBar';
+import { _clearStorage, setLevelCompleted } from '../../src/lib/persistence';
+
+afterEach(() => {
+    cleanup();
+});
 
 if (typeof document === 'undefined') {
     describe.skip('TopBar (skipped - no DOM)', () => {

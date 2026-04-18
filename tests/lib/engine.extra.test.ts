@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { undoLastMove, executeMoveOnState, isWin } from './engine';
-import type { GameState } from './types';
+import { undoLastMove, executeMoveOnState, isWin } from '../../src/lib/engine';
+import type { GameState } from '../../src/lib/types';
 
 function makeState(): GameState {
   return {
