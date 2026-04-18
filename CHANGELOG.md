@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.23](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.22...v0.1.23) (2026-04-18)
+
+
+### Features
+
+* update HomeScreen and JourneyScreen layouts, add SVG icons, and enhance BottomBar functionality ([d16c788](https://github.com/RangerChris/NutsAndBolts/commit/d16c7888169e5d057cd2f789763b773703de1d11))
+
 ### [0.1.22](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.21...v0.1.22) (2026-04-12)
 
 
