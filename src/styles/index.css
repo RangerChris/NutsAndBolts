@@ -830,13 +830,17 @@ body {
 }
 
 .mode-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(220px, 320px));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
     gap: 18px;
     margin-top: 8px;
 }
 
 .mode-card {
+    width: min(520px, 100%);
     background: linear-gradient(180deg, var(--surface-container-high), rgba(255, 255, 255, 0.02));
     border-radius: 14px;
     padding: 16px 18px;
@@ -868,6 +872,17 @@ body {
     font-size: 22px;
 }
 
+.mode-icon-svg {
+    width: 32px;
+    height: 32px;
+    color: #ffffff;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+}
+
 .mode-content {
     display: flex;
     flex-direction: column;
@@ -886,27 +901,14 @@ body {
     max-width: 360px;
 }
 
-.home-controls {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    margin-top: 16px;
-}
-
-.help-btn {
-    padding: 10px 14px;
-    border-radius: 10px;
-    background: var(--primary-container);
-    color: var(--on-primary-container);
-    border: none;
-    font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
-}
-
 @media (max-width: 720px) {
     .mode-grid {
-        grid-template-columns: 1fr;
+        align-items: stretch;
+        flex-wrap: nowrap;
+        width: 100%;
+    }
+
+    .mode-card {
         width: 100%;
     }
 }

@@ -39,11 +39,11 @@ export default function JourneyScreen({ onPlayLevel, onBack }: Props) {
 
     return (
         <div className="journey-screen" style={{ padding: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-                <h2>Journey Levels</h2>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 12, marginBottom: 12 }}>
                 <div>
                     <button className="control-btn" onClick={() => onBack?.()}>Back</button>
                 </div>
+                <h2 style={{ margin: 0 }}>Journey Levels</h2>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {DIFFICULTIES.map((d) => {

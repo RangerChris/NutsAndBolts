@@ -17,7 +17,14 @@ export default function HomeScreen({ onSelectMode }: Props) {
             <h1>Nuts & Bolts</h1>
             <div className="mode-grid">
                 <button onClick={() => onSelectMode('journey', { difficulty })} className="mode-card" aria-label="Start Journey">
-                    <div className="mode-icon-placeholder" aria-hidden="true"></div>
+                    <div className="mode-icon-placeholder" aria-hidden="true">
+                        <svg className="mode-icon-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M5 19V7L12 5V17L5 19Z" />
+                            <path d="M12 17V5L19 7V19L12 17Z" />
+                            <circle cx="8" cy="10" r="1.6" />
+                            <circle cx="16" cy="14" r="1.6" />
+                        </svg>
+                    </div>
                     <div className="mode-content">
                         <div className="mode-title">Journey</div>
                         <div className="mode-desc">Progress through curated puzzles and unlock new levels.</div>
@@ -25,7 +32,16 @@ export default function HomeScreen({ onSelectMode }: Props) {
                 </button>
 
                 <button onClick={() => onSelectMode('daily')} className="mode-card" aria-label="Play Daily">
-                    <div className="mode-icon-placeholder" aria-hidden="true"></div>
+                    <div className="mode-icon-placeholder" aria-hidden="true">
+                        <svg className="mode-icon-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <rect x="4" y="5" width="16" height="15" rx="2" />
+                            <path d="M8 3V7" />
+                            <path d="M16 3V7" />
+                            <path d="M4 9H20" />
+                            <path d="M8 13H11" />
+                            <path d="M13 13H16" />
+                        </svg>
+                    </div>
                     <div className="mode-content">
                         <div className="mode-title">Daily</div>
                         <div className="mode-desc">One shared seeded puzzle per day — compete for best solutions.</div>
@@ -44,16 +60,30 @@ export default function HomeScreen({ onSelectMode }: Props) {
                 {/* Custom Seed option removed per request */}
 
                 <button onClick={() => setOpenEndless(true)} className="mode-card" aria-label="Endless Mode">
-                    <div className="mode-icon-placeholder" aria-hidden="true"></div>
+                    <div className="mode-icon-placeholder" aria-hidden="true">
+                        <svg className="mode-icon-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M4 12C5.7 8.8 8.8 8.8 11 12C13.2 15.2 16.3 15.2 20 12C18.3 8.8 15.2 8.8 13 12C10.8 15.2 7.7 15.2 4 12Z" />
+                        </svg>
+                    </div>
                     <div className="mode-content">
                         <div className="mode-title">Endless</div>
                         <div className="mode-desc">Keep solving generated puzzles — a fresh challenge every win.</div>
                     </div>
                 </button>
-            </div>
 
-            <div className="home-controls">
-                <button data-testid="help-tutorial" className="help-btn" onClick={() => onSelectMode('tutorial')}>Help / Tutorial</button>
+                <button data-testid="help-tutorial" onClick={() => onSelectMode('tutorial')} className="mode-card" aria-label="Help and Tutorial">
+                    <div className="mode-icon-placeholder" aria-hidden="true">
+                        <svg className="mode-icon-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M4 6.5C4 5.7 4.7 5 5.5 5H11V19H5.5C4.7 19 4 18.3 4 17.5V6.5Z" />
+                            <path d="M20 6.5C20 5.7 19.3 5 18.5 5H13V19H18.5C19.3 19 20 18.3 20 17.5V6.5Z" />
+                            <path d="M11 7H13" />
+                        </svg>
+                    </div>
+                    <div className="mode-content">
+                        <div className="mode-title">Help / Tutorial</div>
+                        <div className="mode-desc">Learn controls and mechanics with a guided walkthrough.</div>
+                    </div>
+                </button>
             </div>
             {openEndless && (
                 <div className="complete-overlay" role="dialog" aria-modal="true">
