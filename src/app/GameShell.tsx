@@ -9,7 +9,7 @@ import {
     computeStars,
     computeSolutionPath,
 } from '../lib/engine';
-import Board, { AnimMove } from '../components/Board';
+import Board, { type AnimMove, type HintPreview } from '../components/Board';
 import BottomBar from '../components/BottomBar';
 import TopBar from '../components/TopBar';
 import starUrl from '../assets/icons/star.svg';
@@ -75,6 +75,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     const [invalidTarget, setInvalidTarget] = useState<string | null>(null);
     const lastClickRef = useRef<{ id: string | null; time: number }>({ id: null, time: 0 });
     const [animMove, setAnimMove] = useState<AnimMove | null>(null);
+    const [hintPreview, setHintPreview] = useState<HintPreview | null>(null);
     const [showComplete, setShowComplete] = useState(false);
     const [levelSolvable, setLevelSolvable] = useState(true);
 
@@ -143,6 +144,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         setSelected(null);
         setInvalidTarget(null);
         setAnimMove(null);
+        setHintPreview(null);
         setShowComplete(false);
     };
 
@@ -168,12 +170,32 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
 
         if (!selected) return;
 
+        const srcBefore = state.bolts.find((b) => b.id === selected);
+        const tgtBefore = state.bolts.find((b) => b.id === id);
+        const movableBefore = srcBefore && tgtBefore ? getMovableTopCount(srcBefore, tgtBefore) : { count: 0 };
+        const preRects = movableBefore.count > 0
+            ? Array.from({ length: movableBefore.count }, (_, offset) => {
+                const slotIndex = (srcBefore?.nuts.length || 0) - movableBefore.count + offset;
+                const selector = `[data-bolt="${selected}"] [data-nut-index="${slotIndex}"] [data-preview-fill]`;
+                const sourceEl = document.querySelector(selector) as SVGGraphicsElement | null;
+                if (!sourceEl) return null;
+                const rect = sourceEl.getBoundingClientRect();
+                return {
+                    left: rect.left,
+                    top: rect.top,
+                    width: rect.width,
+                    height: rect.height,
+                    color: sourceEl.getAttribute('data-preview-fill') || '#bdbdbd',
+                };
+            }).filter(Boolean) as Array<{ left: number; top: number; width: number; height: number; color: string }>
+            : [];
+
         const res = executeMoveOnState(state, selected, id);
         setSelected(null);
         if (res.success) {
             setState({ ...state });
             if (res.move) {
-                setAnimMove({ move: res.move, preRects: [] });
+                setAnimMove({ move: res.move, preRects });
             }
             try { emitEvent('move', res.move); } catch { }
         } else {
@@ -185,17 +207,17 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     // Extra bolt feature removed — no-op placeholder kept for compatibility if referenced
     // function handleAddExtraBolt() { }
 
-    const findHint = () => {
+    const findHint = (): HintPreview | null => {
         const solution = computeSolutionPath(state, { maxDepth: 140, maxStates: 250000 });
         if (solution && solution.length > 0) {
-            return { from: solution[0].fromBoltId, to: solution[0].toBoltId };
+            return { fromBoltId: solution[0].fromBoltId, toBoltId: solution[0].toBoltId, count: solution[0].count, allowed: true };
         }
 
         for (const src of state.bolts) {
             for (const tgt of state.bolts) {
                 if (tgt.id === src.id) continue;
                 const movable = getMovableTopCount(src, tgt);
-                if (movable.count > 0) return { from: src.id, to: tgt.id };
+                if (movable.count > 0) return { fromBoltId: src.id, toBoltId: tgt.id, count: movable.count, allowed: true };
             }
         }
         return null;
@@ -204,8 +226,9 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     const handleHint = () => {
         const h = findHint();
         if (!h) return;
-        setSelected(h.from);
-        setTimeout(() => setSelected(null), 800);
+        setSelected(null);
+        setInvalidTarget(null);
+        setHintPreview({ ...h });
     };
 
     const handleContinue = () => {
@@ -282,6 +305,8 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
                     onBoltClick={handleBoltClick}
                     animMove={animMove}
                     onAnimDone={handleAnimDone}
+                    hintPreview={hintPreview}
+                    onHintDone={() => setHintPreview(null)}
                 />
             </div>
 

@@ -110,10 +110,13 @@ function canonSolverBolts(bolts: SolverBolt[]): string {
 }
 
 function isWinSolverBolts(bolts: SolverBolt[]): boolean {
+  const seenColors = new Set<string>();
   for (const b of bolts) {
     if (b.nuts.length === 0) continue;
     const first = b.nuts[0];
     if (!b.nuts.every((n) => n === first)) return false;
+    if (seenColors.has(first)) return false;
+    seenColors.add(first);
   }
   return true;
 }
@@ -242,10 +245,13 @@ export function undoLastMove(state: GameState): { success: boolean; reason?: str
 }
 
 export function isWin(state: GameState): boolean {
+  const seenColors = new Set<string>();
   for (const b of state.bolts) {
     if (b.nuts.length === 0) continue;
     const first = nutColor(b.nuts[0]);
     if (!b.nuts.every((n) => nutColor(n) === first)) return false;
+    if (seenColors.has(first || '')) return false;
+    seenColors.add(first || '');
   }
   return true;
 }

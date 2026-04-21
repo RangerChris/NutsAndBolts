@@ -7,3 +7,4 @@ coverage/
 .env
 screenshots/
 test-results/
+.playwright-mcp/

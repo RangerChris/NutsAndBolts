@@ -10,6 +10,14 @@ type Props = {
   showDebug?: boolean;
   onClick?: (id: string) => void;
   hiddenNuts?: boolean;
+  movePreview?: {
+    toBoltId: string;
+    count: number;
+  } | null;
+  hintPreview?: {
+    fromBoltId: string;
+    count: number;
+  } | null;
 
 };
 
@@ -70,9 +78,20 @@ export default function BoltView({
   showDebug = false,
   onClick,
   hiddenNuts = false,
+  movePreview = null,
+  hintPreview = null,
 }: Props) {
   const palette = getPalette(paletteId);
   const capacity = bolt.capacity;
+  const topNut = bolt.nuts[bolt.nuts.length - 1];
+  const topColor = topNut?.color;
+  let topGroupStartIndex = bolt.nuts.length;
+  if (topColor) {
+    for (let idx = bolt.nuts.length - 1; idx >= 0; idx--) {
+      if (bolt.nuts[idx]?.color !== topColor) break;
+      topGroupStartIndex = idx;
+    }
+  }
 
   const effectiveCapacity = Math.max(capacity, bolt.nuts.length);
   const headY = THREAD_H + effectiveCapacity * SLOT_H; // y where head begins (relative to drawing origin)
@@ -103,7 +122,7 @@ export default function BoltView({
       role="button"
       tabIndex={0}
       aria-label={`Bolt ${bolt.id}, ${bolt.nuts.length} of ${capacity} nuts`}
-      className={`bolt ${selected ? 'bolt-selected' : ''} ${invalid ? 'bolt-invalid' : ''} bolt-root-inline`}
+      className={`bolt ${invalid ? 'bolt-invalid' : ''} bolt-root-inline`}
       onClick={() => onClick?.(bolt.id)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -187,6 +206,7 @@ export default function BoltView({
               return (
                 <rect
                   key={`ghost-${slotIdx}`}
+                  data-slot-index={slotIdx}
                   x={NUT_X}
                   y={y}
                   width={NUT_W}
@@ -208,12 +228,22 @@ export default function BoltView({
               const isTop = slotIdx === bolt.nuts.length - 1;
               const isRevealed = Boolean(nut.revealed);
               const shouldHide = Boolean(hiddenNuts && !isTop && !isRevealed);
+              const isHintSourceNut = hintPreview?.fromBoltId === bolt.id && slotIdx >= bolt.nuts.length - hintPreview.count;
+              const isMoveTargetNut = movePreview?.toBoltId === bolt.id && slotIdx >= bolt.nuts.length - movePreview.count;
+              const isSelectedTopGroupNut = selected && slotIdx >= topGroupStartIndex;
               const y = nutTop(slotIdx, effectiveCapacity);
 
               const gradId = `nutgrad-${bolt.id}-${slotIdx}`;
 
               return (
-                <g key={`${bolt.id}-${slotIdx}-${nut.id}`} data-nut-index={slotIdx} data-nut-id={colorId} data-nut-instance={nut.id}>
+                <g
+                  key={`${bolt.id}-${slotIdx}-${nut.id}`}
+                  data-nut-index={slotIdx}
+                  data-nut-id={colorId}
+                  data-nut-instance={nut.id}
+                  className={isSelectedTopGroupNut ? 'bolt-selected-group' : undefined}
+                  data-selected-top-group={isSelectedTopGroupNut ? 'true' : undefined}
+                >
                   <defs>
                     <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
                       <stop offset="0%" stopColor={lighten(color, 0.18)} stopOpacity="1" />
@@ -231,7 +261,11 @@ export default function BoltView({
                     stroke={shouldHide ? 'rgba(0,0,0,0.12)' : 'var(--nut-stroke)'}
                     strokeWidth={0.8}
                     filter={shouldHide ? undefined : `url(#${dsFilterId})`}
+                    data-preview-fill={shouldHide ? '#bdbdbd' : color}
+                    data-hint-source-hidden={isHintSourceNut ? 'true' : undefined}
+                    data-move-target-hidden={isMoveTargetNut ? 'true' : undefined}
                     data-hidden={shouldHide ? 'true' : undefined}
+                    opacity={isHintSourceNut || isMoveTargetNut ? 0 : 1}
                   />
                   {!shouldHide && (
                     <rect
@@ -241,7 +275,7 @@ export default function BoltView({
                       height={Math.max(4, Math.round(NUT_H * 0.18))}
                       rx={2}
                       fill="var(--sheen-color)"
-                      opacity={0.9}
+                      opacity={isHintSourceNut || isMoveTargetNut ? 0 : 0.9}
                     />
                   )}
                 </g>

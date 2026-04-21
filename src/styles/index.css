@@ -163,9 +163,9 @@ body {
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06) inset;
 }
 
-.bolt-selected {
-    transform: translateY(-6px);
-    filter: drop-shadow(0 12px 28px var(--ambient-shadow-color));
+.bolt-selected-group {
+    transform: translateY(-12px);
+    transition: transform 120ms ease;
 }
 
 .bottom-bar {
@@ -269,7 +269,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .bolt-selected {
+    .bolt-selected-group {
         transform: none;
     }
 
@@ -938,8 +938,8 @@ body {
     padding: 0 14px;
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    background: linear-gradient(180deg, var(--surface-container-high), var(--surface-container));
-    color: var(--text);
+    background: #ffffff;
+    color: #000000;
     font-size: 16px;
     font-weight: 700;
     font-family: var(--font-sans);
@@ -1079,4 +1079,9 @@ body {
         min-width: 64px;
         font-size: 14px;
     }
+}
+
+.endless-difficulty-select option {
+    background: #ffffff;
+    color: #000000;
 }

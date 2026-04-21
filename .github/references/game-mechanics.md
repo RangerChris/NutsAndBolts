@@ -36,7 +36,7 @@ Extra bolt (player-controlled)
 
 Win condition
 
-- A level is complete when every non-empty bolt contains nuts of a single color (no mixed bolts) and any level-specific solved constraints are met. The presence of the player's extra bolt does not alter the solved predicate; if the solved condition is met while the extra is present, the level is considered completed and the extra is cleaned up.
+- A level is complete when every non-empty bolt contains nuts of a single color (no mixed bolts), each color appears on at most one non-empty bolt (no split-color completion), and any level-specific solved constraints are met. The presence of the player's extra bolt does not alter the solved predicate; if the solved condition is met while the extra is present, the level is considered completed and the extra is cleaned up.
 
 Undo / Hint
 
