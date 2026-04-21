@@ -110,13 +110,10 @@ function canonSolverBolts(bolts: SolverBolt[]): string {
 }
 
 function isWinSolverBolts(bolts: SolverBolt[]): boolean {
-  const seenColors = new Set<string>();
   for (const b of bolts) {
     if (b.nuts.length === 0) continue;
     const first = b.nuts[0];
     if (!b.nuts.every((n) => n === first)) return false;
-    if (seenColors.has(first)) return false;
-    seenColors.add(first);
   }
   return true;
 }
@@ -140,9 +137,9 @@ function getMovableCountForSolver(source: SolverBolt, target: SolverBolt): { col
   const { color, count } = getTopGroupForSolver(source);
   if (!color || count <= 0) return { color, count: 0 };
   const free = target.capacity - target.nuts.length;
-  if (free <= 0) return { color, count: 0 };
+  if (free < count) return { color, count: 0 };
   if (target.nuts.length > 0 && target.nuts[target.nuts.length - 1] !== color) return { color, count: 0 };
-  return { color, count: Math.min(count, free) };
+  return { color, count };
 }
 
 export function computeSolutionPath(startState: GameState, options?: SolverOptions): SolverStep[] | null {
@@ -245,13 +242,10 @@ export function undoLastMove(state: GameState): { success: boolean; reason?: str
 }
 
 export function isWin(state: GameState): boolean {
-  const seenColors = new Set<string>();
   for (const b of state.bolts) {
     if (b.nuts.length === 0) continue;
     const first = nutColor(b.nuts[0]);
     if (!b.nuts.every((n) => nutColor(n) === first)) return false;
-    if (seenColors.has(first || '')) return false;
-    seenColors.add(first || '');
   }
   return true;
 }

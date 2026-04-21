@@ -43,6 +43,7 @@ Undo / Hint
 - `Undo` should revert the last successful move and restore engine state to the previous moment. If the engine semantics allow it, undo should also restore any resources consumed by the last move.
 
 - `Hint` may highlight a legal move or suggest the next move from a computed solution path. Hints should be conservative and rate-limited to avoid trivializing puzzles.
+- `Hint` legality must match move legality exactly: for a selected source bolt, the hinted target must have enough free capacity for the *entire* contiguous top group. Hints must never rely on partial transfers.
 
 Engine & generator notes
 

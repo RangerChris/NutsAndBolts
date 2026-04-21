@@ -28,12 +28,14 @@ describe('engine helpers', () => {
     expect(ok.reason).toBe('capacity');
   });
 
-  it('allows placement when target has partial free room', () => {
+  it('rejects placement when target lacks room for the full top group', () => {
     const src: Bolt = { id: 's', capacity: 4, nuts: ['red', 'red', 'red'] };
     const tgt: Bolt = { id: 't', capacity: 4, nuts: [] };
+    tgt.nuts = ['blue', 'blue', 'blue'];
     const top = pickTopGroup(src);
     const ok = canPlaceGroup(src, tgt, top.count);
-    expect(ok.ok).toBe(true);
+    expect(ok.ok).toBe(false);
+    expect(ok.reason).toBe('capacity');
   });
 
   it('performs a legal move and returns a Move', () => {
@@ -46,14 +48,13 @@ describe('engine helpers', () => {
     expect(tgt.nuts.length).toBe(2);
   });
 
-  it('performs a partial move when target has limited room', () => {
+  it('does not perform move when target has limited room for full group', () => {
     const src: Bolt = { id: 's', capacity: 4, nuts: ['red', 'red', 'red'] };
     const tgt: Bolt = { id: 't', capacity: 4, nuts: ['red', 'red', 'red'] };
     const move = performMove(src, tgt);
-    expect(move).not.toBeNull();
-    expect(move?.count).toBe(1);
-    expect(src.nuts.length).toBe(2);
-    expect(tgt.nuts.length).toBe(4);
+    expect(move).toBeNull();
+    expect(src.nuts.length).toBe(3);
+    expect(tgt.nuts.length).toBe(3);
   });
 
   it('does not perform illegal move (color mismatch)', () => {
@@ -83,7 +84,7 @@ describe('engine helpers', () => {
     expect(state.moveHistory.length).toBe(1);
   });
 
-  it('executeMoveOnState moves only available count when room is limited', () => {
+  it('executeMoveOnState fails when room is insufficient for full group', () => {
     const state: GameState = {
       bolts: [
         { id: 'a', capacity: 4, nuts: ['red', 'red', 'red'] },
@@ -95,11 +96,11 @@ describe('engine helpers', () => {
       moveHistory: [],
     };
     const res = executeMoveOnState(state, 'a', 'b');
-    expect(res.success).toBe(true);
-    expect(res.move?.count).toBe(1);
-    expect(state.bolts[0].nuts.length).toBe(2);
-    expect(state.bolts[1].nuts.length).toBe(4);
-    expect(state.moveHistory.length).toBe(1);
+    expect(res.success).toBe(false);
+    expect(res.reason).toBe('capacity');
+    expect(state.bolts[0].nuts.length).toBe(3);
+    expect(state.bolts[1].nuts.length).toBe(3);
+    expect(state.moveHistory.length).toBe(0);
   });
 
   it('undoLastMove reverts the last move', () => {
@@ -138,7 +139,7 @@ describe('engine helpers', () => {
     expect(isWin(state)).toBe(false);
   });
 
-  it('isWin fails when same color exists on multiple bolts', () => {
+  it('isWin allows same color across multiple uniform bolts', () => {
     const state: GameState = {
       bolts: [
         { id: 'a', capacity: 4, nuts: ['red', 'red'] },
@@ -149,7 +150,7 @@ describe('engine helpers', () => {
       difficulty: 'easy',
       moveHistory: [],
     };
-    expect(isWin(state)).toBe(false);
+    expect(isWin(state)).toBe(true);
   });
 
   it('validateState catches simple invariants', () => {

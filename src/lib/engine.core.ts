@@ -21,7 +21,7 @@ export function pickTopGroup(bolt: Bolt): { color?: string; count: number } {
 export function canPlaceGroup(source: Bolt, target: Bolt, groupCount: number): { ok: boolean; reason?: string } {
   if (groupCount <= 0) return { ok: false, reason: 'empty-group' };
   const free = target.capacity - target.nuts.length;
-  if (free <= 0) return { ok: false, reason: 'capacity' };
+  if (free < groupCount) return { ok: false, reason: 'capacity' };
   if (target.nuts.length === 0) return { ok: true };
   const targetTop = nutColor(target.nuts[target.nuts.length - 1]);
   const sourceTop = nutColor(source.nuts[source.nuts.length - 1]);
@@ -34,8 +34,7 @@ export function getMovableTopCount(source: Bolt, target: Bolt): { color?: string
   if (!color || count <= 0) return { count: 0, reason: 'empty-source' };
   const can = canPlaceGroup(source, target, count);
   if (!can.ok) return { color, count: 0, reason: can.reason };
-  const free = target.capacity - target.nuts.length;
-  return { color, count: Math.min(count, free) };
+  return { color, count };
 }
 
 export function performMove(source: Bolt, target: Bolt): Move | null {

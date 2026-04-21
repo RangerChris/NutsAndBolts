@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { createLevel } from '../../src/lib/generator';
+import { computeSolutionPath } from '../../src/lib/engine';
 
 describe('level generator', () => {
   it('generates reproducible board for same seed', () => {
@@ -15,11 +16,15 @@ describe('level generator', () => {
     for (const bolt of state.bolts) {
       expect(bolt.nuts.length).toBeLessThanOrEqual(bolt.capacity);
     }
-    
+
+    const nutColor = (n: unknown) => (typeof n === 'string' ? n : (n as { color?: string } | undefined)?.color);
     const hasMixed = state.bolts.some(
-      (b) => b.nuts.length > 1 && !b.nuts.every((n) => n === b.nuts[0])
+      (b) => b.nuts.length > 1 && !b.nuts.every((n) => nutColor(n) === nutColor(b.nuts[0]))
     );
     expect(hasMixed).toBe(true);
+
+    const path = computeSolutionPath(state, { maxDepth: 140, maxStates: 250000 });
+    expect(path).not.toBeNull();
     expect(typeof state.optimalMoves === 'number' || state.optimalMoves === null).toBe(true);
   });
 
