@@ -1,6 +1,6 @@
 import type { Bolt, GameState, Move, Nut } from './types';
 import { MAX_BOLTS } from './constants';
-import { getMovableTopCount, performMove, markRevealedIfNeeded } from './engine.core';
+import { getMovableTopCount, performMove, markRevealedIfNeeded, markTopRunRevealedIfNeeded } from './engine.core';
 import { emitBalancerEvent } from './balancer';
 
 const nutColor = (n?: Nut | string | unknown) => (typeof n === 'string' ? n : (n as Nut | undefined)?.color);
@@ -34,6 +34,7 @@ export function executeMoveOnState(state: GameState, fromId: string, toId: strin
   state.moveHistory.push(move);
   try {
     markRevealedIfNeeded(state, fromId, srcLenBefore, move.count);
+    markTopRunRevealedIfNeeded(state, toId);
   } catch {}
   try {
     if (isWin(state)) {

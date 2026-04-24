@@ -5,6 +5,37 @@ type NutOrString = Nut | string;
 
 const nutColor = (n?: NutOrString) => (typeof n === 'string' ? n : n?.color);
 
+function ensureRevealedNut(bolt: Bolt, idx: number): { nut: Nut; changed: boolean } | null {
+  const current = bolt.nuts[idx] as NutOrString | undefined;
+  const color = nutColor(current);
+  if (!color) return null;
+  if (typeof current === 'string') {
+    const created: Nut = { id: `${bolt.id}-n${idx}`, color, revealed: true };
+    bolt.nuts[idx] = created;
+    return { nut: created, changed: true };
+  }
+  const changed = !current.revealed;
+  current.revealed = true;
+  return { nut: current, changed };
+}
+
+export function revealTopColorRun(bolt: Bolt): Nut[] {
+  if (!bolt.nuts || bolt.nuts.length === 0) return [];
+  const topColor = nutColor(bolt.nuts[bolt.nuts.length - 1]);
+  if (!topColor) return [];
+
+  const newlyRevealed: Nut[] = [];
+  let idx = bolt.nuts.length - 1;
+  while (idx >= 0) {
+    const color = nutColor(bolt.nuts[idx]);
+    if (color !== topColor) break;
+    const ensured = ensureRevealedNut(bolt, idx);
+    if (ensured && ensured.changed) newlyRevealed.push(ensured.nut);
+    idx--;
+  }
+  return newlyRevealed;
+}
+
 export function pickTopGroup(bolt: Bolt): { color?: string; count: number } {
   if (!bolt.nuts || bolt.nuts.length === 0) return { color: undefined, count: 0 };
   const top = bolt.nuts[bolt.nuts.length - 1];
@@ -62,39 +93,24 @@ export function performMove(source: Bolt, target: Bolt): Move | null {
 
 export function markRevealedIfNeeded(state: GameState, fromId: string, beforeLen: number, moveCount: number) {
   if (!state.hiddenNuts || beforeLen - moveCount <= 0) return;
-  const revealedBolt = state.bolts.find((b: Bolt) => b.id === fromId);
-  if (!revealedBolt || revealedBolt.nuts.length === 0) return;
+  markTopRunRevealedIfNeeded(state, fromId);
+}
 
-  const lastMove = state.moveHistory && state.moveHistory.length > 0 ? state.moveHistory[state.moveHistory.length - 1] : undefined;
-  const movedColor = lastMove ? lastMove.color : undefined;
+export function markTopRunRevealedIfNeeded(state: GameState, boltId: string) {
+  if (!state.hiddenNuts) return;
+  const bolt = state.bolts.find((b: Bolt) => b.id === boltId);
+  if (!bolt || bolt.nuts.length === 0) return;
 
-  // Reveal consecutive nuts starting from the new top, stopping when we encounter a nut
-  // whose color differs from the moved group's color.
-  for (let idx = revealedBolt.nuts.length - 1; idx >= 0; idx--) {
-    let n = revealedBolt.nuts[idx];
-    const c = nutColor(n);
-    if (!c) break;
-
-    // mark as Nut object with revealed flag if needed
-    if (typeof n === 'string') {
-      n = { id: `${revealedBolt.id}-n${idx}`, color: n, revealed: true } as Nut;
-      revealedBolt.nuts[idx] = n;
-    } else {
-      n.revealed = true;
-    }
-
+  const newlyRevealed = revealTopColorRun(bolt);
+  for (const nut of newlyRevealed) {
     emitBalancerEvent('game', {
       event: 'nutRevealed',
       level: state.level,
       difficulty: state.difficulty,
       seed: state.seed,
-      boltId: fromId,
-      revealedNutId: n ? n.id : undefined,
-      revealedColor: c,
+      boltId,
+      revealedNutId: nut.id,
+      revealedColor: nut.color,
     });
-
-    if (movedColor && c !== movedColor) break;
-    // if movedColor is undefined, reveal only the immediate top (we already revealed it), then stop
-    if (!movedColor) break;
   }
 }

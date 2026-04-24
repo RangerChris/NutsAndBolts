@@ -15,4 +15,17 @@ describe('createLevel hiddenNuts flag', () => {
     expect(forcedOn.state.hiddenNuts).toBe(true);
     expect(forcedOff.state.hiddenNuts).toBe(false);
   });
+
+  it('reveals full top same-color chains at level start when hidden mode is enabled', () => {
+    const { state } = createLevel({ difficulty: 'easy', level: 2, seed: 'hidden-top-run', hiddenNuts: true });
+
+    for (const bolt of state.bolts) {
+      if (bolt.nuts.length === 0) continue;
+      const topColor = bolt.nuts[bolt.nuts.length - 1].color;
+      for (let idx = bolt.nuts.length - 1; idx >= 0; idx--) {
+        if (bolt.nuts[idx].color !== topColor) break;
+        expect(Boolean(bolt.nuts[idx].revealed)).toBe(true);
+      }
+    }
+  });
 });

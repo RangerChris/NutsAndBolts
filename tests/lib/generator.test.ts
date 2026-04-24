@@ -44,4 +44,18 @@ describe('level generator', () => {
       }
     }
   }, 15000);
+
+  it('can skip solvability check for restart flows', () => {
+    const { state } = createLevel({
+      difficulty: 'easy',
+      level: 1,
+      seed: 'restart-skip-check',
+      skipSolvabilityCheck: true,
+    });
+
+    expect(state.optimalMoves).toBeNull();
+    for (const bolt of state.bolts) {
+      expect(bolt.nuts.length).toBeLessThanOrEqual(bolt.capacity);
+    }
+  });
 });

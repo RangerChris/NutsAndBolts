@@ -63,8 +63,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
 
     useEffect(() => {
         const { state: s } = createLevel({ difficulty, level: currentLevel, seed, hiddenNuts: forceHidden ? true : null });
-        const initialSolution = computeSolutionPath(s, { maxDepth: 140, maxStates: 250000 });
-        setLevelSolvable(Boolean(initialSolution && initialSolution.length > 0));
+        setLevelSolvable(typeof s.optimalMoves === 'number' && s.optimalMoves > 0);
         try {
             setSeedForDifficulty(difficulty, seed);
         } catch { }
@@ -137,9 +136,13 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     };
 
     const handleRestart = () => {
-        const { state: s } = createLevel({ difficulty, level: currentLevel, seed, hiddenNuts: forceHidden ? true : null });
-        const initialSolution = computeSolutionPath(s, { maxDepth: 140, maxStates: 250000 });
-        setLevelSolvable(Boolean(initialSolution && initialSolution.length > 0));
+        const { state: s } = createLevel({
+            difficulty,
+            level: currentLevel,
+            seed,
+            hiddenNuts: forceHidden ? true : null,
+            skipSolvabilityCheck: true,
+        });
         setState(s);
         setSelected(null);
         setInvalidTarget(null);

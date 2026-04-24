@@ -2,11 +2,12 @@ import { seededRandom, randomInt } from './rng';
 import type { GameState, Bolt, Move } from './types';
 import { DIFFICULTY_CONFIG } from './constants';
 import { getLevelParams } from './progression';
-import { pickTopGroup, normalizeState, checkStateInvariants, computeSolutionPath } from './engine';
+import { pickTopGroup, normalizeState, checkStateInvariants, computeSolutionPath, revealTopColorRun } from './engine';
 import { emitBalancerEvent } from './balancer';
 import type { Nut } from './types';
 
 type CreateLevelOpts = { difficulty: GameState['difficulty']; level?: number; seed?: string | number; hiddenNuts?: boolean | null };
+type CreateLevelRuntimeOpts = CreateLevelOpts & { skipSolvabilityCheck?: boolean };
 
 function hasSingletonColorCount(bolts: Bolt[]): boolean {
   const counts = new Map<string, number>();
@@ -45,7 +46,7 @@ export function createSolvedBoard(numBolts: number, stackHeight: number): Bolt[]
   return bolts;
 }
 
-export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: string } {
+export function createLevel(opts: CreateLevelRuntimeOpts): { state: GameState; seed: string } {
   const cfg = DIFFICULTY_CONFIG[opts.difficulty];
   const levelNum = opts.level || 1;
   const { numBolts, stackHeight } = getLevelParams(opts.difficulty, levelNum);
@@ -155,6 +156,13 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
     }
   }
 
+  // Hidden-nut mode should reveal the full contiguous top color run on each bolt.
+  if (hiddenNutsEnabled) {
+    for (const bolt of boltsToReturn) {
+      revealTopColorRun(bolt);
+    }
+  }
+
   state.moveHistory = filteredMoves;
   const normalized = normalizeState(state);
 
@@ -181,20 +189,24 @@ export function createLevel(opts: CreateLevelOpts): { state: GameState; seed: st
     });
   } catch {}
 
-  try {
-    const solution = computeSolutionPath(normalized, {
-      maxDepth: Math.max(80, shuffleMoves * 3),
-      maxStates: 250000,
-    });
-    normalized.optimalMoves = solution ? solution.length : null;
+  if (!opts.skipSolvabilityCheck) {
+    try {
+      const solution = computeSolutionPath(normalized, {
+        maxDepth: Math.max(80, shuffleMoves * 3),
+        maxStates: 250000,
+      });
+      normalized.optimalMoves = solution ? solution.length : null;
 
-    if (!solution) {
-      const next = retrySeed(seed);
-      if (next.retryCount < 5) {
-        return createLevel({ ...opts, seed: next.retrySeed });
+      if (!solution) {
+        const next = retrySeed(seed);
+        if (next.retryCount < 5) {
+          return createLevel({ ...opts, seed: next.retrySeed });
+        }
       }
+    } catch {
+      normalized.optimalMoves = null;
     }
-  } catch {
+  } else {
     normalized.optimalMoves = null;
   }
 
