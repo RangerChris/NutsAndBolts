@@ -10,7 +10,7 @@ export const PALETTES: Palette[] = [
   {
     id: 0,
     name: 'Clarity Bright',
-    colors: ['#FF4D6D', '#FF9F1C', '#FFD60A', '#8AC926', '#2EC4B6', '#00BBF9', '#4D96FF', '#9B5DE5', '#F15BB5', '#F9844A'],
+    colors: ['#FF4D6D', '#FF9F1C', '#FFD60A', '#8AC926', '#269287', '#0397c9', '#1b447e', '#9B5DE5', '#F15BB5', '#F9844A'],
   },
   {
     id: 1,
