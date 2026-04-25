@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.28](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.27...v0.1.28) (2026-04-25)
+
+
+### Bug Fixes
+
+* update color values in Clarity Bright palette for better contrast ([0c25e8a](https://github.com/RangerChris/NutsAndBolts/commit/0c25e8abdd13d16607b22c682878f082ca6e40f7))
+
 ### [0.1.27](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.26...v0.1.27) (2026-04-24)
 
 
