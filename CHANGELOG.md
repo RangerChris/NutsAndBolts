@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.29](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.28...v0.1.29) (2026-05-04)
+
+
+### Bug Fixes
+
+* adjust spacing and padding for bolt and board elements for improved layout ([6d785c3](https://github.com/RangerChris/NutsAndBolts/commit/6d785c3cbfd4df8b32f8f3883674a23d737b3988))
+
 ### [0.1.28](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.27...v0.1.28) (2026-04-25)
 
 
