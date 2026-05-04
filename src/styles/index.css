@@ -114,11 +114,11 @@ body {
 
 .bolt-list {
     display: flex;
-    gap: 16px;
+    gap: 12px;
 }
 
 .bolt {
-    padding: 6px;
+    padding: 4px;
     background: transparent;
     border-radius: 6px;
     cursor: pointer;
@@ -744,8 +744,16 @@ body {
     }
 
     .board-row {
-        gap: 6px;
+        gap: 4px;
         padding: 4px;
+    }
+
+    .bolt {
+        padding: 3px;
+    }
+
+    .bolt-list {
+        gap: 8px;
     }
 
     .bolt-svg {
@@ -810,12 +818,20 @@ body {
 
 @media (max-width: 400px) {
     .bolt-svg {
-        width: 60px;
+        width: 56px;
     }
 
     .board-row {
-        gap: 4px;
+        gap: 2px;
         padding: 2px;
+    }
+
+    .bolt {
+        padding: 2px;
+    }
+
+    .bolt-list {
+        gap: 6px;
     }
 }
 
