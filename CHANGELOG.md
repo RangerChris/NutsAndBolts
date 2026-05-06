@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.33](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.32...v0.1.33) (2026-05-06)
+
+
+### Features
+
+* remove unused drop shadow filter and update gradient colors in BoltView ([b10132c](https://github.com/RangerChris/NutsAndBolts/commit/b10132c3cdc074087ba7d7394fe80db0454e1676))
+
 ### [0.1.32](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.31...v0.1.32) (2026-05-06)
 
 
