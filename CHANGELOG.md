@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.31](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.30...v0.1.31) (2026-05-06)
+
+
+### Features
+
+* enhance GameShell with endless mode seed generation and add seed panel toggle in TopBar ([5598b7c](https://github.com/RangerChris/NutsAndBolts/commit/5598b7ccc342ae6d2486ec072a8351db5341d5c7))
+
 ### [0.1.30](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.29...v0.1.30) (2026-05-06)
 
 
