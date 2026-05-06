@@ -28,13 +28,13 @@ const HEAD_H = 32;
 const HEAD_X = (W - HEAD_W) / 2;
 const SHAFT_W = 28;
 const SHAFT_X = CX - SHAFT_W / 2;
-const SLOT_H = 34;
-const NUT_H = 26;
+const SLOT_H = 28;
+const NUT_H = 22;
 const NUT_W = 72;
 const NUT_X = (W - NUT_W) / 2;
 const NUT_Y_PAD = (SLOT_H - NUT_H) / 2;
-const THREAD_H = 22;
-const TOP_PAD = 8;
+const THREAD_H = 16;
+const TOP_PAD = 4;
 
 function clamp(v: number, a = 0, b = 255) {
   return Math.max(a, Math.min(b, Math.round(v)));

@@ -118,7 +118,7 @@ body {
 }
 
 .bolt {
-    padding: 4px;
+    padding: 3px;
     background: transparent;
     border-radius: 6px;
     cursor: pointer;
@@ -508,7 +508,7 @@ body {
     grid-template-rows: repeat(3, min-content);
     grid-auto-flow: column;
     grid-auto-columns: max-content;
-    gap: 12px;
+    gap: 8px;
     padding: 8px;
     align-items: start;
     justify-content: center;
@@ -702,7 +702,7 @@ body {
 }
 
 .bolt-svg {
-    width: 120px;
+    width: 110px;
     height: auto;
     display: block;
 }
