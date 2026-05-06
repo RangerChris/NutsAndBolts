@@ -117,6 +117,16 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         }
     }, [state]);
 
+    useEffect(() => {
+        if (!state || levelSolvable) return;
+        if (isWin(state)) {
+            setLevelSolvable(true);
+            return;
+        }
+        const solution = computeSolutionPath(state, { maxDepth: 140, maxStates: 250000 });
+        if (solution) setLevelSolvable(true);
+    }, [state, levelSolvable]);
+
     const computeSortedPercent = (s: GameState) => {
         const bolts = s.bolts || [];
         const total = bolts.reduce((acc, b) => acc + (b.nuts?.length || 0), 0);
@@ -174,6 +184,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         setInvalidTarget(null);
         setAnimMove(null);
         setHintPreview(null);
+        setLevelSolvable(true);
         setShowComplete(false);
     };
 
@@ -241,20 +252,15 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         if (solution && solution.length > 0) {
             return { fromBoltId: solution[0].fromBoltId, toBoltId: solution[0].toBoltId, count: solution[0].count, allowed: true };
         }
-
-        for (const src of state.bolts) {
-            for (const tgt of state.bolts) {
-                if (tgt.id === src.id) continue;
-                const movable = getMovableTopCount(src, tgt);
-                if (movable.count > 0) return { fromBoltId: src.id, toBoltId: tgt.id, count: movable.count, allowed: true };
-            }
-        }
         return null;
     };
 
     const handleHint = () => {
         const h = findHint();
-        if (!h) return;
+        if (!h) {
+            setLevelSolvable(false);
+            return;
+        }
         setSelected(null);
         setInvalidTarget(null);
         setHintPreview({ ...h });
