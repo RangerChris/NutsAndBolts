@@ -44,6 +44,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     const paletteId = 0;
     const [seed, setSeed] = useState<string>(() => {
         if (playMode === 'daily') return getDailySeed();
+        if (playMode === 'endless') return `seed-${Date.now()}`;
         try {
             if (initialSeed) return initialSeed;
             const s = getSeedForDifficulty(persistedDifficulty as string);
@@ -60,15 +61,40 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     const [currentLevel, setCurrentLevelState] = useState<number>(initialLevel);
     const [showDebug, setShowDebug] = useState<boolean>(false);
     const [forceHidden, setForceHidden] = useState<boolean>(false);
+    const [showSeedPanel, setShowSeedPanel] = useState<boolean>(playMode === 'custom');
+    const shellRetryCountRef = useRef<number>(0);
 
     useEffect(() => {
         const { state: s } = createLevel({ difficulty, level: currentLevel, seed, hiddenNuts: forceHidden ? true : null });
-        setLevelSolvable(typeof s.optimalMoves === 'number' && s.optimalMoves > 0);
-        try {
-            setSeedForDifficulty(difficulty, seed);
-        } catch { }
+        const solvable = typeof s.optimalMoves === 'number' && s.optimalMoves > 0;
+
+        if (!solvable && playMode !== 'daily' && shellRetryCountRef.current < 3) {
+            shellRetryCountRef.current += 1;
+            setSeed(`seed-${Date.now()}`);
+            return;
+        }
+
+        shellRetryCountRef.current = 0;
+        setLevelSolvable(solvable);
+        if (playMode !== 'daily' && playMode !== 'endless') {
+            try {
+                setSeedForDifficulty(difficulty, seed);
+            } catch { }
+        }
         setState(s);
     }, [seed, difficulty, currentLevel, forceHidden]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const tag = (e.target as HTMLElement)?.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+            if (e.key === 's' || e.key === 'S') {
+                setShowSeedPanel((v) => !v);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
 
     const [selected, setSelected] = useState<string | null>(null);
     const [invalidTarget, setInvalidTarget] = useState<string | null>(null);
@@ -284,7 +310,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
                     difficulty={difficulty}
                     seed={seed}
                     playMode={playMode}
-                    showSeed={playMode === 'custom'}
+                    showSeed={showSeedPanel}
                     showDebug={showDebug}
                     onShowDebugChange={setShowDebug}
                     forceHidden={forceHidden}

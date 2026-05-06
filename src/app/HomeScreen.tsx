@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import type { PlayMode, Difficulty } from '../lib/types';
 import { getDailySeed } from '../lib/daily';
-import { getDailyLastCompleted } from '../lib/persistence';
+import { getDailyLastCompleted, getSelectedDifficulty, setSelectedDifficulty } from '../lib/persistence';
 
 type Props = {
     onSelectMode: (mode: PlayMode, opts?: { difficulty?: Difficulty; seed?: string }) => void;
 };
 
 export default function HomeScreen({ onSelectMode }: Props) {
-    const [difficulty, setDifficulty] = useState<Difficulty>('easy');
+    const [difficulty, setDifficulty] = useState<Difficulty>(() => (getSelectedDifficulty() as Difficulty) ?? 'easy');
 
     const [openEndless, setOpenEndless] = useState(false);
 
@@ -93,7 +93,7 @@ export default function HomeScreen({ onSelectMode }: Props) {
                         <div className="endless-difficulty-row">
                             <label className="endless-difficulty-label">
                                 Difficulty:
-                                <select className="endless-difficulty-select" value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)}>
+                                <select className="endless-difficulty-select" value={difficulty} onChange={(e) => { const d = e.target.value as Difficulty; setDifficulty(d); try { setSelectedDifficulty(d); } catch { } }}>
                                     <option value="easy">easy</option>
                                     <option value="medium">medium</option>
                                     <option value="hard">hard</option>

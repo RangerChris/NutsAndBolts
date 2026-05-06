@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { PlayMode } from '../lib/types';
 import { loadProgress } from '../lib/persistence';
 
@@ -20,6 +20,10 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
     const [editingSeed, setEditingSeed] = useState(false);
     const [seedValue, setSeedValue] = useState(seed || '');
 
+    useEffect(() => {
+        if (!editingSeed) setSeedValue(seed || '');
+    }, [seed, editingSeed]);
+
 
     return (
         <div className="topbar topbar-root">
@@ -30,7 +34,7 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
                             try {
                                 const p = loadProgress();
                                 const arr = p.difficulties?.[difficulty]?.completed || [];
-                                return `Completed ${arr.length}`;
+                                return `${difficulty} • Completed ${arr.length}`;
                             } catch { return '' }
                         })()}
                     </div>
@@ -68,13 +72,26 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
                             <strong>Seed</strong>:{' '}
                             {!editingSeed ? (
                                 <span>
-                                    {seedValue || '—'}{' '}
-                                    <button onClick={() => setEditingSeed(true)} className="topbar-btn-edit">Edit</button>
+                                    <span className="topbar-seed-value">{seedValue || '—'}</span>{' '}
+                                    <button onClick={() => setEditingSeed(true)} className="topbar-btn-edit">Edit</button>{' '}
+                                    <button
+                                        className="topbar-btn-copy"
+                                        onClick={() => { try { navigator.clipboard.writeText(seedValue); } catch { } }}
+                                        title="Copy seed"
+                                    >Copy</button>
                                 </span>
                             ) : (
                                 <span>
-                                    <input aria-label="Seed" value={seedValue} onChange={(e) => setSeedValue(e.target.value)} className="topbar-input-seed" />
-                                    <button onClick={() => { setEditingSeed(false); onSeedChange?.(seedValue); }}>Save</button>
+                                    <input
+                                        aria-label="Seed"
+                                        value={seedValue}
+                                        onChange={(e) => setSeedValue(e.target.value)}
+                                        onKeyDown={(e) => { if (e.key === 'Enter') { setEditingSeed(false); onSeedChange?.(seedValue); } if (e.key === 'Escape') { setSeedValue(seed || ''); setEditingSeed(false); } }}
+                                        className="topbar-input-seed"
+                                        autoFocus
+                                    />{' '}
+                                    <button onClick={() => { setEditingSeed(false); onSeedChange?.(seedValue); }}>Save</button>{' '}
+                                    <button onClick={() => { setSeedValue(seed || ''); setEditingSeed(false); }}>Cancel</button>
                                 </span>
                             )}
                         </div>
