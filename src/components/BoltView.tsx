@@ -112,7 +112,6 @@ export default function BoltView({
   const scale = svgH > MAX_DISPLAY_HEIGHT ? MAX_DISPLAY_HEIGHT / svgH : 1;
   const headGradId = `head-${bolt.id}`;
   const shaftGradId = `shaft-${bolt.id}`;
-  const dsFilterId = `ds-${bolt.id}`;
   const platformGradId = `plat-${bolt.id}`;
 
 
@@ -135,9 +134,6 @@ export default function BoltView({
       <svg className="bolt-svg" width={W} height={svgH} viewBox={`0 0 ${W} ${svgH}`} aria-hidden="true">
         <g transform={`scale(${scale})`}>
           <defs>
-            <filter id={dsFilterId} x="-50%" y="-50%" width="200%" height="200%">
-              <feDropShadow dx="0" dy="6" stdDeviation="10" floodColor="var(--amb-shadow-color)" floodOpacity="0.9" />
-            </filter>
             <linearGradient id={headGradId} x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%" stopColor="var(--head-grad-light)" />
               <stop offset="100%" stopColor="var(--head-grad-dark)" />
@@ -260,7 +256,6 @@ export default function BoltView({
                     fill={shouldHide ? '#bdbdbd' : `url(#${gradId})`}
                     stroke={shouldHide ? 'rgba(0,0,0,0.12)' : 'var(--nut-stroke)'}
                     strokeWidth={0.8}
-                    filter={shouldHide ? undefined : `url(#${dsFilterId})`}
                     data-preview-fill={shouldHide ? '#bdbdbd' : color}
                     data-hint-source-hidden={isHintSourceNut ? 'true' : undefined}
                     data-move-target-hidden={isMoveTargetNut ? 'true' : undefined}
@@ -338,8 +333,8 @@ export default function BoltView({
 
             <defs>
               <linearGradient id={platformGradId} x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0%" stopColor="var(--surface-container-low)" />
-                <stop offset="100%" stopColor="var(--surface-container-high)" />
+                <stop offset="0%" stopColor="var(--surface-strong)" />
+                <stop offset="100%" stopColor="var(--surface-soft)" />
               </linearGradient>
             </defs>
             <rect
@@ -350,14 +345,6 @@ export default function BoltView({
               rx="8"
               fill={`url(#${platformGradId})`}
               stroke="rgba(228,226,229,0.03)"
-            />
-            <ellipse
-              cx={CX}
-              cy={headY + HEAD_H + 10}
-              rx={(HEAD_W + 24) / 2}
-              ry={8}
-              fill="var(--ambient-shadow-strong)"
-              opacity="0.6"
             />
           </g>
         </g>
