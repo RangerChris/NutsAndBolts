@@ -43,7 +43,10 @@ export default function JourneyScreen({ onPlayLevel, onBack }: Props) {
                 <div>
                     <button className="control-btn" onClick={() => onBack?.()}>Back</button>
                 </div>
-                <h2 className="journey-title">Journey Levels</h2>
+                <div className="journey-heading-copy">
+                    <h2 className="journey-title">Journey Levels</h2>
+                    <p className="journey-subtitle">Choose a tier and clear levels to build your completion streak.</p>
+                </div>
             </div>
             <div className="journey-difficulty-list">
                 {DIFFICULTIES.map((d) => {

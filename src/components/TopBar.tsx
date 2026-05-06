@@ -29,7 +29,7 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
         <div className="topbar topbar-root">
             <div className="topbar-left">
                 {playMode === 'endless' ? (
-                    <div>
+                    <div className="topbar-status">
                         <strong>Endless</strong>: {(() => {
                             try {
                                 const p = loadProgress();
@@ -40,7 +40,7 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
                     </div>
                 ) : (
                     playMode !== 'daily' && (
-                        <div>
+                        <div className="topbar-status">
                             <strong>Level</strong>: {level}
                         </div>
                     )
@@ -68,7 +68,7 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
                                 <span>Force Hidden Nuts</span>
                             </label>
                         )}
-                        <div className="topbar-seed">
+                        <div className="topbar-seed topbar-pill">
                             <strong>Seed</strong>:{' '}
                             {!editingSeed ? (
                                 <span>

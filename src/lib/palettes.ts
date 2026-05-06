@@ -9,32 +9,28 @@ export type Palette = {
 export const PALETTES: Palette[] = [
   {
     id: 0,
-    name: 'Clarity Bright',
-    colors: ['#FF4D6D', '#FF9F1C', '#FFD60A', '#8AC926', '#269287', '#0397c9', '#1b447e', '#9B5DE5', '#F15BB5', '#F9844A'],
+    name: 'Candy Glass',
+    colors: ['#FF4E89', '#FF7A59', '#FFB347', '#7BE35A', '#2EDDBE', '#23B9FF', '#3674FF', '#8E6BFF', '#D65DFF', '#FF74C6'],
   },
   {
     id: 1,
-    name: 'Neon',
-    // Neon palette: high-saturation, easily distinguishable bright hues
-    colors: ['#FF00FF', '#FF007F', '#FF4D00', '#FFDD00', '#7CFF00', '#00FF00', '#00FF9F', '#00FFFF', '#007BFF', '#8A00FF'],
+    name: 'Hyper Neon',
+    colors: ['#FF00C8', '#FF2E8D', '#FF5E00', '#FFE600', '#9DFF00', '#00FF6A', '#00FFE1', '#00B7FF', '#3B6DFF', '#9B3DFF'],
   },
   {
     id: 2,
-    name: 'Tropical Mix',
-    // Designed as 5 complementary pairs for clear separation:
-    // (Coral, Teal), (Orange, Blue), (Lime, Purple), (Pink, Mint), (Yellow, Indigo)
-    colors: ['#FF6B6B', '#2EC4B6', '#FF9F43', '#4D96FF', '#8AC926', '#9B5DE5', '#F15BB5', '#7AE7C7', '#FFD60A', '#6C63FF'],
+    name: 'Juicy Pop',
+    colors: ['#FF6A72', '#2FD7C0', '#FFA64A', '#52A2FF', '#95E33D', '#8C64FF', '#FF67B7', '#68EFD6', '#FFD85A', '#5A82FF'],
   },
   {
     id: 3,
-    name: 'Bold Spectrum',
-    colors: ['#FF3B30', '#FF6D00', '#FFB703', '#70E000', '#00C853', '#00B8D4', '#00A6FB', '#4361EE', '#8338EC', '#FF2D92'],
+    name: 'Arcade Spectrum',
+    colors: ['#FF3A62', '#FF6E3A', '#FFB100', '#7BE000', '#00D98B', '#00C8D9', '#00A6FF', '#4D74FF', '#8B56FF', '#FF3DB1'],
   },
   {
     id: 4,
-    name: 'Sunrise Energy',
-    // Complementary warm/cool pairs for distinctness
-    colors: ['#FF5A5F', '#2EC4B6', '#FF9F3D', '#4D96FF', '#FFD60A', '#9B5DE5', '#FF70A6', '#7AE7C7', '#FF8C42', '#4361EE'],
+    name: 'Sorbet Flow',
+    colors: ['#FF617E', '#32D4C4', '#FF9B52', '#5D9BFF', '#FFD45D', '#9E68FF', '#FF79AF', '#7EE7CB', '#FFB36A', '#5E78FF'],
   },
 ];
 

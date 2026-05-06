@@ -14,7 +14,11 @@ export default function HomeScreen({ onSelectMode }: Props) {
 
     return (
         <div className="home-screen">
-            <h1>Nuts & Bolts</h1>
+            <div className="home-hero">
+                <p className="home-kicker">Bright Logic Puzzle</p>
+                <h1>Nuts & Bolts</h1>
+                <p className="home-subtitle">Sort every stack into single-color bolts with slick controls built for touch and desktop play.</p>
+            </div>
             <div className="mode-grid">
                 <button onClick={() => onSelectMode('journey', { difficulty })} className="mode-card" aria-label="Start Journey">
                     <div className="mode-icon-placeholder" aria-hidden="true">

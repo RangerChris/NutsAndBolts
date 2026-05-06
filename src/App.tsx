@@ -36,9 +36,16 @@ export default function App(): ReactElement {
 
     return (
         <div className="app-root hardware-texture">
+            <div className="app-atmosphere" aria-hidden>
+                <span className="orb orb-a" />
+                <span className="orb orb-b" />
+                <span className="orb orb-c" />
+            </div>
             <main className="app-main glass-effect metallic-brushed">
-                <AppShell />
-                {!progressLoaded && <div>Loading progress...</div>}
+                <div className="app-main-inner">
+                    <AppShell />
+                    {!progressLoaded && <div className="app-progress-loading">Loading progress...</div>}
+                </div>
             </main>
         </div>
     );

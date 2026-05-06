@@ -63,6 +63,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     const [forceHidden, setForceHidden] = useState<boolean>(false);
     const [showSeedPanel, setShowSeedPanel] = useState<boolean>(playMode === 'custom');
     const shellRetryCountRef = useRef<number>(0);
+    const initialHistoryLenRef = useRef<number>(0);
 
     useEffect(() => {
         const { state: s } = createLevel({ difficulty, level: currentLevel, seed, hiddenNuts: forceHidden ? true : null });
@@ -76,6 +77,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
 
         shellRetryCountRef.current = 0;
         setLevelSolvable(solvable);
+        initialHistoryLenRef.current = s.moveHistory?.length ?? 0;
         if (playMode !== 'daily' && playMode !== 'endless') {
             try {
                 setSeedForDifficulty(difficulty, seed);
@@ -186,6 +188,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         setHintPreview(null);
         setLevelSolvable(true);
         setShowComplete(false);
+        initialHistoryLenRef.current = s.moveHistory?.length ?? 0;
     };
 
     const handleBoltClick = (id: string) => {
@@ -310,7 +313,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
 
     return (
         <div className="game-shell-root">
-            <div className="game-shell-header">
+            <div className="game-shell-header shell-panel">
                 <TopBar
                     level={state.level}
                     difficulty={difficulty}
@@ -330,7 +333,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
                 />
             </div>
 
-            <div className="board-stage">
+            <div className="board-stage shell-panel board-panel">
                 <Board
                     state={state}
                     paletteId={paletteId}
@@ -345,7 +348,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
                 />
             </div>
 
-            <div className="sorted-progress-wrapper">
+            <div className="sorted-progress-wrapper shell-panel progress-panel">
                 <div className="sorted-progress">
                     <div className="progress-bar" aria-hidden>
                         <div ref={progressFillRef} className="progress-fill" />
@@ -355,13 +358,13 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
                 </div>
             </div>
 
-            <div className="game-actions">
+            <div className="game-actions shell-panel actions-panel">
                 <BottomBar
                     onUndo={handleUndo}
                     onHint={handleHint}
                     onRestart={handleRestart}
                     onBack={onExit}
-                    undoDisabled={!state.moveHistory || state.moveHistory.length === 0}
+                    undoDisabled={(state.moveHistory?.length ?? 0) <= initialHistoryLenRef.current}
                     hintDisabled={!levelSolvable}
                 />
             </div>

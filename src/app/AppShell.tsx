@@ -24,9 +24,13 @@ export default function AppShell() {
     };
 
     const [screen, setScreen] = useState<Screen>(getInitialScreen);
+    const shellScreenClass =
+        screen.type === 'game'
+            ? `screen-${screen.type} mode-${screen.mode}`
+            : `screen-${screen.type}`;
 
     return (
-        <div className="app-shell-root">
+        <div className={`app-shell-root ${shellScreenClass}`}>
             {screen.type === 'home' && (
                 <HomeScreen
                     onSelectMode={(mode, opts) => {
