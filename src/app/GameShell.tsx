@@ -312,7 +312,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     };
 
     return (
-        <div className="game-shell-root">
+        <div className={`game-shell-root mode-${playMode} difficulty-${difficulty}`}>
             <div className="game-shell-header shell-panel">
                 <TopBar
                     level={state.level}

@@ -283,6 +283,24 @@ select {
     padding: 8px;
 }
 
+.game-shell-root.mode-endless.difficulty-extreme .board-stage {
+    padding: clamp(6px, 0.9vw, 10px);
+}
+
+.game-shell-root.mode-endless.difficulty-extreme .board-container {
+    padding-bottom: 6px;
+    scroll-padding-bottom: 6px;
+}
+
+.game-shell-root.mode-endless.difficulty-extreme .board-row {
+    gap: clamp(3px, 0.6vw, 8px);
+    padding: clamp(3px, 0.6vw, 8px);
+}
+
+.game-shell-root.mode-endless.difficulty-extreme .bolt {
+    padding: 1px;
+}
+
 .topbar-root {
     display: flex;
     align-items: center;
@@ -849,7 +867,7 @@ select {
 
 .mode-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: clamp(10px, 1.3vw, 16px);
     margin-top: 0;
     width: 100%;
@@ -1136,10 +1154,6 @@ select {
         z-index: 10;
     }
 
-    .mode-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
     .journey-difficulty-list {
         grid-template-columns: 1fr;
     }
@@ -1182,12 +1196,25 @@ select {
         padding: 8px;
     }
 
-    .mode-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
     .mode-card {
         min-height: 84px;
+    }
+
+    .game-shell-root.mode-endless.difficulty-extreme .board-stage {
+        padding: 4px;
+    }
+
+    .game-shell-root.mode-endless.difficulty-extreme .board-row {
+        gap: 3px;
+        padding: 3px;
+    }
+
+    .game-shell-root.mode-endless.difficulty-extreme .bolt-svg {
+        width: clamp(48px, 13vw, 64px);
+    }
+
+    .game-shell-root.mode-endless.difficulty-extreme .bolt-selected-group {
+        transform: translateY(-8px);
     }
 
     .topbar-root {
@@ -1233,6 +1260,10 @@ select {
 
     .bolt-svg {
         width: clamp(54px, 16vw, 72px);
+    }
+
+    .game-shell-root.mode-endless.difficulty-extreme .bolt-svg {
+        width: clamp(46px, 13.2vw, 60px);
     }
 
     .board-row {
