@@ -34,11 +34,10 @@ export type GameState = {
   optimalMoves?: number | null;
 };
 
-export type PlayMode = 'journey' | 'daily' | 'custom' | 'endless' | 'tutorial';
+export type PlayMode = 'journey' | 'daily' | 'custom' | 'endless';
 
 export type Screen =
   | { type: 'home' }
   | { type: 'difficulty-select'; mode: 'journey' | 'endless' }
   | { type: 'custom-seed-entry' }
-  | { type: 'game'; mode: PlayMode; difficulty: Difficulty; seed?: string }
-  | { type: 'tutorial' };
+  | { type: 'game'; mode: PlayMode; difficulty: Difficulty; seed?: string };

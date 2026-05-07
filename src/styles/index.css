@@ -400,22 +400,20 @@ select {
 
 .board-row {
     display: grid;
-    grid-template-rows: repeat(3, min-content);
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
+    grid-template-columns: repeat(auto-fit, minmax(clamp(70px, 12vw, 110px), 1fr));
     gap: clamp(5px, 0.8vw, 10px);
     padding: clamp(5px, 0.8vw, 10px);
     align-items: start;
     justify-content: center;
-    width: max-content;
-    margin: 0 auto;
+    justify-items: center;
 }
 
 .board-item {
-    flex: 0 0 auto;
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    width: 100%;
+    height: 100%;
 }
 
 .bolt-list {
@@ -653,14 +651,6 @@ select {
     gap: 4px;
 }
 
-.tutorial-overlay {
-    z-index: 65;
-}
-
-.tutorial-modal {
-    max-width: 640px;
-}
-
 .hardware-stars {
     display: flex;
     gap: 12px;
@@ -818,20 +808,19 @@ select {
     width: min(1180px, 100%);
     margin: 0 auto;
     display: grid;
-    grid-template-columns: minmax(260px, 1fr) minmax(320px, 1.3fr);
+    grid-template-columns: 1fr;
     gap: clamp(14px, 2.2vw, 28px);
     align-items: start;
     padding: clamp(16px, 2vw, 26px);
 }
 
 .home-hero {
-    position: sticky;
-    top: 0;
     border-radius: var(--radius-lg);
     padding: clamp(18px, 2.1vw, 30px);
     background: linear-gradient(165deg, rgba(255, 255, 255, 0.74), rgba(255, 255, 255, 0.42));
     border: 1px solid rgba(255, 255, 255, 0.84);
     box-shadow: 0 18px 40px rgba(39, 95, 146, 0.2);
+    order: -1;
 }
 
 .home-kicker {
@@ -860,7 +849,7 @@ select {
 
 .mode-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(10px, 1.3vw, 16px);
     margin-top: 0;
     width: 100%;
@@ -1086,20 +1075,6 @@ select {
     font-size: 12px;
 }
 
-.tutorial-step-text {
-    margin: 0 0 12px 0;
-    font-weight: 700;
-    color: #1a5076;
-}
-
-.tutorial-actions {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
 .endless-difficulty-select option {
     background: #ffffff;
     color: #134265;
@@ -1156,11 +1131,13 @@ select {
     }
 
     .home-hero {
-        position: static;
+        position: sticky;
+        top: 0;
+        z-index: 10;
     }
 
     .mode-grid {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .journey-difficulty-list {
@@ -1206,7 +1183,7 @@ select {
     }
 
     .mode-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 
     .mode-card {
@@ -1290,6 +1267,34 @@ select {
 
     .complete-title {
         font-size: 1.55rem;
+    }
+
+    .board-row {
+        grid-template-columns: repeat(2, minmax(54px, 1fr));
+    }
+}
+
+@media (min-width: 401px) and (max-width: 520px) {
+    .board-row {
+        grid-template-columns: repeat(3, minmax(72px, 1fr));
+    }
+}
+
+@media (min-width: 521px) and (max-width: 768px) {
+    .board-row {
+        grid-template-columns: repeat(4, minmax(90px, 1fr));
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .board-row {
+        grid-template-columns: repeat(6, minmax(100px, 1fr));
+    }
+}
+
+@media (min-width: 1025px) {
+    .board-row {
+        grid-template-columns: repeat(9, minmax(110px, 1fr));
     }
 }
 

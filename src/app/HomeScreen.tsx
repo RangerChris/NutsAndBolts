@@ -74,20 +74,6 @@ export default function HomeScreen({ onSelectMode }: Props) {
                         <div className="mode-desc">Keep solving generated puzzles — a fresh challenge every win.</div>
                     </div>
                 </button>
-
-                <button data-testid="help-tutorial" onClick={() => onSelectMode('tutorial')} className="mode-card" aria-label="Help and Tutorial">
-                    <div className="mode-icon-placeholder" aria-hidden="true">
-                        <svg className="mode-icon-svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                            <path d="M4 6.5C4 5.7 4.7 5 5.5 5H11V19H5.5C4.7 19 4 18.3 4 17.5V6.5Z" />
-                            <path d="M20 6.5C20 5.7 19.3 5 18.5 5H13V19H18.5C19.3 19 20 18.3 20 17.5V6.5Z" />
-                            <path d="M11 7H13" />
-                        </svg>
-                    </div>
-                    <div className="mode-content">
-                        <div className="mode-title">Help / Tutorial</div>
-                        <div className="mode-desc">Learn controls and mechanics with a guided walkthrough.</div>
-                    </div>
-                </button>
             </div>
             {openEndless && (
                 <div className="complete-overlay" role="dialog" aria-modal="true">

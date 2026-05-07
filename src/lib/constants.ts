@@ -24,4 +24,3 @@ export const DIFFICULTY_CONFIG: Record<
 // improved-game feature constants
 export const DAILY_DIFFICULTY: Difficulty = 'medium';
 export const DAILY_SEED_VERSION = 'daily-v1';
-export const TUTORIAL_SEED = 'tutorial-v1';
