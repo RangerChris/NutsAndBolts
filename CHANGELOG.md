@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.2](https://github.com/RangerChris/NutsAndBolts/compare/v0.2.1...v0.2.2) (2026-05-07)
+
 ### [0.2.1](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.34...v0.2.1) (2026-05-07)
 
 ### [0.1.34](https://github.com/RangerChris/NutsAndBolts/compare/v0.1.33...v0.1.34) (2026-05-07)
