@@ -1366,6 +1366,18 @@ select {
     }
 }
 
+@media (max-width: 520px) {
+    .game-shell-root.mode-endless.difficulty-extreme .board-row {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 521px) and (max-width: 900px) {
+    .game-shell-root.mode-endless.difficulty-extreme .board-row {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
 @media (min-width: 521px) and (max-width: 768px) {
     .board-row {
         grid-template-columns: repeat(4, minmax(90px, 1fr));
