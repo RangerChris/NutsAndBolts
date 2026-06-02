@@ -36,6 +36,38 @@ type Props = {
     onExit?: () => void;
 };
 
+const getNutColor = (n: unknown) => (typeof n === 'string' ? n : (n as { color?: string } | undefined)?.color);
+
+export function computeSortedPercent(s: GameState): number {
+    const bolts = s.bolts || [];
+    const total = bolts.reduce((acc, b) => acc + (b.nuts?.length || 0), 0);
+    if (total === 0) return 100;
+
+    let sorted = 0;
+    const colorToUniformBoltCount = new Map<string, number>();
+
+    for (const b of bolts) {
+        if (!b.nuts || b.nuts.length === 0) continue;
+        const firstColor = getNutColor(b.nuts[0]);
+        if (!firstColor) continue;
+
+        const uniform = b.nuts.every((n) => getNutColor(n) === firstColor);
+        if (uniform) {
+            sorted += b.nuts.length;
+            colorToUniformBoltCount.set(firstColor, (colorToUniformBoltCount.get(firstColor) ?? 0) + 1);
+        }
+    }
+
+    const percent = Math.round((sorted / total) * 100);
+    if (percent === 100) {
+        for (const count of colorToUniformBoltCount.values()) {
+            if (count > 1) return 99;
+        }
+    }
+
+    return percent;
+}
+
 export default function GameShell({ playMode = 'journey', initialSeed, initialDifficulty, onExit }: Props): ReactElement {
     const [state, setState] = useState<GameState | null>(null);
     const progress = loadProgress();
@@ -128,25 +160,6 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         const solution = computeSolutionPath(state, { maxDepth: 140, maxStates: 250000 });
         if (solution) setLevelSolvable(true);
     }, [state, levelSolvable]);
-
-    const computeSortedPercent = (s: GameState) => {
-        const bolts = s.bolts || [];
-        const total = bolts.reduce((acc, b) => acc + (b.nuts?.length || 0), 0);
-        if (total === 0) return 100;
-        let sorted = 0;
-        for (const b of bolts) {
-            if (!b.nuts || b.nuts.length === 0) continue;
-            const first = b.nuts[0];
-            const getNutColor = (n: unknown) => (typeof n === 'string' ? n : (n as { color?: string } | undefined)?.color);
-            const firstColor = getNutColor(first);
-            const uniform = b.nuts.every((n) => {
-                const col = getNutColor(n);
-                return col === firstColor;
-            });
-            if (uniform) sorted += b.nuts.length;
-        }
-        return Math.round((sorted / total) * 100);
-    };
 
     const pct = state ? computeSortedPercent(state) : 0;
     const progressFillRef = useRef<HTMLDivElement | null>(null);
