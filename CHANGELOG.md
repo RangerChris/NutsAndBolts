@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.6](https://github.com/RangerChris/NutsAndBolts/compare/v0.2.5...v0.2.6) (2026-06-02)
+
+
+### Bug Fixes
+
+* update endless completed count logic in TopBar component and tests ([9b9a4fd](https://github.com/RangerChris/NutsAndBolts/commit/9b9a4fd24533f6f39aa75d3d40ce8073357b2e42))
+
 ### [0.2.5](https://github.com/RangerChris/NutsAndBolts/compare/v0.2.4...v0.2.5) (2026-06-02)
 
 ### [0.2.4](https://github.com/RangerChris/NutsAndBolts/compare/v0.2.3...v0.2.4) (2026-05-07)
