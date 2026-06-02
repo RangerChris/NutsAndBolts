@@ -33,8 +33,8 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
                         <strong>Endless</strong>: {(() => {
                             try {
                                 const p = loadProgress();
-                                const arr = p.difficulties?.[difficulty]?.completed || [];
-                                return `${difficulty} • Completed ${arr.length}`;
+                                const count = p.difficulties?.[difficulty]?.endlessCount ?? 0;
+                                return `${difficulty} • Completed ${count}`;
                             } catch { return '' }
                         })()}
                     </div>
