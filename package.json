@@ -51,6 +51,11 @@
     ],
     "exclude": [
       "e2e/**"
-    ]
+    ],
+    "coverage": {
+      "exclude": [
+        "src/assets/icons/**"
+      ]
+    }
   }
 }
