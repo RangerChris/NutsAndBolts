@@ -142,7 +142,7 @@ export function migrateProgress(obj: unknown): PersistedProgress {
 
   
   if (o.levels && typeof o.levels === 'object') {
-    const difficulties: Record<string, { currentLevel: number; maxReached: number; completed?: number[] }> = {};
+    const difficulties: Record<string, { currentLevel: number; maxReached: number; completed?: number[]; endlessCount?: number }> = {};
     const levels = o.levels as Record<string, unknown>;
     for (const k of Object.keys(levels)) {
       const v = levels[k] as Record<string, unknown>;

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useState, useRef } from 'react';
 import type { GameState, PlayMode } from '../lib/types';
 import { createLevel } from '../lib/generator';
 import {
@@ -16,7 +16,6 @@ import starUrl from '../assets/icons/star.svg';
 import {
     loadProgress,
     getSelectedDifficulty,
-    setSelectedDifficulty,
     setCurrentLevel,
     getSeedForDifficulty,
     setSeedForDifficulty,
@@ -84,10 +83,11 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         } catch { }
         return `seed-${Date.now()}`;
     });
-    const [difficulty, setDifficulty] = useState<GameState['difficulty']>(
-        playMode === 'daily'
+    const difficulty = useMemo<GameState['difficulty']>(
+        () => (playMode === 'daily'
             ? 'hard'
-            : ((initialDifficulty as GameState['difficulty']) || (persistedDifficulty as GameState['difficulty']))
+            : ((initialDifficulty as GameState['difficulty']) || (persistedDifficulty as GameState['difficulty']))),
+        [playMode, initialDifficulty, persistedDifficulty]
     );
     const initialLevel = progress.difficulties?.[difficulty]?.currentLevel ?? 1;
     const [currentLevel, setCurrentLevelState] = useState<number>(initialLevel);
@@ -216,7 +216,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
             if (b && b.nuts.length > 0) {
                 try {
                     const top = b.nuts[b.nuts.length - 1];
-                    const color = typeof top === 'string' ? top : (top as any).color;
+                    const color = getNutColor(top);
                     emitEvent('pick', { color, count: b.nuts.length });
                 } catch { }
                 setSelected(id);

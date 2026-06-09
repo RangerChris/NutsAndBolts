@@ -14,6 +14,7 @@ function ensureRevealedNut(bolt: Bolt, idx: number): { nut: Nut; changed: boolea
     bolt.nuts[idx] = created;
     return { nut: created, changed: true };
   }
+  if (!current) return null;
   const changed = !current.revealed;
   current.revealed = true;
   return { nut: current, changed };

@@ -17,10 +17,14 @@ export default function App(): ReactElement {
             try {
                 if (ev.payload && ev.payload.event === 'levelComplete') {
                     const diff = ev.payload.difficulty;
+                    if (typeof diff !== 'string') return;
+                    const rawLevel = ev.payload.level;
                     const level =
-                        typeof ev.payload.level === 'number'
-                            ? ev.payload.level
-                            : parseInt(ev.payload.level, 10) || 1;
+                        typeof rawLevel === 'number'
+                            ? rawLevel
+                            : typeof rawLevel === 'string'
+                            ? parseInt(rawLevel, 10) || 1
+                            : 1;
                     setCurrentLevel(diff, level + 1);
                 }
             } catch {

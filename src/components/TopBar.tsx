@@ -16,7 +16,7 @@ type Props = {
     onSeedChange?: (seed: string) => void;
 };
 
-export default function TopBar({ level, difficulty, seed, playMode = 'journey', showSeed = true, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onDifficultyChange, onSeedChange }: Props) {
+export default function TopBar({ level, difficulty, seed, playMode = 'journey', showSeed = true, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onSeedChange }: Props) {
     const [editingSeed, setEditingSeed] = useState(false);
     const [seedValue, setSeedValue] = useState(seed || '');
 

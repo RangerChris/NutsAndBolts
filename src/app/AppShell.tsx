@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import HomeScreen from './HomeScreen';
 import GameShell from './GameShell';
 import JourneyScreen from './JourneyScreen';
-import type { Screen } from '../lib/types';
+import type { Difficulty, Screen } from '../lib/types';
 
 export default function AppShell() {
     const getInitialScreen = (): Screen => {
@@ -11,7 +11,10 @@ export default function AppShell() {
             if (params) {
                 const mode = params.get('mode');
                 if (mode === 'custom') {
-                    const difficulty = (params.get('difficulty') as any) || 'easy';
+                    const rawDifficulty = params.get('difficulty');
+                    const difficulty: Difficulty = rawDifficulty === 'medium' || rawDifficulty === 'hard' || rawDifficulty === 'extreme'
+                        ? rawDifficulty
+                        : 'easy';
                     const seed = params.get('seed') || undefined;
                     return { type: 'game', mode: 'custom', difficulty, seed };
                 }

@@ -205,8 +205,6 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
 
             const liftX = sourceRect.left + liftNudgeX;
             const liftY = liftTop - index * 3;
-            const stageOneDx = liftX - sourceRect.left;
-            const stageOneDy = liftY - sourceRect.top;
 
             const transitionTo = (left: number, top: number, duration: number, easing: string) => {
                 clone.style.transition = `transform ${duration}ms ${easing}`;
