@@ -61,6 +61,28 @@ export const DEFAULT_PROGRESS: PersistedProgress = {
   daily: { lastCompleted: null },
 };
 
+// Returns a fresh deep copy of DEFAULT_PROGRESS so callers can mutate the
+// result without poisoning the shared constant.
+export function cloneDefaultProgress(): PersistedProgress {
+  return {
+    version: DEFAULT_PROGRESS.version,
+    difficulties: {
+      easy: {
+        currentLevel: DEFAULT_PROGRESS.difficulties.easy.currentLevel,
+        maxReached: DEFAULT_PROGRESS.difficulties.easy.maxReached,
+        completed: [...(DEFAULT_PROGRESS.difficulties.easy.completed ?? [])],
+        endlessCount: DEFAULT_PROGRESS.difficulties.easy.endlessCount ?? 0,
+      },
+    },
+    settings: {
+      paletteId: DEFAULT_PROGRESS.settings.paletteId,
+      difficulty: DEFAULT_PROGRESS.settings.difficulty,
+      seeds: { ...(DEFAULT_PROGRESS.settings.seeds ?? {}) },
+    },
+    daily: { lastCompleted: DEFAULT_PROGRESS.daily?.lastCompleted ?? null },
+  };
+}
+
 export function saveProgress(payload: PersistedProgress) {
   try {
     storageImpl.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -73,24 +95,25 @@ export function saveProgress(payload: PersistedProgress) {
 export function loadProgress(): PersistedProgress {
   try {
     const raw = storageImpl.getItem(STORAGE_KEY);
-    if (!raw) return DEFAULT_PROGRESS;
+    if (!raw) return cloneDefaultProgress();
     const parsed = JSON.parse(raw);
     const migrated = migrateProgress(parsed);
     return migrated;
   } catch {
-    return DEFAULT_PROGRESS;
+    return cloneDefaultProgress();
   }
 }
 
 export function migrateProgress(obj: unknown): PersistedProgress {
-  if (!obj || typeof obj !== 'object') return DEFAULT_PROGRESS;
+  if (!obj || typeof obj !== 'object') return cloneDefaultProgress();
   const o = obj as Record<string, unknown>;
-  
+
   if (typeof o.version === 'number' && o.difficulties && o.settings) {
     const p = o as PersistedProgress;
-    // ensure new fields
-    p.settings = p.settings || DEFAULT_PROGRESS.settings;
-    if (!('daily' in p)) p.daily = DEFAULT_PROGRESS.daily;
+    // ensure new fields — fall back to copies of the defaults to avoid sharing
+    // the DEFAULT_PROGRESS singleton across callers.
+    p.settings = p.settings || cloneDefaultProgress().settings;
+    if (!('daily' in p)) p.daily = { lastCompleted: null };
     // ensure each difficulty entry has completed array and separate endless count
     if (p.difficulties) {
       for (const k of Object.keys(p.difficulties)) {
@@ -127,20 +150,20 @@ export function migrateProgress(obj: unknown): PersistedProgress {
       const max = typeof v?.max === 'number' ? (v.max as number) : current;
       difficulties[k] = { currentLevel: current, maxReached: max };
     }
-    const settings = (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings;
+    const settings = (o.settings as PersistedProgress['settings']) || cloneDefaultProgress().settings;
     // ensure completed arrays and endless count exist
     for (const k of Object.keys(difficulties)) {
       const dd = difficulties[k];
       dd.completed = dd.completed || [];
       dd.endlessCount = dd.endlessCount || 0;
     }
-    return { version: 2, difficulties, settings, daily: DEFAULT_PROGRESS.daily };
+    return { version: 2, difficulties, settings, daily: { lastCompleted: null } };
   }
 
-  
-  const difficulties = (o.difficulties as PersistedProgress['difficulties']) || DEFAULT_PROGRESS.difficulties;
-  const settings = (o.settings as PersistedProgress['settings']) || DEFAULT_PROGRESS.settings;
-  const daily = (o.daily as PersistedProgress['daily']) || DEFAULT_PROGRESS.daily;
+
+  const difficulties = (o.difficulties as PersistedProgress['difficulties']) || cloneDefaultProgress().difficulties;
+  const settings = (o.settings as PersistedProgress['settings']) || cloneDefaultProgress().settings;
+  const daily = (o.daily as PersistedProgress['daily']) || { lastCompleted: null };
   // ensure completed arrays and endless count on each difficulty entry
   for (const k of Object.keys(difficulties)) {
     const d = difficulties[k] as PersistedProgress['difficulties'][string];
@@ -211,7 +234,7 @@ export function setCurrentLevel(difficulty: string, level: number) {
 
 export function setPaletteId(paletteId: number) {
   const p = loadProgress();
-  p.settings = p.settings || DEFAULT_PROGRESS.settings;
+  p.settings = p.settings || cloneDefaultProgress().settings;
   p.settings.paletteId = paletteId;
   saveProgress(p);
   return p;
@@ -225,7 +248,7 @@ export function getSeedForDifficulty(difficulty: string): string | null {
 
 export function setSeedForDifficulty(difficulty: string, seed: string) {
   const p = loadProgress();
-  p.settings = p.settings || DEFAULT_PROGRESS.settings;
+  p.settings = p.settings || cloneDefaultProgress().settings;
   p.settings.seeds = p.settings.seeds || {};
   p.settings.seeds[difficulty] = seed;
   saveProgress(p);
@@ -239,7 +262,7 @@ export function getSelectedDifficulty(): string {
 
 export function setSelectedDifficulty(difficulty: string) {
   const p = loadProgress();
-  p.settings = p.settings || DEFAULT_PROGRESS.settings;
+  p.settings = p.settings || cloneDefaultProgress().settings;
   p.settings.difficulty = difficulty;
   saveProgress(p);
   return p;
