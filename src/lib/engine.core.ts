@@ -73,14 +73,13 @@ export function performMove(source: Bolt, target: Bolt): Move | null {
   const movable = getMovableTopCount(source, target);
   if (!movable.color || movable.count === 0) return null;
   const moved = source.nuts.splice(source.nuts.length - movable.count, movable.count) as Nut[];
-  for (let i = 0; i < moved.length; i++) {
-    const m = moved[i];
+  moved.forEach((m, i) => {
     if (typeof m === 'string') {
-      moved[i] = { id: `${source.id}-moved-${Date.now()}-${i}`, color: m, revealed: true } as Nut;
+      moved[i] = { id: `${source.id}-moved-${Date.now()}-${i}`, color: m, revealed: true };
     } else {
-      moved[i].revealed = true;
+      m.revealed = true;
     }
-  }
+  });
   target.nuts.push(...moved);
   const move: Move = {
     fromBoltId: source.id,
@@ -99,7 +98,7 @@ export function markRevealedIfNeeded(state: GameState, fromId: string, beforeLen
 
 export function markTopRunRevealedIfNeeded(state: GameState, boltId: string) {
   if (!state.hiddenNuts) return;
-  const bolt = state.bolts.find((b: Bolt) => b.id === boltId);
+  const bolt = state.bolts.find((b) => b.id === boltId);
   if (!bolt || bolt.nuts.length === 0) return;
 
   const newlyRevealed = revealTopColorRun(bolt);

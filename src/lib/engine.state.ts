@@ -38,26 +38,7 @@ export function executeMoveOnState(state: GameState, fromId: string, toId: strin
   } catch {}
   try {
     if (isWin(state)) {
-      const moveCount = state.moveHistory.length;
-      const optimal = typeof state.optimalMoves === 'number' ? state.optimalMoves : null;
-      let moveStars = 1;
-      if (optimal && optimal > 0) {
-        if (moveCount <= Math.floor(0.75 * optimal)) moveStars = 2;
-        else moveStars = 1;
-      }
-      let timeStar = 0;
-      const history = state.moveHistory || [];
-      let timeSpent = 0;
-      if (history.length >= 2) {
-        const first = history[0].timestamp || 0;
-        const last = history[history.length - 1].timestamp || 0;
-        timeSpent = Math.max(0, last - first);
-      } else {
-        timeSpent = 0;
-      }
-      const availableMs = ((optimal && optimal > 0 ? optimal : moveCount) * 3) * 1000;
-      if (timeSpent < availableMs) timeStar = 1;
-      const totalStars = Math.min(3, moveStars + timeStar);
+      const { moveCount, optimal, timeSpentMs, timeAvailableMs, totalStars } = computeStars(state);
       emitBalancerEvent('game', {
         event: 'levelComplete',
         level: state.level,
@@ -65,8 +46,8 @@ export function executeMoveOnState(state: GameState, fromId: string, toId: strin
         seed: state.seed,
         moveHistoryLength: moveCount,
         optimalMoves: optimal,
-        timeSpentMs: timeSpent,
-        timeAvailableMs: availableMs,
+        timeSpentMs,
+        timeAvailableMs,
         stars: totalStars,
         bolts: state.bolts.length,
       });
@@ -290,9 +271,7 @@ export function normalizeState(state: Partial<GameState>): GameState {
   const bolts = (state.bolts || []).map((b: Partial<Bolt> | undefined, idx: number) => ({
     id: b?.id ?? `b${idx}`,
     capacity: typeof b?.capacity === 'number' ? b.capacity : 4,
-    nuts: Array.isArray(b?.nuts)
-      ? (b.nuts as unknown[]).map((n, i) => (typeof n === 'string' ? { id: `${b?.id ?? `b${idx}`}-n${i}`, color: n, revealed: i === ((b?.nuts as unknown[]).length - 1) } : { id: (n as { id?: unknown }).id ?? `${b?.id ?? `b${idx}`}-n${i}`, color: (n as { color?: unknown }).color ?? String(n), revealed: Boolean((n as { revealed?: unknown }).revealed) }))
-      : [],
+    nuts: Array.isArray(b?.nuts) ? (b.nuts as unknown[]).map((n, i) => normalizeNut(n, b?.id ?? `b${idx}`, i, (b?.nuts as unknown[]).length - 1)) : [],
   }));
   const normalized: GameState = {
     bolts,
@@ -305,4 +284,12 @@ export function normalizeState(state: Partial<GameState>): GameState {
   } as GameState;
   if (typeof (state as unknown as { hiddenNuts?: unknown }).hiddenNuts === 'boolean') normalized.hiddenNuts = (state as unknown as { hiddenNuts: boolean }).hiddenNuts;
   return normalized;
+}
+
+function normalizeNut(n: unknown, boltId: string, i: number, lastIndex: number): Nut {
+  if (typeof n === 'string') return { id: `${boltId}-n${i}`, color: n, revealed: i === lastIndex };
+  const obj = n as { id?: unknown; color?: unknown; revealed?: unknown };
+  const id = obj.id ?? `${boltId}-n${i}`;
+  const color = obj.color ?? String(n);
+  return { id: id as string, color: color as string, revealed: Boolean(obj.revealed) };
 }

@@ -9,24 +9,33 @@ type LevelParams = {
   shuffleMoves: number;
 };
 
+function mutateDifficulty(
+  difficulty: Difficulty,
+  mutate: (s: { currentLevel: number; maxReached: number }) => void,
+) {
+  const p = loadProgress();
+  if (!p.difficulties) p.difficulties = {};
+  const d = p.difficulties[difficulty] || { currentLevel: 1, maxReached: 1 };
+  mutate(d);
+  d.maxReached = Math.max(d.maxReached || 1, d.currentLevel);
+  p.difficulties[difficulty] = d;
+  saveProgress(p);
+  return { currentLevel: d.currentLevel, maxReached: d.maxReached };
+}
+
 export function getLevelParams(difficulty: Difficulty, level: number): LevelParams {
   const cfg = DIFFICULTY_CONFIG[difficulty];
+  const clamped = Math.max(1, level) - 1;
   const boltsGrowEvery = 3;
   const heightGrowEvery = 5;
 
-  const extraBolts = Math.floor((Math.max(1, level) - 1) / boltsGrowEvery);
-  const numBolts = Math.min(cfg.maxBolts, cfg.minBolts + extraBolts);
+  const numBolts = Math.min(cfg.maxBolts, cfg.minBolts + Math.floor(clamped / boltsGrowEvery));
+  const [minHeight, maxHeight] = cfg.stackHeightRange;
+  const stackHeight = Math.min(maxHeight, minHeight + Math.floor(clamped / heightGrowEvery));
 
-  const extraHeight = Math.floor((Math.max(1, level) - 1) / heightGrowEvery);
-  const maxHeight = cfg.stackHeightRange[1];
-  const stackHeight = Math.min(maxHeight, cfg.stackHeightRange[0] + extraHeight);
-
-  const levelCap = progressionConfig.levelCap;
-  const rawT = Math.min(level - 1, levelCap) / levelCap;
-  const easedT = Math.pow(rawT, progressionConfig.easingExponent);
-  const shuffleMin = cfg.shuffleRange[0];
-  const shuffleMax = cfg.shuffleRange[1];
-  const difficultyMultiplier: Record<Difficulty, number> = progressionConfig.difficultyMultiplier as Record<Difficulty, number>;
+  const { levelCap, easingExponent, difficultyMultiplier } = progressionConfig;
+  const easedT = Math.pow(Math.min(clamped, levelCap) / levelCap, easingExponent);
+  const [shuffleMin, shuffleMax] = cfg.shuffleRange;
   const base = shuffleMin + easedT * (shuffleMax - shuffleMin);
   const shuffleMoves = Math.round(Math.min(shuffleMax, base * difficultyMultiplier[difficulty]));
 
@@ -34,29 +43,19 @@ export function getLevelParams(difficulty: Difficulty, level: number): LevelPara
 }
 
 export function getCurrentLevel(difficulty: Difficulty): number {
-  const p = loadProgress();
-  return p.difficulties?.[difficulty]?.currentLevel ?? 1;
+  return loadProgress().difficulties?.[difficulty]?.currentLevel ?? 1;
 }
 
-export function advanceLevel(difficulty: Difficulty): { currentLevel: number; maxReached: number } {
-  const p = loadProgress();
-  if (!p.difficulties) p.difficulties = {};
-  const d = p.difficulties[difficulty] || { currentLevel: 1, maxReached: 1 };
-  d.currentLevel = (d.currentLevel || 1) + 1;
-  d.maxReached = Math.max(d.maxReached || 1, d.currentLevel);
-  p.difficulties[difficulty] = d;
-  saveProgress(p);
-  return { currentLevel: d.currentLevel, maxReached: d.maxReached };
+export function advanceLevel(difficulty: Difficulty) {
+  return mutateDifficulty(difficulty, (d) => {
+    d.currentLevel = (d.currentLevel || 1) + 1;
+  });
 }
 
 export function setCurrentLevel(difficulty: Difficulty, level: number) {
-  const p = loadProgress();
-  if (!p.difficulties) p.difficulties = {};
-  const d = p.difficulties[difficulty] || { currentLevel: 1, maxReached: 1 };
-  d.currentLevel = Math.max(1, level);
-  d.maxReached = Math.max(d.maxReached || 1, d.currentLevel);
-  p.difficulties[difficulty] = d;
-  saveProgress(p);
+  mutateDifficulty(difficulty, (d) => {
+    d.currentLevel = Math.max(1, level);
+  });
 }
 
 export default { getLevelParams, getCurrentLevel, advanceLevel, setCurrentLevel };

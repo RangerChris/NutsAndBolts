@@ -25,6 +25,7 @@ import {
 import { emitEvent } from '../lib/events';
 import { getDailySeed } from '../lib/daily';
 import { setDailyCompleted } from '../lib/persistence';
+import { playPick, playDrop, playCancel, playMenuSelect, playStart } from '../lib/sound';
 
 import type { ReactElement } from 'react';
 
@@ -116,6 +117,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
             } catch { }
         }
         setState(s);
+        playStart();
     }, [seed, difficulty, currentLevel, forceHidden]);
 
     useEffect(() => {
@@ -144,12 +146,16 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
 
     useEffect(() => {
         if (!state) return;
-        if (isWin(state)) setShowComplete(true);
-        else setShowComplete(false);
-        if (isWin(state)) {
+        const won = isWin(state);
+        setShowComplete(won);
+        if (won) {
             try { emitEvent('win', { level: state.level }); } catch { }
         }
     }, [state]);
+
+    useEffect(() => {
+        if (showComplete) playMenuSelect();
+    }, [showComplete]);
 
     useEffect(() => {
         if (!state || levelSolvable) return;
@@ -201,6 +207,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         setHintPreview(null);
         setLevelSolvable(true);
         setShowComplete(false);
+        playStart();
         initialHistoryLenRef.current = s.moveHistory?.length ?? 0;
     };
 
@@ -219,12 +226,21 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
                     const color = getNutColor(top);
                     emitEvent('pick', { color, count: b.nuts.length });
                 } catch { }
+                playPick();
                 setSelected(id);
                 return;
             }
         }
 
         if (!selected) return;
+
+        if (selected === id) {
+            // Tap the selected bolt again to abort the move.
+            playCancel();
+            setSelected(null);
+            setInvalidTarget(null);
+            return;
+        }
 
         const srcBefore = state.bolts.find((b) => b.id === selected);
         const tgtBefore = state.bolts.find((b) => b.id === id);
@@ -249,6 +265,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         const res = executeMoveOnState(state, selected, id);
         setSelected(null);
         if (res.success) {
+            playDrop();
             setState({ ...state });
             if (res.move) {
                 setAnimMove({ move: res.move, preRects });
@@ -283,10 +300,12 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     };
 
     const handleContinue = () => {
+        const safe = (fn: () => void) => {
+            try { fn(); } catch { }
+        };
+
         if (playMode === 'endless') {
-            try {
-                addEndlessCompleted(difficulty);
-            } catch { }
+            safe(() => addEndlessCompleted(difficulty));
             const newSeed = `seed-${Date.now()}`;
             setSeed(newSeed);
             setShowComplete(false);
@@ -294,21 +313,17 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         }
 
         if (playMode === 'daily') {
-            try {
+            safe(() => {
                 const ds = getDailySeed();
                 // ds like daily-v1-YYYY-MM-DD -> store date only
-                const dateStr = ds.slice('daily-v1-'.length);
-                setDailyCompleted(dateStr);
-            } catch { }
+                setDailyCompleted(ds.slice('daily-v1-'.length));
+            });
             onExit?.();
             return;
         }
 
         if (playMode === 'journey') {
-            try {
-                setLevelCompleted(difficulty, state.level);
-            } catch { }
-            // return to Journey selector
+            safe(() => setLevelCompleted(difficulty, state.level));
             onExit?.();
             return;
         }
@@ -318,9 +333,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         setCurrentLevelState(nextLevel);
         const newSeed = `seed-${Date.now()}`;
         setSeed(newSeed);
-        try {
-            setSeedForDifficulty(difficulty, newSeed);
-        } catch { }
+        safe(() => setSeedForDifficulty(difficulty, newSeed));
         setShowComplete(false);
     };
 

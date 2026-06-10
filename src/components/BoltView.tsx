@@ -49,14 +49,13 @@ function hexToRgb(hex: string) {
 function rgbToHex(r: number, g: number, b: number) {
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
 }
-function lighten(hex: string, amt = 0.1) {
+function shift(hex: string, amt: number, sign: 1 | -1) {
   const { r, g, b } = hexToRgb(hex);
-  return rgbToHex(clamp(r + 255 * amt), clamp(g + 255 * amt), clamp(b + 255 * amt));
+  const k = 255 * amt * sign;
+  return rgbToHex(clamp(r + k), clamp(g + k), clamp(b + k));
 }
-function darken(hex: string, amt = 0.1) {
-  const { r, g, b } = hexToRgb(hex);
-  return rgbToHex(clamp(r - 255 * amt), clamp(g - 255 * amt), clamp(b - 255 * amt));
-}
+const lighten = (hex: string, amt = 0.1) => shift(hex, amt, 1);
+const darken = (hex: string, amt = 0.1) => shift(hex, amt, -1);
 
 
 
@@ -85,10 +84,10 @@ export default function BoltView({
   const capacity = bolt.capacity;
   const topNut = bolt.nuts[bolt.nuts.length - 1];
   const topColor = topNut?.color;
-  let topGroupStartIndex = bolt.nuts.length;
+  let topGroupStartIndex = topColor ? bolt.nuts.length - 1 : bolt.nuts.length;
   if (topColor) {
-    for (let idx = bolt.nuts.length - 1; idx >= 0; idx--) {
-      if (bolt.nuts[idx]?.color !== topColor) break;
+    for (let idx = bolt.nuts.length - 2; idx >= 0; idx--) {
+      if (bolt.nuts[idx].color !== topColor) break;
       topGroupStartIndex = idx;
     }
   }
@@ -99,16 +98,9 @@ export default function BoltView({
 
   const viewportWidth = typeof window !== 'undefined' && typeof window.innerWidth === 'number' ? window.innerWidth : 1200;
   const DEFAULT_MAX = viewportWidth <= 520 ? 240 : viewportWidth <= 900 ? 280 : 320;
-  let MAX_DISPLAY_HEIGHT = DEFAULT_MAX;
-  if (typeof window !== 'undefined' && typeof window.innerHeight === 'number') {
-    const avail = window.innerHeight - 160;
-
-    if (avail > 0) {
-      MAX_DISPLAY_HEIGHT = Math.min(avail, DEFAULT_MAX);
-    } else {
-      MAX_DISPLAY_HEIGHT = DEFAULT_MAX;
-    }
-  }
+  const winHeight = typeof window !== 'undefined' && typeof window.innerHeight === 'number' ? window.innerHeight : null;
+  const avail = winHeight === null ? 0 : winHeight - 160;
+  const MAX_DISPLAY_HEIGHT = avail > 0 ? Math.min(avail, DEFAULT_MAX) : DEFAULT_MAX;
   const scale = svgH > MAX_DISPLAY_HEIGHT ? MAX_DISPLAY_HEIGHT / svgH : 1;
   const headGradId = `head-${bolt.id}`;
   const shaftGradId = `shaft-${bolt.id}`;
