@@ -25,6 +25,7 @@ import {
 import { emitEvent } from '../lib/events';
 import { getDailySeed } from '../lib/daily';
 import { setDailyCompleted } from '../lib/persistence';
+import { playPick, playDrop, playCancel, playMenuSelect, playStart } from '../lib/sound';
 
 import type { ReactElement } from 'react';
 
@@ -116,6 +117,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
             } catch { }
         }
         setState(s);
+        playStart();
     }, [seed, difficulty, currentLevel, forceHidden]);
 
     useEffect(() => {
@@ -150,6 +152,10 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
             try { emitEvent('win', { level: state.level }); } catch { }
         }
     }, [state]);
+
+    useEffect(() => {
+        if (showComplete) playMenuSelect();
+    }, [showComplete]);
 
     useEffect(() => {
         if (!state || levelSolvable) return;
@@ -201,6 +207,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         setHintPreview(null);
         setLevelSolvable(true);
         setShowComplete(false);
+        playStart();
         initialHistoryLenRef.current = s.moveHistory?.length ?? 0;
     };
 
@@ -219,12 +226,21 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
                     const color = getNutColor(top);
                     emitEvent('pick', { color, count: b.nuts.length });
                 } catch { }
+                playPick();
                 setSelected(id);
                 return;
             }
         }
 
         if (!selected) return;
+
+        if (selected === id) {
+            // Tap the selected bolt again to abort the move.
+            playCancel();
+            setSelected(null);
+            setInvalidTarget(null);
+            return;
+        }
 
         const srcBefore = state.bolts.find((b) => b.id === selected);
         const tgtBefore = state.bolts.find((b) => b.id === id);
@@ -249,6 +265,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         const res = executeMoveOnState(state, selected, id);
         setSelected(null);
         if (res.success) {
+            playDrop();
             setState({ ...state });
             if (res.move) {
                 setAnimMove({ move: res.move, preRects });
