@@ -16,6 +16,16 @@ type Props = {
     onSeedChange?: (seed: string) => void;
 };
 
+function getEndlessCountLabel(difficulty: string): string {
+    try {
+        const p = loadProgress();
+        const count = p.difficulties?.[difficulty]?.endlessCount ?? 0;
+        return `${difficulty} • Completed ${count}`;
+    } catch {
+        return '';
+    }
+}
+
 export default function TopBar({ level, difficulty, seed, playMode = 'journey', showSeed = true, showDebug = false, onShowDebugChange, forceHidden = false, onForceHiddenChange, onSeedChange }: Props) {
     const [editingSeed, setEditingSeed] = useState(false);
     const [seedValue, setSeedValue] = useState(seed || '');
@@ -24,27 +34,33 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
         if (!editingSeed) setSeedValue(seed || '');
     }, [seed, editingSeed]);
 
+    const saveSeed = () => {
+        setEditingSeed(false);
+        onSeedChange?.(seedValue);
+    };
+
+    const cancelEdit = () => {
+        setSeedValue(seed || '');
+        setEditingSeed(false);
+    };
+
+    const handleSeedKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') saveSeed();
+        else if (e.key === 'Escape') cancelEdit();
+    };
 
     return (
         <div className="topbar topbar-root">
             <div className="topbar-left">
                 {playMode === 'endless' ? (
                     <div className="topbar-status">
-                        <strong>Endless</strong>: {(() => {
-                            try {
-                                const p = loadProgress();
-                                const count = p.difficulties?.[difficulty]?.endlessCount ?? 0;
-                                return `${difficulty} • Completed ${count}`;
-                            } catch { return '' }
-                        })()}
+                        <strong>Endless</strong>: {getEndlessCountLabel(difficulty)}
                     </div>
-                ) : (
-                    playMode !== 'daily' && (
-                        <div className="topbar-status">
-                            <strong>Level</strong>: {level}
-                        </div>
-                    )
-                )}
+                ) : playMode !== 'daily' ? (
+                    <div className="topbar-status">
+                        <strong>Level</strong>: {level}
+                    </div>
+                ) : null}
             </div>
             <div className="topbar-controls">
                 {/* Difficulty selection removed from in-game TopBar. Choose difficulty when starting Journey/Endless from Home screen. */}
@@ -62,7 +78,7 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
                             <label className="topbar-debug">
                                 <input
                                     type="checkbox"
-                                    checked={Boolean(forceHidden)}
+                                    checked={forceHidden}
                                     onChange={(e) => onForceHiddenChange?.(e.target.checked)}
                                 />
                                 <span>Force Hidden Nuts</span>
@@ -86,12 +102,12 @@ export default function TopBar({ level, difficulty, seed, playMode = 'journey', 
                                         aria-label="Seed"
                                         value={seedValue}
                                         onChange={(e) => setSeedValue(e.target.value)}
-                                        onKeyDown={(e) => { if (e.key === 'Enter') { setEditingSeed(false); onSeedChange?.(seedValue); } if (e.key === 'Escape') { setSeedValue(seed || ''); setEditingSeed(false); } }}
+                                        onKeyDown={handleSeedKeyDown}
                                         className="topbar-input-seed"
                                         autoFocus
                                     />{' '}
-                                    <button onClick={() => { setEditingSeed(false); onSeedChange?.(seedValue); }}>Save</button>{' '}
-                                    <button onClick={() => { setSeedValue(seed || ''); setEditingSeed(false); }}>Cancel</button>
+                                    <button onClick={saveSeed}>Save</button>{' '}
+                                    <button onClick={cancelEdit}>Cancel</button>
                                 </span>
                             )}
                         </div>

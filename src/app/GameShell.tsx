@@ -144,9 +144,9 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
 
     useEffect(() => {
         if (!state) return;
-        if (isWin(state)) setShowComplete(true);
-        else setShowComplete(false);
-        if (isWin(state)) {
+        const won = isWin(state);
+        setShowComplete(won);
+        if (won) {
             try { emitEvent('win', { level: state.level }); } catch { }
         }
     }, [state]);
@@ -283,10 +283,12 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
     };
 
     const handleContinue = () => {
+        const safe = (fn: () => void) => {
+            try { fn(); } catch { }
+        };
+
         if (playMode === 'endless') {
-            try {
-                addEndlessCompleted(difficulty);
-            } catch { }
+            safe(() => addEndlessCompleted(difficulty));
             const newSeed = `seed-${Date.now()}`;
             setSeed(newSeed);
             setShowComplete(false);
@@ -294,21 +296,17 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         }
 
         if (playMode === 'daily') {
-            try {
+            safe(() => {
                 const ds = getDailySeed();
                 // ds like daily-v1-YYYY-MM-DD -> store date only
-                const dateStr = ds.slice('daily-v1-'.length);
-                setDailyCompleted(dateStr);
-            } catch { }
+                setDailyCompleted(ds.slice('daily-v1-'.length));
+            });
             onExit?.();
             return;
         }
 
         if (playMode === 'journey') {
-            try {
-                setLevelCompleted(difficulty, state.level);
-            } catch { }
-            // return to Journey selector
+            safe(() => setLevelCompleted(difficulty, state.level));
             onExit?.();
             return;
         }
@@ -318,9 +316,7 @@ export default function GameShell({ playMode = 'journey', initialSeed, initialDi
         setCurrentLevelState(nextLevel);
         const newSeed = `seed-${Date.now()}`;
         setSeed(newSeed);
-        try {
-            setSeedForDifficulty(difficulty, newSeed);
-        } catch { }
+        safe(() => setSeedForDifficulty(difficulty, newSeed));
         setShowComplete(false);
     };
 

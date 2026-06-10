@@ -1,16 +1,41 @@
 import React, { useState } from 'react';
 import type { PlayMode, Difficulty } from '../lib/types';
-import { getDailySeed } from '../lib/daily';
+import { getDailySeed, getDailyDateString } from '../lib/daily';
 import { getDailyLastCompleted, getSelectedDifficulty, setSelectedDifficulty } from '../lib/persistence';
 
 type Props = {
     onSelectMode: (mode: PlayMode, opts?: { difficulty?: Difficulty; seed?: string }) => void;
 };
 
+function DailyCompletedBadge() {
+    try {
+        const today = getDailyDateString(getDailySeed());
+        if (today && getDailyLastCompleted() === today) {
+            return <div className="daily-completed-wrap"><span className="daily-completed-badge">Completed today</span></div>;
+        }
+    } catch {
+        // persistence or daily seed may be unavailable; render nothing
+    }
+    return null;
+}
+
+const DIFFICULTY_OPTIONS: Difficulty[] = ['easy', 'medium', 'hard', 'extreme'];
+
 export default function HomeScreen({ onSelectMode }: Props) {
     const [difficulty, setDifficulty] = useState<Difficulty>(() => (getSelectedDifficulty() as Difficulty) ?? 'easy');
 
     const [openEndless, setOpenEndless] = useState(false);
+
+    const handleDifficultyChange = (d: Difficulty) => {
+        setDifficulty(d);
+        try {
+            setSelectedDifficulty(d);
+        } catch {
+            // persistence may be unavailable; UI state still updates
+        }
+    };
+
+    const closeEndless = () => setOpenEndless(false);
 
     return (
         <div className="home-screen">
@@ -49,15 +74,7 @@ export default function HomeScreen({ onSelectMode }: Props) {
                     <div className="mode-content">
                         <div className="mode-title">Daily</div>
                         <div className="mode-desc">One shared seeded puzzle per day — compete for best solutions.</div>
-                        {(() => {
-                            try {
-                                const today = getDailySeed().slice('daily-v1-'.length);
-                                if (getDailyLastCompleted() === today) {
-                                    return <div className="daily-completed-wrap"><span className="daily-completed-badge">Completed today</span></div>;
-                                }
-                            } catch { }
-                            return null;
-                        })()}
+                        <DailyCompletedBadge />
                     </div>
                 </button>
 
@@ -83,18 +100,21 @@ export default function HomeScreen({ onSelectMode }: Props) {
                         <div className="endless-difficulty-row">
                             <label className="endless-difficulty-label">
                                 Difficulty:
-                                <select className="endless-difficulty-select" value={difficulty} onChange={(e) => { const d = e.target.value as Difficulty; setDifficulty(d); try { setSelectedDifficulty(d); } catch { } }}>
-                                    <option value="easy">easy</option>
-                                    <option value="medium">medium</option>
-                                    <option value="hard">hard</option>
-                                    <option value="extreme">extreme</option>
+                                <select
+                                    className="endless-difficulty-select"
+                                    value={difficulty}
+                                    onChange={(e) => handleDifficultyChange(e.target.value as Difficulty)}
+                                >
+                                    {DIFFICULTY_OPTIONS.map((d) => (
+                                        <option key={d} value={d}>{d}</option>
+                                    ))}
                                 </select>
                             </label>
                         </div>
                         <div className="endless-actions-wrap">
-                            <button className="primary-cta" onClick={() => { setOpenEndless(false); onSelectMode('endless', { difficulty }); }}>Play Endless</button>
+                            <button className="primary-cta" onClick={() => { closeEndless(); onSelectMode('endless', { difficulty }); }}>Play Endless</button>
                             <div className="secondary-actions endless-secondary-actions">
-                                <button className="control-btn endless-cancel-btn" onClick={() => setOpenEndless(false)}>Cancel</button>
+                                <button className="control-btn endless-cancel-btn" onClick={closeEndless}>Cancel</button>
                             </div>
                         </div>
                     </div>

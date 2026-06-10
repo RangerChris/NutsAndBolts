@@ -5,6 +5,12 @@ import { onBalancerEvent } from './lib/balancer';
 
 import type { ReactElement } from 'react';
 
+function toLevel(raw: unknown): number {
+    if (typeof raw === 'number') return raw;
+    if (typeof raw === 'string') return parseInt(raw, 10) || 1;
+    return 1;
+}
+
 export default function App(): ReactElement {
     const [progressLoaded, setProgressLoaded] = useState(false);
 
@@ -12,23 +18,14 @@ export default function App(): ReactElement {
         const { unsubscribe } = initPersistence();
         setProgressLoaded(true);
 
-
         const unsubEvent = onBalancerEvent((ev) => {
             try {
-                if (ev.payload && ev.payload.event === 'levelComplete') {
-                    const diff = ev.payload.difficulty;
-                    if (typeof diff !== 'string') return;
-                    const rawLevel = ev.payload.level;
-                    const level =
-                        typeof rawLevel === 'number'
-                            ? rawLevel
-                            : typeof rawLevel === 'string'
-                            ? parseInt(rawLevel, 10) || 1
-                            : 1;
-                    setCurrentLevel(diff, level + 1);
-                }
+                if (ev.payload?.event !== 'levelComplete') return;
+                const { difficulty, level: rawLevel } = ev.payload;
+                if (typeof difficulty !== 'string') return;
+                setCurrentLevel(difficulty, toLevel(rawLevel) + 1);
             } catch {
-
+                // swallow listener errors — persistence writes are best-effort
             }
         });
 

@@ -27,6 +27,33 @@ type Props = {
     onHintDone?: () => void;
 };
 
+const EASE_LIFT = 'cubic-bezier(0.22, 1, 0.36, 1)';
+const EASE_MOVE = 'cubic-bezier(0.2, 0.9, 0.2, 1)';
+const EASE_SOFT = 'ease-in-out';
+const LIFT_OFFSET = 18;
+const LIFT_NUDGE_DENIED = 10;
+const LIFT_STAGGER = 3;
+const HOVER_DELAY_MS = 210;
+const DROP_DELAY_MS = 470;
+const LIFT_DURATION_MS = 180;
+const HOVER_DURATION_MS = 220;
+const ANIM_TOTAL_MS = 760;
+const HINT_DENIED_TOTAL_MS = 440;
+const HINT_CLONE_Z = 9999;
+
+function boltEl(id: string): HTMLElement | null {
+    return document.querySelector(`[data-bolt="${id}"]`) as HTMLElement | null;
+}
+
+function boltRect(id: string): DOMRect | undefined {
+    return boltEl(id)?.getBoundingClientRect();
+}
+
+function transitionClone(clone: HTMLElement, origin: DOMRect, left: number, top: number, duration: number, easing: string) {
+    clone.style.transition = `transform ${duration}ms ${easing}`;
+    clone.style.transform = `translate(${left - origin.left}px, ${top - origin.top}px)`;
+}
+
 function createPreviewClone(sourceRect: DOMRect, fill: string, className = 'hint-preview-clone') {
     const clone = document.createElement('div');
     clone.className = className;
@@ -35,7 +62,7 @@ function createPreviewClone(sourceRect: DOMRect, fill: string, className = 'hint
     clone.style.top = `${sourceRect.top}px`;
     clone.style.width = `${sourceRect.width}px`;
     clone.style.height = `${sourceRect.height}px`;
-    clone.style.zIndex = '9999';
+    clone.style.zIndex = String(HINT_CLONE_Z);
     clone.style.pointerEvents = 'none';
     clone.style.opacity = '0.98';
 
@@ -83,11 +110,12 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
         const clones: HTMLElement[] = [];
         const timers: number[] = [];
 
-        const fromBoltEl = document.querySelector(`[data-bolt="${move.fromBoltId}"]`) as HTMLElement | null;
-        const toBoltEl = document.querySelector(`[data-bolt="${move.toBoltId}"]`) as HTMLElement | null;
-        const fromBoltRect = fromBoltEl?.getBoundingClientRect();
-        const toBoltRect = toBoltEl?.getBoundingClientRect();
-        const liftTop = Math.min(fromBoltRect ? fromBoltRect.top - 18 : Number.POSITIVE_INFINITY, toBoltRect ? toBoltRect.top - 18 : Number.POSITIVE_INFINITY);
+        const fromBoltRect = boltRect(move.fromBoltId);
+        const toBoltRect = boltRect(move.toBoltId);
+        const liftTop = Math.min(
+            fromBoltRect ? fromBoltRect.top - LIFT_OFFSET : Number.POSITIVE_INFINITY,
+            toBoltRect ? toBoltRect.top - LIFT_OFFSET : Number.POSITIVE_INFINITY
+        );
         const safeLiftTop = Number.isFinite(liftTop) ? liftTop : 0;
 
         for (let i = 0; i < preRects.length; i++) {
@@ -99,44 +127,30 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
             const targetEl = document.querySelector(targetSelector) as HTMLElement | null;
             if (!targetEl) continue;
             const targetRect = targetEl.getBoundingClientRect();
+            const prRect = { left: pr.left, top: pr.top, width: pr.width, height: pr.height } as DOMRect;
 
-            const clone = createPreviewClone(
-                {
-                    left: pr.left,
-                    top: pr.top,
-                    width: pr.width,
-                    height: pr.height,
-                } as DOMRect,
-                pr.color,
-                'move-preview-clone'
-            );
+            const clone = createPreviewClone(prRect, pr.color, 'move-preview-clone');
             clones.push(clone);
 
-            const transitionTo = (left: number, top: number, duration: number, easing: string) => {
-                clone.style.transition = `transform ${duration}ms ${easing}`;
-                clone.style.transform = `translate(${left - pr.left}px, ${top - pr.top}px)`;
-            };
-
-            const liftY = safeLiftTop - i * 3;
-            const hoverLeft = targetRect.left;
-            const hoverTop = safeLiftTop - i * 3;
+            const liftY = safeLiftTop - i * LIFT_STAGGER;
+            const hoverTop = safeLiftTop - i * LIFT_STAGGER;
 
             requestAnimationFrame(() => {
-                transitionTo(pr.left, liftY, 180, 'cubic-bezier(0.22, 1, 0.36, 1)');
+                transitionClone(clone, prRect, pr.left, liftY, LIFT_DURATION_MS, EASE_LIFT);
             });
             timers.push(window.setTimeout(() => {
-                transitionTo(hoverLeft, hoverTop, 220, 'ease-in-out');
-            }, 210));
+                transitionClone(clone, prRect, targetRect.left, hoverTop, HOVER_DURATION_MS, EASE_SOFT);
+            }, HOVER_DELAY_MS));
             timers.push(window.setTimeout(() => {
-                transitionTo(targetRect.left, targetRect.top, 220, 'cubic-bezier(0.2, 0.9, 0.2, 1)');
-            }, 470));
+                transitionClone(clone, prRect, targetRect.left, targetRect.top, HOVER_DURATION_MS, EASE_MOVE);
+            }, DROP_DELAY_MS));
         }
 
         const t = window.setTimeout(() => {
             clones.forEach((c) => c.remove());
             clones.length = 0;
             onAnimDone?.();
-        }, 760);
+        }, ANIM_TOTAL_MS);
         return () => {
             clearTimeout(t);
             timers.forEach((timer) => clearTimeout(timer));
@@ -183,17 +197,18 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
             return;
         }
 
-        const fromBoltEl = document.querySelector(`[data-bolt="${hintPreview.fromBoltId}"]`) as HTMLElement | null;
-        const toBoltEl = document.querySelector(`[data-bolt="${hintPreview.toBoltId}"]`) as HTMLElement | null;
-        const fromBoltRect = fromBoltEl?.getBoundingClientRect();
-        const toBoltRect = toBoltEl?.getBoundingClientRect();
+        const fromBoltRect = boltRect(hintPreview.fromBoltId);
+        const toBoltRect = boltRect(hintPreview.toBoltId);
         if (!fromBoltRect) {
             onHintDone?.();
             return;
         }
 
-        const liftTop = Math.min(fromBoltRect.top - 18, toBoltRect ? toBoltRect.top - 18 : fromBoltRect.top - 18);
-        const liftNudgeX = hintPreview.allowed ? 0 : 10;
+        const liftTop = Math.min(
+            fromBoltRect.top - LIFT_OFFSET,
+            toBoltRect ? toBoltRect.top - LIFT_OFFSET : fromBoltRect.top - LIFT_OFFSET
+        );
+        const liftNudgeX = hintPreview.allowed ? 0 : LIFT_NUDGE_DENIED;
         const clones: HTMLElement[] = [];
         const timers: number[] = [];
 
@@ -204,37 +219,32 @@ export default function Board({ state, paletteId, showDebug = false, selectedBol
             clones.push(clone);
 
             const liftX = sourceRect.left + liftNudgeX;
-            const liftY = liftTop - index * 3;
-
-            const transitionTo = (left: number, top: number, duration: number, easing: string) => {
-                clone.style.transition = `transform ${duration}ms ${easing}`;
-                clone.style.transform = `translate(${left - sourceRect.left}px, ${top - sourceRect.top}px)`;
-            };
+            const liftY = liftTop - index * LIFT_STAGGER;
 
             requestAnimationFrame(() => {
-                transitionTo(liftX, liftY, 180, 'cubic-bezier(0.22, 1, 0.36, 1)');
+                transitionClone(clone, sourceRect, liftX, liftY, LIFT_DURATION_MS, EASE_LIFT);
             });
 
             if (!hintPreview.allowed) {
                 timers.push(window.setTimeout(() => {
-                    transitionTo(sourceRect.left, sourceRect.top, 180, 'ease-in-out');
-                }, 210));
+                    transitionClone(clone, sourceRect, sourceRect.left, sourceRect.top, LIFT_DURATION_MS, EASE_SOFT);
+                }, HOVER_DELAY_MS));
                 return;
             }
 
             const targetRect = targetRects[index].getBoundingClientRect();
             const hoverLeft = targetRect.left;
-            const hoverTop = liftTop - index * 3;
+            const hoverTop = liftTop - index * LIFT_STAGGER;
 
             timers.push(window.setTimeout(() => {
-                transitionTo(hoverLeft, hoverTop, 220, 'ease-in-out');
-            }, 210));
+                transitionClone(clone, sourceRect, hoverLeft, hoverTop, HOVER_DURATION_MS, EASE_SOFT);
+            }, HOVER_DELAY_MS));
             timers.push(window.setTimeout(() => {
-                transitionTo(targetRect.left, targetRect.top, 220, 'cubic-bezier(0.2, 0.9, 0.2, 1)');
-            }, 470));
+                transitionClone(clone, sourceRect, targetRect.left, targetRect.top, HOVER_DURATION_MS, EASE_MOVE);
+            }, DROP_DELAY_MS));
         });
 
-        const totalDuration = hintPreview.allowed ? 760 : 440;
+        const totalDuration = hintPreview.allowed ? ANIM_TOTAL_MS : HINT_DENIED_TOTAL_MS;
         timers.push(window.setTimeout(() => {
             clones.forEach((clone) => clone.remove());
             onHintDone?.();

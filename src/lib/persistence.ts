@@ -3,13 +3,9 @@ import { STORAGE_KEY } from './constants';
 let storageImpl: Storage;
 try {
   if (typeof localStorage !== 'undefined') {
-    try {
-      localStorage.setItem('__nb_test', '1');
-      localStorage.removeItem('__nb_test');
-      storageImpl = localStorage;
-    } catch (e) {
-      throw e;
-    }
+    localStorage.setItem('__nb_test', '1');
+    localStorage.removeItem('__nb_test');
+    storageImpl = localStorage;
   } else {
     throw new Error('no localStorage');
   }
@@ -83,6 +79,16 @@ export function cloneDefaultProgress(): PersistedProgress {
   };
 }
 
+// Legacy completed arrays stored endless runs as raw timestamps; anything above
+// this threshold (in ms since epoch) is treated as a timestamp, not a level.
+const LEGACY_ENDLESS_TIMESTAMP_THRESHOLD = 1_000_000_000;
+
+function normalizeDifficultyEntry(d: PersistedProgress['difficulties'][string]) {
+  if (!('completed' in d)) d.completed = [];
+  if (d.endlessCount === undefined) d.endlessCount = 0;
+  return d;
+}
+
 export function saveProgress(payload: PersistedProgress) {
   try {
     storageImpl.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -124,23 +130,24 @@ export function migrateProgress(obj: unknown): PersistedProgress {
           const journeyLevels: number[] = [];
           let endlessCount = d.endlessCount || 0;
           for (const item of d.completed) {
+            if (typeof item !== 'number') continue;
             // journey levels are 1-10, endless entries are large timestamps
-            if (typeof item === 'number' && item >= 1 && item <= 10) {
+            if (item >= 1 && item <= 10) {
               journeyLevels.push(item);
-            } else if (typeof item === 'number' && item > 1000000000) {
+            } else if (item > LEGACY_ENDLESS_TIMESTAMP_THRESHOLD) {
               endlessCount++;
             }
           }
           d.completed = journeyLevels;
           d.endlessCount = endlessCount;
         }
-        if (d.endlessCount === undefined) d.endlessCount = 0;
+        normalizeDifficultyEntry(d);
       }
     }
     return p as PersistedProgress;
   }
 
-  
+
   if (o.levels && typeof o.levels === 'object') {
     const difficulties: Record<string, { currentLevel: number; maxReached: number; completed?: number[]; endlessCount?: number }> = {};
     const levels = o.levels as Record<string, unknown>;
@@ -151,12 +158,7 @@ export function migrateProgress(obj: unknown): PersistedProgress {
       difficulties[k] = { currentLevel: current, maxReached: max };
     }
     const settings = (o.settings as PersistedProgress['settings']) || cloneDefaultProgress().settings;
-    // ensure completed arrays and endless count exist
-    for (const k of Object.keys(difficulties)) {
-      const dd = difficulties[k];
-      dd.completed = dd.completed || [];
-      dd.endlessCount = dd.endlessCount || 0;
-    }
+    for (const k of Object.keys(difficulties)) normalizeDifficultyEntry(difficulties[k]);
     return { version: 2, difficulties, settings, daily: { lastCompleted: null } };
   }
 
@@ -164,11 +166,8 @@ export function migrateProgress(obj: unknown): PersistedProgress {
   const difficulties = (o.difficulties as PersistedProgress['difficulties']) || cloneDefaultProgress().difficulties;
   const settings = (o.settings as PersistedProgress['settings']) || cloneDefaultProgress().settings;
   const daily = (o.daily as PersistedProgress['daily']) || { lastCompleted: null };
-  // ensure completed arrays and endless count on each difficulty entry
   for (const k of Object.keys(difficulties)) {
-    const d = difficulties[k] as PersistedProgress['difficulties'][string];
-    if (!('completed' in d)) d.completed = [];
-    if (!('endlessCount' in d)) d.endlessCount = 0;
+    normalizeDifficultyEntry(difficulties[k] as PersistedProgress['difficulties'][string]);
   }
   return { version: 2, difficulties, settings, daily };
 }
