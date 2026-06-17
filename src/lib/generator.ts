@@ -36,7 +36,9 @@ function makeMove(fromBoltId: string, toBoltId: string, color: string, count: nu
   return { fromBoltId, toBoltId, color, count, timestamp: Date.now() };
 }
 
-function tryWithRetry(opts: CreateLevelRuntimeOpts, seed: string): { state: GameState; seed: string } | null {
+type CreateLevelResult = { state: GameState; seed: string; solution: Move[] };
+
+function tryWithRetry(opts: CreateLevelRuntimeOpts, seed: string): CreateLevelResult | null {
   const next = retrySeed(seed);
   if (next.retryCount < MAX_RETRIES) {
     return createLevel({ ...opts, seed: next.retrySeed });
@@ -67,17 +69,8 @@ function ensureMixedBolt(bolts: Bolt[], filteredMoves: Move[]): void {
       return;
     }
   }
-
-  const nonEmpty = bolts.filter((b) => b.nuts.length > 0);
-  if (nonEmpty.length < 2) return;
-  const a = nonEmpty[0];
-  const b = nonEmpty[1];
-  const ta = a.nuts.pop() as Nut;
-  const tb = b.nuts.pop() as Nut;
-  a.nuts.push(tb);
-  b.nuts.push(ta);
-  filteredMoves.push(makeMove(a.id, b.id, ta.color, 1));
-  filteredMoves.push(makeMove(b.id, a.id, tb.color, 1));
+  // No swap fallback: the loop above always finds the empty extra bolt as a legal, reversible
+  // target when any non-empty bolt exists, so falling through here means the board is empty.
 }
 
 export function createSolvedBoard(numBolts: number, stackHeight: number): Bolt[] {
@@ -101,12 +94,23 @@ type ShuffleStep = {
 };
 
 function pickShuffleSource(bolts: Bolt[], rng: () => number, lastMove: { from?: string; to?: string } | null): ShuffleStep | null {
-  const nonEmpty = bolts.filter((b) => b.nuts.length > 0);
-  if (nonEmpty.length === 0) return null;
-  const src = nonEmpty[Math.floor(rng() * nonEmpty.length)];
+  // Only pick sources that admit an immediately-undoable move: either the whole bolt is one color
+  // (moving any amount off empties it or leaves the same color on top) or the top run has size >= 2
+  // (a partial move leaves the top color in place, keeping the move reversible). Moving a lone
+  // differently-colored top nut off a mixed bolt would expose a new color and break reversibility.
+  const safe = bolts.filter((b) => {
+    if (b.nuts.length === 0) return false;
+    const { count } = pickTopGroup(b);
+    return count === b.nuts.length || count > 1;
+  });
+  if (safe.length === 0) return null;
+  const src = safe[Math.floor(rng() * safe.length)];
   const { color, count } = pickTopGroup(src);
   if (!color || count === 0) return null;
-  const moveCount = Math.max(1, Math.min(count, Math.floor(rng() * count) + 1));
+  // Partial move keeps the source's top color (reversible); a full move is only allowed when it
+  // empties the source (count === src.nuts.length).
+  const maxMove = count < src.nuts.length ? count - 1 : count;
+  const moveCount = Math.max(1, Math.min(maxMove, Math.floor(rng() * maxMove) + 1));
   const targets = bolts.filter((b) => b.id !== src.id && b.nuts.length + moveCount <= b.capacity);
   if (targets.length === 0) return null;
   const mixedCandidates = targets.filter((b) => b.nuts.length > 0 && b.nuts[b.nuts.length - 1].color !== color);
@@ -124,7 +128,7 @@ function applyShuffleStep(bolts: Bolt[], step: ShuffleStep, rng: () => number, m
   moveHistory.push(makeMove(step.src.id, tgt.id, step.color, moved.length));
 }
 
-export function createLevel(opts: CreateLevelRuntimeOpts): { state: GameState; seed: string } {
+export function createLevel(opts: CreateLevelRuntimeOpts): CreateLevelResult {
   const cfg = DIFFICULTY_CONFIG[opts.difficulty];
   const levelNum = opts.level || 1;
   const { numBolts, stackHeight } = getLevelParams(opts.difficulty, levelNum);
@@ -134,8 +138,10 @@ export function createLevel(opts: CreateLevelRuntimeOpts): { state: GameState; s
 
   const bolts = createSolvedBoard(numBolts, stackHeight);
   const EXTRA_BOLT_ID = 'extra-0';
-  const TEMP_EXTRA_ID = '__temp_extra';
-  bolts.push({ id: TEMP_EXTRA_ID, capacity: stackHeight, nuts: [] });
+  // The empty extra bolt doubles as the shuffle scratch space. Keeping it in the returned board
+  // (instead of dropping a scratch bolt) preserves every nut and makes the reverse-shuffle a
+  // valid solution. It may start non-empty; the game makes no assumption that it starts empty.
+  bolts.push({ id: EXTRA_BOLT_ID, capacity: stackHeight, nuts: [] });
   const moveHistory: Move[] = [];
 
   let lastMove: { from?: string; to?: string } | null = null;
@@ -147,18 +153,16 @@ export function createLevel(opts: CreateLevelRuntimeOpts): { state: GameState; s
     lastMove = { from: last.fromBoltId, to: last.toBoltId };
   }
 
-  const boltsToReturn = bolts.filter((b) => b.id !== TEMP_EXTRA_ID);
-  boltsToReturn.push({ id: EXTRA_BOLT_ID, capacity: stackHeight, nuts: [] });
   const filteredMoves: Move[] = [];
   const hiddenNutsEnabled = typeof opts.hiddenNuts === 'boolean' ? opts.hiddenNuts : rng() < 0.25;
 
-  for (const b of boltsToReturn) {
+  for (const b of bolts) {
     for (const n of b.nuts) n.revealed = false;
     if (b.nuts.length > 0) b.nuts[b.nuts.length - 1].revealed = true;
   }
 
   const state: GameState = {
-    bolts: boltsToReturn,
+    bolts,
     extraBoltUsed: true,
     level: opts.level || 1,
     difficulty: opts.difficulty,
@@ -167,11 +171,11 @@ export function createLevel(opts: CreateLevelRuntimeOpts): { state: GameState; s
     moveHistory: filteredMoves,
   };
 
-  ensureMixedBolt(boltsToReturn, filteredMoves);
+  ensureMixedBolt(bolts, filteredMoves);
 
   // Hidden-nut mode should reveal the full contiguous top color run on each bolt.
   if (hiddenNutsEnabled) {
-    for (const bolt of boltsToReturn) revealTopColorRun(bolt);
+    for (const bolt of bolts) revealTopColorRun(bolt);
   }
 
   state.moveHistory = filteredMoves;
@@ -181,6 +185,14 @@ export function createLevel(opts: CreateLevelRuntimeOpts): { state: GameState; s
     const retried = tryWithRetry(opts, seed);
     if (retried) return retried;
   }
+
+  // The reverse of [shuffle moves ... ensureMixedBolt moves] is a guaranteed-valid solution on
+  // the final board (every shuffle move is immediately-undoable, and ensureMixedBolt only does
+  // legal reversible moves). Used as the optimalMoves fallback when the BFS solver exhausts its
+  // budget (hard/extreme), and exposed for hint support / tests.
+  const reversedSolution: Move[] = [...moveHistory, ...filteredMoves]
+    .map((m) => ({ ...m, fromBoltId: m.toBoltId, toBoltId: m.fromBoltId }))
+    .reverse();
 
   const invariants = checkStateInvariants(normalized);
 
@@ -210,12 +222,10 @@ export function createLevel(opts: CreateLevelRuntimeOpts): { state: GameState; s
     } catch {
       solution = null;
     }
-    normalized.optimalMoves = solution ? solution.length : null;
-    if (!solution) {
-      const retried = tryWithRetry(opts, seed);
-      if (retried) return retried;
-    }
+    // Fall back to the verified reverse-shuffle length instead of null so the level is never
+    // reported as unsolvable just because the solver ran out of budget.
+    normalized.optimalMoves = solution ? solution.length : reversedSolution.length;
   }
 
-  return { state: normalized, seed };
+  return { state: normalized, seed, solution: reversedSolution };
 }

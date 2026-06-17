@@ -88,7 +88,10 @@ function toSolverBolts(state: GameState): SolverBolt[] {
 }
 
 function canonSolverBolts(bolts: SolverBolt[]): string {
-  return bolts.map((b) => b.nuts.join(',')).join('|');
+  // Sort per-bolt layouts so bolts with identical contents are interchangeable — this collapses
+  // permutations of identical bolts into one canonical state and drastically shrinks the BFS
+  // space. The actual bolts array stays unsorted; this is only the visited/parent key.
+  return bolts.map((b) => b.nuts.join(',')).sort().join('|');
 }
 
 function isWinSolverBolts(bolts: SolverBolt[]): boolean {

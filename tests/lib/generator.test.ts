@@ -1,6 +1,28 @@
 import { describe, it, expect } from 'vitest';
 import { createLevel } from '../../src/lib/generator';
-import { computeSolutionPath } from '../../src/lib/engine';
+import { computeSolutionPath, isWin } from '../../src/lib/engine';
+import { getLevelParams } from '../../src/lib/progression';
+import type { Bolt, GameState, Move, Nut } from '../../src/lib/types';
+
+const nutColor = (n: unknown) => (typeof n === 'string' ? n : (n as { color?: string } | undefined)?.color);
+
+// Apply a count-respecting move to a deep-cloned bolt set; throws if the move is illegal.
+function replayMove(bolts: Bolt[], m: Move): void {
+  const src = bolts.find((b) => b.id === m.fromBoltId);
+  const tgt = bolts.find((b) => b.id === m.toBoltId);
+  expect(src).toBeDefined();
+  expect(tgt).toBeDefined();
+  const top = src!.nuts[src!.nuts.length - 1];
+  expect(nutColor(top)).toBe(m.color);
+  expect(tgt!.capacity - tgt!.nuts.length).toBeGreaterThanOrEqual(m.count);
+  if (tgt!.nuts.length > 0) expect(nutColor(tgt!.nuts[tgt!.nuts.length - 1])).toBe(m.color);
+  const moved = src!.nuts.splice(src!.nuts.length - m.count, m.count);
+  tgt!.nuts.push(...moved);
+}
+
+function cloneBolts(state: GameState): Bolt[] {
+  return state.bolts.map((b) => ({ ...b, nuts: b.nuts.map((n) => ({ ...n }) as Nut) }));
+}
 
 describe('level generator', () => {
   it('generates reproducible board for same seed', () => {
@@ -58,4 +80,42 @@ describe('level generator', () => {
       expect(bolt.nuts.length).toBeLessThanOrEqual(bolt.capacity);
     }
   });
+
+  it('preserves every nut across all difficulties (no nuts stranded on a dropped scratch bolt)', () => {
+    const diffs = ['easy', 'medium', 'hard', 'extreme'] as const;
+    for (const difficulty of diffs) {
+      for (let lvl = 1; lvl <= 6; lvl++) {
+        const { state } = createLevel({ difficulty, level: lvl, seed: `preserve-${difficulty}-${lvl}` });
+        const { numBolts, stackHeight } = getLevelParams(difficulty, lvl);
+        const total = state.bolts.reduce((acc, b) => acc + b.nuts.length, 0);
+        expect(total).toBe(numBolts * stackHeight);
+      }
+    }
+  });
+
+  it('every generated level has a positive optimalMoves (never null) for all difficulties', () => {
+    const diffs = ['easy', 'medium', 'hard', 'extreme'] as const;
+    for (const difficulty of diffs) {
+      for (let lvl = 1; lvl <= 6; lvl++) {
+        const { state } = createLevel({ difficulty, level: lvl, seed: `opt-${difficulty}-${lvl}` });
+        expect(state.optimalMoves).not.toBeNull();
+        expect(typeof state.optimalMoves).toBe('number');
+        expect((state.optimalMoves as number) > 0).toBe(true);
+      }
+    }
+  }, 30000);
+
+  it('the returned solution replays legally from the start board to a win', () => {
+    const diffs = ['easy', 'medium', 'hard'] as const;
+    for (const difficulty of diffs) {
+      for (let lvl = 1; lvl <= 4; lvl++) {
+        const { state, solution } = createLevel({ difficulty, level: lvl, seed: `replay-${difficulty}-${lvl}` });
+        expect(Array.isArray(solution)).toBe(true);
+        expect(solution!.length).toBeGreaterThan(0);
+        const bolts = cloneBolts(state);
+        for (const m of solution!) replayMove(bolts, m);
+        expect(isWin({ ...state, bolts })).toBe(true);
+      }
+    }
+  }, 30000);
 });
