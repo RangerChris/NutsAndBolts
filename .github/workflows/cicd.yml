@@ -89,7 +89,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           npm run release
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} --follow-tags
+          VER=$(node -p "require('./package.json').version")
+          # Push commit before tag: --follow-tags would push the tag even if
+          # the main push is rejected, leaving an orphaned tag that blocks
+          # every future release.
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} HEAD:refs/heads/main || exit 1
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }} "v${VER}"
 
       - name: Build
         run: npm run build
